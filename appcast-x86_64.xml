@@ -2,6 +2,23 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>Lumen</title>
+        <link>https://github.com/wangwanjie/Lumen</link>
+        <description>Lumen release feed.</description>
+        <language>en</language>
+        <item>
+            <title>0.1.1</title>
+            <pubDate>Fri, 20 Nov 2026 07:18:27 +0800</pubDate>
+            <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.1.1</link>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/wangwanjie/Lumen/releases/download/v0.1.1/Lumen_v0.1.1_x86_64.dmg" length="8062701" type="application/octet-stream" sparkle:edSignature="6EcIJnbLfP3eJgg0G+oCB0D0uFYEX4da6Ffes3avfDUa83irE+loNBhbIVn0fdhlYixPHEizLdVr1WG6hP5CDw==" />
+            <description>&lt;h2&gt;Lumen 0.1.1&lt;/h2&gt;
+&lt;h3&gt;新增与改进&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;真机显示真实设备名与机型（如“VanJay's iPhone 16 Pro”），`--device` 可按设备名匹配&lt;/li&gt;&lt;li&gt;SwiftUI：`Label` 做标题的 Button，以及 Toggle、Picker、Link、NavigationLink、Menu 的标题都能采集到&lt;/li&gt;&lt;li&gt;Liquid Glass、背景模糊等效果在截图中正确显示（整窗截图使用系统快照，单节点截图使用近似材质），不再出现白块或缺失&lt;/li&gt;&lt;li&gt;MCP 增加 resources / prompts（含“UI 调试工作流”提示词）&lt;/li&gt;&lt;li&gt;`lumen --version` 显示构建类型与架构&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;修复&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;真机上 SwiftUI 深层视图因主线程栈较小被截断的问题&lt;/li&gt;&lt;li&gt;画布半透明节点的颜色偏浓；子视图文字变化后画布未刷新&lt;/li&gt;&lt;li&gt;检查器拖动微调不起作用；修改记录、AI 提示与审计报告中的文案瑕疵&lt;/li&gt;&lt;li&gt;设计稿对比默认对齐到错误的窗口&lt;/li&gt;&lt;li&gt;退出点击诊断后着色残留；审计规则开关后报告未更新&lt;/li&gt;&lt;li&gt;启动即打开快照时画布未适配窗口；工具栏外观菜单标题被隐藏&lt;/li&gt;&lt;li&gt;“帮助 › 集成指引”内容不完整；多 App 选择页端口被截断&lt;/li&gt;&lt;/ul&gt;</description>
+        </item>
         <item>
             <title>0.1.0</title>
             <pubDate>Fri, 20 Nov 2026 03:57:06 +0800</pubDate>
@@ -21,8 +38,5 @@
 &lt;h3&gt;接入&lt;/h3&gt;
 &lt;ul&gt;&lt;li&gt;Swift Package Manager：`&lt;a href="https://github.com/wangwanjie/Lumen`，产品"&gt;https://github.com/wangwanjie/Lumen`，产品&lt;/a&gt; `LumenServer`&lt;/li&gt;&lt;li&gt;CocoaPods：`pod 'LumenServer', :configurations =&amp;gt; ['Debug']`&lt;/li&gt;&lt;li&gt;只应在 Debug 构建中集成；默认只接受本机与 USB 连接&lt;/li&gt;&lt;/ul&gt;</description>
         </item>
-        <link>https://github.com/wangwanjie/Lumen</link>
-        <description>Lumen release feed.</description>
-        <language>en</language>
     </channel>
 </rss>
