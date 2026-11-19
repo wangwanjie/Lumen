@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Lumen</title>
+        <item>
+            <title>0.1.0</title>
+            <pubDate>Fri, 20 Nov 2026 03:57:05 +0800</pubDate>
+            <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.1.0</link>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/wangwanjie/Lumen/releases/download/v0.1.0/Lumen_v0.1.0_arm64.dmg" length="7531439" type="application/octet-stream" sparkle:edSignature="n5AAIlVUbonrKC2Hm46k0ryjLe0lPp1ugSk8taLIacKclkY2vBrPhFiLHMQbmkLS9o81vZav1w6zaKibRueHBA==" />
+            <description>&lt;h2&gt;Lumen 0.1.0&lt;/h2&gt;
+&lt;p&gt;Lumen 的第一个公开版本：一套面向 iOS / macOS 的 UI 调试工具，包含 macOS 图形客户端、`lumen` 命令行与 MCP 服务，以及嵌入被调试 App 的采集端 LumenServer。&lt;/p&gt;
+&lt;h3&gt;查看与调试&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;2D / 3D 层级画布（Metal 渲染），间距测量、隐藏节点、边框线、3D 层次感&lt;/li&gt;&lt;li&gt;层级大纲与属性检查器，选择器查询（类名、`#identifier`、`[text*="登录"]`、`:visible`、组合）&lt;/li&gt;&lt;li&gt;SwiftUI 逻辑视图树：`Text` 文字、控件、修饰符链与参数、`@State` 等调试数据&lt;/li&gt;&lt;li&gt;运行时改属性、调用方法、开关手势，修改记录可撤销、可复制为 AI 提示&lt;/li&gt;&lt;li&gt;Auto Layout 约束与歧义诊断、点击诊断（hit-test 与响应链）、无障碍元素、外观覆盖（深色、字号、RTL）&lt;/li&gt;&lt;li&gt;审计：触控区域、文字截断、对比度、遮挡、布局歧义、无障碍缺失等，可用于 CI&lt;/li&gt;&lt;li&gt;时间轴回看与差异对比、设计稿叠加与差异对比、`.lumen` 完整归档离线打开&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;连接&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;本机（macOS App、iOS 模拟器）、USB 真机、可选的局域网 Bonjour&lt;/li&gt;&lt;li&gt;零改动注入：`lumen launch --mac` / `--simulator`&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;AI 助手&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;`lumen mcp`：层级、查询、截图、快照对比、审计、hit-test、约束、无障碍、改属性、调用方法、源码定位等工具&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;接入&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;Swift Package Manager：`&lt;a href="https://github.com/wangwanjie/Lumen`，产品"&gt;https://github.com/wangwanjie/Lumen`，产品&lt;/a&gt; `LumenServer`&lt;/li&gt;&lt;li&gt;CocoaPods：`pod 'LumenServer', :configurations =&amp;gt; ['Debug']`&lt;/li&gt;&lt;li&gt;只应在 Debug 构建中集成；默认只接受本机与 USB 连接&lt;/li&gt;&lt;/ul&gt;</description>
+        </item>
+        <link>https://github.com/wangwanjie/Lumen</link>
+        <description>Lumen release feed.</description>
+        <language>en</language>
+    </channel>
+</rss>
