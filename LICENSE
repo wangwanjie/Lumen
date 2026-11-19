@@ -1,0 +1,42 @@
+Lumen 软件许可协议
+
+Copyright (c) 2026 wangwanjie. 保留所有权利。
+
+本仓库发布的 Lumen.app、lumen 命令行工具与 LumenServer 二进制 SDK（以下统称“本软件”）以二进制形式免费提供，
+著作权归 wangwanjie 所有。
+
+1. 授权：在遵守本协议的前提下，你可以免费下载、安装和使用本软件，并可在你自己的 App 的调试（Debug）构建中
+   集成 LumenServer 二进制 SDK，用于开发与调试。
+2. 限制：未经著作权人书面许可，不得
+   (a) 对本软件进行反编译、反汇编、逆向工程，或以其他方式尝试获取其源代码，适用法律明确允许的除外；
+   (b) 修改本软件，或基于本软件制作衍生作品；
+   (c) 单独出售、出租、再许可或再分发本软件，或将其作为独立产品提供；
+   (d) 移除或修改本软件中的著作权声明。
+3. 本协议不授予任何商标或源代码相关的权利。
+4. 免责：本软件按“原样”提供，不附带任何明示或默示的保证。在任何情况下，著作权人均不对因使用本软件
+   产生的任何索赔、损害或其他责任负责。
+5. 违反本协议的，授权自动终止，你应停止使用并删除本软件的全部副本。
+
+----------------------------------------------------------------------
+
+Lumen Software License
+
+Copyright (c) 2026 wangwanjie. All rights reserved.
+
+Lumen.app, the lumen command line tool and the LumenServer binary SDK published in this repository
+(the "Software") are provided free of charge in binary form only. All rights are owned by wangwanjie.
+
+1. Grant: subject to this license, you may download, install and use the Software free of charge, and
+   integrate the LumenServer binary SDK into Debug builds of your own apps for development and debugging.
+2. Restrictions: without prior written permission you may not
+   (a) decompile, disassemble, reverse engineer or otherwise attempt to derive the source code of the
+       Software, except to the extent expressly permitted by applicable law;
+   (b) modify the Software or create derivative works based on it;
+   (c) sell, rent, sublicense or redistribute the Software on its own, or offer it as a standalone product;
+   (d) remove or alter any copyright notices in the Software.
+3. No trademark or source code rights are granted under this license.
+4. Disclaimer: THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO
+   EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE
+   USE OF THE SOFTWARE.
+5. This license terminates automatically if you breach it; you must then stop using and delete all
+   copies of the Software.

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lumen — iOS / macOS 界面调试工具</title>
+  <meta name="description" content="Lumen：3D 分层查看 iOS / tvOS / visionOS / macOS App 的界面层级，并提供命令行与 MCP 接口。">
+  <link rel="icon" href="assets/AppIcon.png">
+  <style>
+    :root {
+      --bg: #070b19;
+      --panel: #0f1630;
+      --text: #e6ecff;
+      --muted: #94a3c7;
+      --accent: #22d3ee;
+      --accent2: #8b5cf6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: radial-gradient(1200px 600px at 50% -10%, #1b2550 0%, var(--bg) 60%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    main { max-width: 960px; margin: 0 auto; padding: 72px 24px 48px; }
+    header { text-align: center; }
+    header img { width: 128px; height: 128px; filter: drop-shadow(0 12px 32px rgba(34, 211, 238, 0.25)); }
+    h1 { font-size: 48px; margin: 16px 0 8px; letter-spacing: -0.5px; }
+    .tagline { color: var(--muted); font-size: 19px; margin: 0 auto 32px; max-width: 640px; }
+    .downloads { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .button {
+      display: inline-block; padding: 12px 22px; border-radius: 12px; text-decoration: none;
+      font-weight: 600; color: #04111a; background: linear-gradient(135deg, var(--accent), #67e8f9);
+    }
+    .button.secondary { color: var(--text); background: var(--panel); border: 1px solid #26305a; }
+    .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 56px; }
+    .card { background: var(--panel); border: 1px solid #1f2850; border-radius: 16px; padding: 20px; }
+    .card h3 { margin: 0 0 6px; font-size: 17px; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    pre {
+      background: #0a1024; border: 1px solid #1f2850; border-radius: 12px; padding: 16px;
+      overflow-x: auto; font-size: 13px; color: #cfe8ff;
+    }
+    h2 { margin-top: 56px; font-size: 24px; }
+    footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 64px; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="assets/AppIcon.png" alt="Lumen">
+    <h1>Lumen</h1>
+    <p class="tagline">iOS / macOS 界面调试工具。3D 分层查看界面层级，并通过命令行与 MCP 把同样的能力交给脚本、CI 与 AI 助手。</p>
+    <div class="downloads">
+      <a class="button" href="https://github.com/wangwanjie/Lumen/releases/latest/download/Lumen_arm64.dmg">下载（Apple 芯片）</a>
+      <a class="button secondary" href="https://github.com/wangwanjie/Lumen/releases/latest/download/Lumen_x86_64.dmg">下载（Intel）</a>
+    </div>
+    <p class="hint">需要 macOS 14 或更高版本 · 已经 Apple 公证 · 内置自动更新</p>
+  </header>
+
+  <section class="grid">
+    <div class="card"><h3>2D / 3D 层级画布</h3><p>Metal 渲染，平面与分层 3D 视图切换，层间距可调，间距测量。</p></div>
+    <div class="card"><h3>属性检查器</h3><p>按类分组的属性、继承链、所属 ViewController 与实例变量名；SwiftUI 界面给出逻辑视图树、文字、控件、修饰符链与状态值。</p></div>
+    <div class="card"><h3>运行时修改</h3><p>直接改属性、调用方法、开关手势，修改记录可撤销并复制为 AI 提示。</p></div>
+    <div class="card"><h3>诊断工具</h3><p>界面审计、点击诊断（hit-test）、约束诊断、无障碍朗读顺序、深色模式 / 字号 / RTL 外观覆盖。</p></div>
+    <div class="card"><h3>时间轴与设计稿对比</h3><p>回看每次层级变化并比较任意两个时间点；叠加设计稿查看差异与还原度。</p></div>
+    <div class="card"><h3>归档与快照</h3><p><code>.lumen</code> 完整归档可离线打开；JSON 快照与当前界面 diff，可作为 CI 断言。</p></div>
+    <div class="card"><h3>选择器查询</h3><p>类 CSS 语法定位节点：<code>UIButton[text*="登录"]:visible</code>。</p></div>
+    <div class="card"><h3>AI 助手</h3><p><code>lumen mcp</code> 让 Claude Code、Cursor 读取层级、查询、截图、审计、改属性。</p></div>
+    <div class="card"><h3>真机与注入</h3><p>USB 真机即插即用，局域网经 Bonjour 发现；<code>lumen launch</code> 零改动注入 macOS 程序或模拟器 App。</p></div>
+    <div class="card"><h3>多平台</h3><p>被调试端支持 iOS、tvOS、visionOS 与 macOS（AppKit）。</p></div>
+  </section>
+
+  <h2>接入</h2>
+  <pre>// Swift Package Manager：https://github.com/wangwanjie/Lumen.git，产品 LumenServer
+#if DEBUG
+import LumenServer
+#endif
+
+#if DEBUG
+LumenServer.start()
+#endif</pre>
+  <pre># CocoaPods（仅 Debug）
+pod 'LumenServer', :podspec =&gt; 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.1.0/LumenServer.podspec', :configurations =&gt; ['Debug']</pre>
+  <pre># USB 真机：插线并在设备上“信任此电脑”后
+lumen devices
+lumen apps
+lumen --device &lt;UDID&gt; hierarchy --depth 4</pre>
+  <pre># 局域网：Info.plist 设置 LumenAllowsNetworkConnections = YES，
+# 并声明 NSLocalNetworkUsageDescription 与 NSBonjourServices（_lumen._tcp）
+lumen apps --network</pre>
+  <pre># 接入 Claude Code
+claude mcp add lumen -- /Applications/Lumen.app/Contents/Helpers/lumen mcp</pre>
+
+  <footer>
+    <a href="https://github.com/wangwanjie/Lumen">GitHub</a> ·
+    <a href="https://github.com/wangwanjie/Lumen/releases">Releases</a> ·
+    MIT © 2026 wangwanjie
+  </footer>
+</main>
+</body>
+</html>
