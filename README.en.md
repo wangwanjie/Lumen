@@ -59,7 +59,7 @@ In Xcode choose File → Add Package Dependencies, enter `https://github.com/wan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.1.0"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.1.1"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -86,7 +86,7 @@ SwiftPM links dependencies in every configuration, so Release builds still link 
 ### 2. CocoaPods (Debug only)
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.1.0/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.1.1/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 The code is the same as above.

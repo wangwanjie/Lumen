@@ -60,7 +60,7 @@ Xcode 中 File → Add Package Dependencies，输入 `https://github.com/wangwan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.1.0"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.1.1"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -87,7 +87,7 @@ SPM 无法按配置链接依赖，Release 构建也会链接 LumenServer，但 `
 ### 2. CocoaPods（仅 Debug 配置）
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.1.0/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.1.1/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 代码同上（`#if DEBUG` 中 `import LumenServer` 并调用 `LumenServer.start()`）。

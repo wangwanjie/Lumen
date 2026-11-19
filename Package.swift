@@ -20,8 +20,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "LumenServer",
-            url: "https://github.com/wangwanjie/Lumen/releases/download/v0.1.0/LumenServer_v0.1.0.xcframework.zip",
-            checksum: "02e4e2e6a32a7d8df1cefdb0ec4b3f8b8a0de8d413083f4cfc5d810636cf5544"
+            url: "https://github.com/wangwanjie/Lumen/releases/download/v0.1.1/LumenServer_v0.1.1.xcframework.zip",
+            checksum: "d35355d531720f170aac00fd0f8911a5cd1b9d1cd5fdfb7ee90b2e76875fc204"
         ),
     ]
 )
