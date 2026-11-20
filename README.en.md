@@ -6,7 +6,7 @@
 
 <p align="center">A UI debugger for iOS and macOS apps: inspect view hierarchies in layered 3D, and read the same data from the command line or through MCP for scripts, CI and AI assistants.</p>
 
-<p align="center"><a href="README.md">简体中文</a></p>
+<p align="center"><a href="https://lumen.vanjay.cn">Website</a> · <a href="README.md">简体中文</a></p>
 
 ## Features
 
@@ -35,6 +35,7 @@ Lumen inspects the view hierarchy of a running app and exposes the same capabili
 | JSON snapshots & diff | `lumen snapshot save` writes a JSON hierarchy snapshot (`lumen.snapshot` format); diff it against another snapshot or the live UI (usable as a CI assertion) |
 | Command line | `lumen` covers app discovery (this Mac, USB devices, LAN), hierarchy, queries, node details, screenshots, snapshots and archives, audits, live editing, source lookup and injection |
 | AI assistants | `lumen mcp` runs as an MCP server with tools for hierarchy, queries, node details, screenshots, snapshot diffs, audits, hit-testing, constraints, accessibility, attribute editing, method calls, appearance overrides and source lookup |
+| One-step setup | `python3 /Applications/Lumen.app/Contents/Resources/lumen_setup.py` adds the server to the Debug configuration of an Xcode project (iOS Simulator / device, tvOS, macOS) without touching the Podfile or Package; `--remove` reverts it exactly |
 | Zero-change injection | `lumen launch` injects the server into a macOS app or an app in the iOS Simulator |
 | Platforms | Debugged apps: iOS, tvOS, visionOS (UIKit) and macOS (AppKit); visionOS requires Swift Package Manager. Client: macOS 14 or later |
 
@@ -51,15 +52,40 @@ Open the DMG and drag Lumen into Applications. Builds are notarized by Apple and
 
 ## Integrating the app you debug
 
-The `LumenServer` collector belongs in Debug builds only. Pick one of three options.
+The `LumenServer` collector belongs in Debug builds only. Pick one of four options; the one-step script is recommended when you would rather not change your dependencies.
 
-### 1. Swift Package Manager
+### 1. One-step script (recommended, zero configuration)
+
+Run this in the project directory (the one containing the `.xcworkspace` / `.xcodeproj`):
+
+```bash
+python3 /Applications/Lumen.app/Contents/Resources/lumen_setup.py
+```
+
+The script only touches the Debug configurations of your app targets; no Podfile, Package or code changes on your side:
+
+- It appends a Run Script phase "[Lumen] Embed LumenInject" that copies the prebuilt collector for the current platform (iOS Simulator / device, tvOS, macOS) from Lumen.app into the app's Frameworks folder and re-signs it with the app's signing identity, so it runs on devices too. Release and other configurations copy nothing, so shipping builds contain no Lumen code;
+- it sets `ENABLE_USER_SCRIPT_SANDBOXING = NO` in those configurations (the Run Script reads from Lumen.app);
+- it inserts a few lines at the top of `didFinishLaunching` / `applicationDidFinishLaunching` / your SwiftUI `App.init` (Swift and Objective-C are detected automatically) that load the framework, which starts the collector.
+
+Every change is marked and running the script again is safe. The changes are for local debugging only; do not commit them:
+
+```bash
+SETUP=/Applications/Lumen.app/Contents/Resources/lumen_setup.py
+python3 $SETUP --remove                 # revert everything byte for byte (e.g. before switching branches)
+python3 $SETUP --dry-run                # print the changes without writing
+python3 $SETUP --target MyApp           # only this app target; --configs Debug,Beta picks configurations
+```
+
+With CocoaPods, `pod install` can do it for you: `python3 $SETUP --install-pod-hook` adds a committable `post_integrate` hook to the Podfile; after `export IntegrateLumen=true` on your machine every `pod install` integrates Lumen, and without it the changes are reverted. Teammates without Lumen.app are unaffected. Targets that already link `LumenServer` via SwiftPM or CocoaPods are skipped.
+
+### 2. Swift Package Manager
 
 In Xcode choose File → Add Package Dependencies, enter `https://github.com/wangwanjie/Lumen.git` and add `LumenServer` to your app target, or in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.1.1"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.2.0"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -81,17 +107,30 @@ LumenServer.start()
 #endif
 ```
 
-SwiftPM links dependencies in every configuration, so Release builds still link LumenServer; `#if DEBUG` keeps it from starting. Use CocoaPods if Release builds must not contain the collector at all.
+Objective-C projects call the entry class of the same name, `LumenServer` (no Swift bridging file needed):
 
-### 2. CocoaPods (Debug only)
+```objc
+#if DEBUG
+@import LumenServer;   // with CocoaPods and modules disabled: #import <LumenServer/LumenServer-Swift.h>
+#endif
 
-```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.1.1/LumenServer.podspec', :configurations => ['Debug']
+// in application:didFinishLaunchingWithOptions: or applicationDidFinishLaunching:
+#if DEBUG
+[LumenServer start];   // LAN access: [LumenServer startAllowingNetworkConnections:YES]
+#endif
 ```
 
-The code is the same as above.
+SwiftPM links dependencies in every configuration, so Release builds still link LumenServer; `#if DEBUG` keeps it from starting. Use CocoaPods if Release builds must not contain the collector at all.
 
-### 3. Zero-change injection: `lumen launch`
+### 3. CocoaPods (Debug only)
+
+```ruby
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.2.0/LumenServer.podspec', :configurations => ['Debug']
+```
+
+The code is the same as above (Swift: `import LumenServer` and `LumenServer.start()` inside `#if DEBUG`; Objective-C: `@import LumenServer;` then `[LumenServer start]`).
+
+### 4. Zero-change injection: `lumen launch`
 
 ```bash
 LUMEN=/Applications/Lumen.app/Contents/Helpers/lumen
@@ -103,7 +142,7 @@ $LUMEN launch --mac /path/to/MyApp.app
 $LUMEN launch --simulator booted com.example.MyApp
 ```
 
-The injection libraries ship inside `/Applications/Lumen.app/Contents/Helpers/` and `lumen` finds them automatically. SIP-protected system apps and apps using the Hardened Runtime without allowing DYLD environment variables cannot be injected; use one of the first two options for those.
+The injection libraries ship inside `/Applications/Lumen.app/Contents/Helpers/` and `lumen` finds them automatically. SIP-protected system apps and apps using the Hardened Runtime without allowing DYLD environment variables cannot be injected; use one of the first three options for those.
 
 Then open Lumen: it discovers apps on this Mac and connects automatically; switch between apps from the toolbar.
 
@@ -113,7 +152,7 @@ Then open Lumen: it discovers apps on this Mac and connects automatically; switc
 
 By default the collector listens on the device's loopback address only; USB connections arrive through usbmuxd, so no extra setup is needed:
 
-1. Integrate LumenServer as above (call `LumenServer.start()` in Debug builds), then install and run the app on your iPhone / iPad;
+1. Integrate LumenServer as above (the one-step script, or call `LumenServer.start()` in Debug builds), then install and run the app on your iPhone / iPad;
 2. Connect it to this Mac with a cable and tap "Trust This Computer" on the device;
 3. Open Lumen and pick the app from the toolbar's app list, grouped under "USB 设备：<device name>" (USB devices); the list refreshes as soon as a device is plugged in or out.
 
@@ -154,6 +193,26 @@ Claude Code:
 claude mcp add lumen -- /Applications/Lumen.app/Contents/Helpers/lumen mcp
 ```
 
+Run `/mcp` in Claude Code to confirm the connection. `/mcp__lumen__lumen_ui_debug_workflow` followed by a description of the problem runs the built-in debugging workflow.
+
+Codex (the CLI, the IDE extension and the ChatGPT desktop app share `~/.codex/config.toml`, so adding it once is enough):
+
+```bash
+codex mcp add lumen -- /Applications/Lumen.app/Contents/Helpers/lumen mcp
+codex mcp list
+```
+
+Or edit the config file directly:
+
+```toml
+# ~/.codex/config.toml
+[mcp_servers.lumen]
+command = "/Applications/Lumen.app/Contents/Helpers/lumen"
+args = ["mcp"]
+```
+
+ChatGPT: use the ChatGPT desktop app for macOS. In its settings, open "MCP servers" and add a STDIO server with the command `/Applications/Lumen.app/Contents/Helpers/lumen` and the argument `mcp`. If you already added Lumen in Codex, the app picks it up from the shared config. ChatGPT on the web only connects to publicly reachable remote MCP servers, so it cannot reach Lumen on your Mac. If the Lumen tools do not show up in regular chats in the desktop app, use them from Codex inside the desktop app.
+
 Clients configured with `mcpServers` (Cursor and others):
 
 ```json
@@ -166,6 +225,14 @@ Clients configured with `mcpServers` (Cursor and others):
   }
 }
 ```
+
+Once connected, you can ask your assistant to work with Lumen directly, for example:
+
+- "The Forgot Password button on the login screen doesn't respond. Use Lumen to check whether another view covers it and tell me which file to change."
+- "Build the profile screen from design/profile.png, run it, then compare Lumen screenshots and the hierarchy against the design and fix spacing, font size and color differences."
+- "Section headers on the Settings screen are hard to read in dark mode. Use Lumen to switch to dark mode, find the hard-coded colors and fix them."
+
+More examples are on the [website](https://lumen.vanjay.cn/#ai-examples).
 
 ## Command line cheat sheet
 
@@ -193,7 +260,7 @@ Global options: `--json` for stable JSON output, `--app <name|bundle id|pid|UDID
 
 ## Privacy & security
 
-- Integrate the collector in Debug builds only: wrap the start call in `#if DEBUG` with SwiftPM, use `:configurations => ['Debug']` with CocoaPods.
+- Integrate the collector in Debug builds only: the one-step script copies it into Debug builds only, wrap the start call in `#if DEBUG` with SwiftPM, use `:configurations => ['Debug']` with CocoaPods.
 - By default it listens on the loopback address (127.0.0.1) only and rejects connections from other hosts; this is how the Simulator, Mac apps and USB-connected devices connect.
 - LAN access must be enabled explicitly: set `LumenAllowsNetworkConnections = YES` in Info.plist or call `LumenServer.start(allowsNetworkConnections: true)`; it then listens on all interfaces and advertises the Bonjour service `_lumen._tcp` (see "Debugging on a device").
 - Text in secure text fields (passwords) is always returned masked and never leaves the debugged app.
