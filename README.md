@@ -14,13 +14,14 @@ Lumen 用来查看运行中 App 的视图层级，并把同一套能力开放给
 
 | 能力 | 说明 |
 |---|---|
-| 2D / 3D 层级画布 | Metal 渲染，平面与分层 3D 视图切换，可调层间距、相机复位，显示隐藏节点与边框线，间距测量 |
-| 层级大纲 | 树形大纲与画布联动选中，按类名、文本等过滤 |
+| 2D / 3D 层级画布 | Metal 渲染，平面与分层 3D 视图切换，可调层间距、相机复位，显示隐藏节点与边框线，间距测量；“定位”后目标图层闪烁高亮；还原 iOS 26 / 27 标签栏的液态玻璃底板与选中镜片；加载与刷新时显示进度、耗时与图层数 |
+| 层级大纲 | 树形大纲与画布联动选中，按类名、文本等过滤；每行完整显示，宽度不够时横向滚动；可在设置中调整字号、行高与层级引导竖线 |
+| 屏蔽的类 | 在设置中维护要屏蔽的类，画布不渲染命中的节点及其子树，大纲灰显标识，可临时显示、重新屏蔽或一键屏蔽此类 |
 | SwiftUI | 在宿主视图之下给出 SwiftUI 的逻辑视图树：`Text` 的文字、`Button` / `Toggle` / `TextField` 等控件、修饰符链与参数、调试数据中的属性值（含 `@State`），可按文本查找；集成 LumenServer 或注入后自动开启 |
 | 属性检查器 | 按类分组的属性、继承链、所属 ViewController、实例变量名、accessibilityIdentifier、窗口坐标 |
 | 运行时改属性 | 在检查器中直接修改可编辑属性（数值拖动微调、取色、文本等），修改记录可撤销、可复制为 AI 提示；命令行 `lumen set` |
 | 调用方法 | 控制台中列出并调用节点、layer 或所属 ViewController 上的方法；命令行 `lumen methods` / `lumen invoke` |
-| 手势开关 | 查看节点上的手势识别器（状态、目标动作、代理），单独启用或禁用；命令行 `lumen gestures` |
+| 手势 | 大纲行首的竖条标出挂有手势识别器的视图，点按弹出手势面板；查看类名、父类、持有它的实例变量、状态、目标动作与代理，单独启用或禁用；命令行 `lumen gestures` |
 | 约束诊断 | Auto Layout 歧义、固有尺寸、抗拉伸与抗压缩优先级、影响该节点的全部约束；命令行 `lumen constraints` |
 | 点击诊断（hit-test） | 解释某一点命中了谁、其他视图为何被跳过、响应链与候选手势；命令行 `lumen hittest` |
 | 无障碍 | 按 VoiceOver 朗读顺序列出无障碍元素（label、value、hint、traits）；命令行 `lumen a11y` |
@@ -35,6 +36,8 @@ Lumen 用来查看运行中 App 的视图层级，并把同一套能力开放给
 | JSON 快照与对比 | `lumen snapshot save` 保存 JSON 层级快照（`lumen.snapshot` 格式），与另一个快照或当前界面 diff，可作为 CI 断言 |
 | 命令行 | `lumen` 覆盖发现 App（本机、USB 真机、局域网）、层级、查询、节点详情、截图、快照与归档、审计、运行时修改、源码定位、注入启动 |
 | AI 助手 | `lumen mcp` 以 MCP 服务运行，提供层级、查询、节点详情、截图、快照对比、审计、hit-test、约束、无障碍、改属性、调用方法、外观覆盖、源码定位等工具 |
+| 目标选择 | 以卡片网格列出可调试的 App，按平台分组、按设备归类，标明 USB / Wi-Fi / 局域网 / 模拟器 / 本机，卡片显示主窗口预览 |
+| 后台提示 | 目标 App 进入后台或被挂起时给出提示与重试，恢复后自动重新拉取层级与纹理 |
 | 一键接入 | `python3 /Applications/Lumen.app/Contents/Resources/lumen_setup.py` 把采集端接入 Xcode 工程的 Debug 配置（iOS 模拟器 / 真机、tvOS、macOS），无需改 Podfile / Package，`--remove` 原样撤销 |
 | 零改动注入 | `lumen launch` 把采集端注入 macOS 程序或 iOS 模拟器中的 App，无需改动工程 |
 | 平台 | 被调试端：iOS 15+、Mac Catalyst 15+、tvOS 15+、visionOS（UIKit）与 macOS 12+（AppKit）；客户端：macOS 14 及以上 |
@@ -88,7 +91,7 @@ Xcode 中 File → Add Package Dependencies，输入 `https://github.com/wangwan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.2.0"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.2.2"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -128,7 +131,7 @@ SPM 无法按配置链接依赖，Release 构建也会链接 LumenServer，但 `
 ### 3. CocoaPods（仅 Debug 配置）
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.2.0/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.2.2/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 代码同上（Swift：`#if DEBUG` 中 `import LumenServer` 并调用 `LumenServer.start()`；Objective-C：`@import LumenServer;` 后 `[LumenServer start]`）。

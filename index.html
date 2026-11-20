@@ -579,7 +579,7 @@
   <!-- Hero -->
   <section class="hero" aria-labelledby="hero-title">
     <div class="wrap">
-      <a class="eyebrow" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener"><b>v0.2.0</b>查看更新记录 →</a>
+      <a class="eyebrow" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener"><b>v0.2.2</b>查看更新记录 →</a>
       <h1 id="hero-title">把运行中的界面，<br><em>一层层</em>拆开看。</h1>
       <p class="lede">3D 分层查看 iOS、macOS App 的视图层级，实时改属性、查布局问题，还能交给 AI 助手直接操作。</p>
       <div class="cta-row">
@@ -703,6 +703,10 @@
         <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-sparkle"/></svg></div><h3>外观覆盖</h3><p>运行时切深色、大字号、从右到左。</p></div>
         <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-archive"/></svg></div><h3>.lumen 归档</h3><p>完整快照存成单个文件，离线打开。</p></div>
         <div class="cap reveal" style="--d:180ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg></div><h3>零改动注入</h3><p>不改工程，直接注入 Mac App 与模拟器。</p></div>
+        <div class="cap reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-target"/></svg></div><h3>手势面板</h3><p>大纲行首竖条标出手势，点按查看并开关。</p></div>
+        <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></div><h3>屏蔽的类</h3><p>按类名隐藏图层及子树，可临时显示。</p></div>
+        <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-usb"/></svg></div><h3>目标卡片</h3><p>按平台与设备分组，标明 USB、Wi-Fi、模拟器。</p></div>
+        <div class="cap reveal" style="--d:180ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg></div><h3>后台自动恢复</h3><p>App 进入后台时提示，回到前台自动刷新。</p></div>
       </div>
     </div>
   </section>
@@ -761,7 +765,7 @@
 
           <div class="tab-panel" role="tabpanel" id="panel-spm" aria-labelledby="tab-spm">
             <p>Xcode 中 File → Add Package Dependencies，输入 <code>https://github.com/wangwanjie/Lumen.git</code>，把 <code>LumenServer</code> 加到 App target；或写进 <code>Package.swift</code>：</p>
-            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.2.0"),
+            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.2.2"),
 <span class="c">// target 依赖</span>
 .product(name: "LumenServer", package: "Lumen"),</code></pre></div>
             <p>启动时调用：</p>
@@ -786,7 +790,7 @@ LumenServer.start()
 
           <div class="tab-panel" role="tabpanel" id="panel-pods" aria-labelledby="tab-pods" hidden>
             <p>只在 Debug 配置中集成，启动代码与 SPM 相同：</p>
-            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.2.0/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
+            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.2.2/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
             <div class="code"><div class="code-bar"><span>Swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>#if DEBUG
 import LumenServer
 LumenServer.start()   <span class="c">// Objective-C：@import LumenServer; [LumenServer start];</span>

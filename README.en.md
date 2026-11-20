@@ -14,13 +14,14 @@ Lumen inspects the view hierarchy of a running app and exposes the same capabili
 
 | Feature | Details |
 |---|---|
-| 2D / 3D canvas | Metal rendering; flat and exploded 3D views, adjustable layer spacing, camera reset, hidden nodes and wireframes, spacing measurements |
-| Hierarchy outline | Tree outline linked with the canvas; filter by class name, text and more |
+| 2D / 3D canvas | Metal rendering; flat and exploded 3D views, adjustable layer spacing, camera reset, hidden nodes and wireframes, spacing measurements; the layer flashes after Locate; renders the liquid-glass platter and selection lens of iOS 26 / 27 tab bars; shows progress, elapsed time and layer count while loading and refreshing |
+| Hierarchy outline | Tree outline linked with the canvas; filter by class name, text and more; every row is shown in full and scrolls horizontally when needed; font size, row height and indent guides are adjustable in Settings |
+| Class blocking | Keep a list of blocked classes in Settings: the canvas skips matching nodes and their subtrees, the outline dims them and offers temporary reveal, re-block and block-this-class |
 | SwiftUI | Shows the SwiftUI logical view tree under each hosting view: `Text` strings, controls such as `Button` / `Toggle` / `TextField`, modifier chains with arguments, and property values from the debug data (including `@State`); searchable by text. Enabled automatically when LumenServer is linked or injected |
 | Inspector | Attributes grouped by class, class chain, owning view controller, ivar name, accessibilityIdentifier, window coordinates |
 | Live attribute editing | Edit attributes in the inspector (drag to nudge numbers, color picker, text…); changes are logged, undoable and can be copied as an AI prompt. CLI: `lumen set` |
 | Method invocation | List and call methods on a node, its layer or its view controller from the console. CLI: `lumen methods` / `lumen invoke` |
-| Gesture toggles | Inspect gesture recognizers (state, target/action, delegate) and enable or disable each one. CLI: `lumen gestures` |
+| Gestures | A bar at the start of an outline row marks views with gesture recognizers; click it to open the gesture panel showing class, superclass, owning ivar, state, target/action and delegate, and enable or disable each recognizer. CLI: `lumen gestures` |
 | Constraint diagnostics | Auto Layout ambiguity, intrinsic size, hugging / compression priorities and every constraint affecting the node. CLI: `lumen constraints` |
 | Hit-test diagnostics | Explains which view a point hits, why others were skipped, the responder chain and candidate gestures. CLI: `lumen hittest` |
 | Accessibility | Lists accessibility elements in VoiceOver order (label, value, hint, traits). CLI: `lumen a11y` |
@@ -35,6 +36,8 @@ Lumen inspects the view hierarchy of a running app and exposes the same capabili
 | JSON snapshots & diff | `lumen snapshot save` writes a JSON hierarchy snapshot (`lumen.snapshot` format); diff it against another snapshot or the live UI (usable as a CI assertion) |
 | Command line | `lumen` covers app discovery (this Mac, USB devices, LAN), hierarchy, queries, node details, screenshots, snapshots and archives, audits, live editing, source lookup and injection |
 | AI assistants | `lumen mcp` runs as an MCP server with tools for hierarchy, queries, node details, screenshots, snapshot diffs, audits, hit-testing, constraints, accessibility, attribute editing, method calls, appearance overrides and source lookup |
+| Target picker | Debuggable apps appear as cards grouped by platform and device, labelled USB / Wi-Fi / LAN / Simulator / This Mac, with a preview of the main window |
+| Background handling | Shows a notice with retry when the target app moves to the background or is suspended, and reloads the hierarchy and textures automatically once it is back |
 | One-step setup | `python3 /Applications/Lumen.app/Contents/Resources/lumen_setup.py` adds the server to the Debug configuration of an Xcode project (iOS Simulator / device, tvOS, macOS) without touching the Podfile or Package; `--remove` reverts it exactly |
 | Zero-change injection | `lumen launch` injects the server into a macOS app or an app in the iOS Simulator |
 | Platforms | Debugged apps: iOS 15+, Mac Catalyst 15+, tvOS 15+, visionOS (UIKit) and macOS 12+ (AppKit). Client: macOS 14 or later |
@@ -85,7 +88,7 @@ In Xcode choose File → Add Package Dependencies, enter `https://github.com/wan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.2.0"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.2.2"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -125,7 +128,7 @@ SwiftPM links dependencies in every configuration, so Release builds still link 
 ### 3. CocoaPods (Debug only)
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.2.0/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.2.2/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 The code is the same as above (Swift: `import LumenServer` and `LumenServer.start()` inside `#if DEBUG`; Objective-C: `@import LumenServer;` then `[LumenServer start]`).
