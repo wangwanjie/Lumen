@@ -37,7 +37,7 @@ Lumen 用来查看运行中 App 的视图层级，并把同一套能力开放给
 | AI 助手 | `lumen mcp` 以 MCP 服务运行，提供层级、查询、节点详情、截图、快照对比、审计、hit-test、约束、无障碍、改属性、调用方法、外观覆盖、源码定位等工具 |
 | 一键接入 | `python3 /Applications/Lumen.app/Contents/Resources/lumen_setup.py` 把采集端接入 Xcode 工程的 Debug 配置（iOS 模拟器 / 真机、tvOS、macOS），无需改 Podfile / Package，`--remove` 原样撤销 |
 | 零改动注入 | `lumen launch` 把采集端注入 macOS 程序或 iOS 模拟器中的 App，无需改动工程 |
-| 平台 | 被调试端：iOS、tvOS、visionOS（UIKit）与 macOS（AppKit），visionOS 需用 Swift Package Manager 接入；客户端：macOS 14 及以上 |
+| 平台 | 被调试端：iOS 15+、Mac Catalyst 15+、tvOS 15+、visionOS（UIKit）与 macOS 12+（AppKit）；客户端：macOS 14 及以上 |
 
 ## 下载
 
@@ -81,6 +81,8 @@ python3 $SETUP --target MyApp           # 只处理指定 App target；--configs
 CocoaPods 工程可以让 `pod install` 自动接入：`python3 $SETUP --install-pod-hook` 在 Podfile 加一个可提交的 `post_integrate` 钩子，本机 `export IntegrateLumen=true` 后每次 `pod install` 自动接入，未设置时自动撤销；未安装 Lumen.app 的同事不受影响。已通过 SPM / CocoaPods 集成 `LumenServer` 的 target 会被跳过。
 
 ### 2. Swift Package Manager
+
+SDK 以预编译的 `LumenServer.xcframework` 发布（iOS、Mac Catalyst、macOS、tvOS、visionOS 的真机与模拟器），首次解析包时从 GitHub Release 下载并校验。
 
 Xcode 中 File → Add Package Dependencies，输入 `https://github.com/wangwanjie/Lumen.git`，把 `LumenServer` 加到 App target；或在 `Package.swift` 中：
 

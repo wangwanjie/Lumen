@@ -37,7 +37,7 @@ Lumen inspects the view hierarchy of a running app and exposes the same capabili
 | AI assistants | `lumen mcp` runs as an MCP server with tools for hierarchy, queries, node details, screenshots, snapshot diffs, audits, hit-testing, constraints, accessibility, attribute editing, method calls, appearance overrides and source lookup |
 | One-step setup | `python3 /Applications/Lumen.app/Contents/Resources/lumen_setup.py` adds the server to the Debug configuration of an Xcode project (iOS Simulator / device, tvOS, macOS) without touching the Podfile or Package; `--remove` reverts it exactly |
 | Zero-change injection | `lumen launch` injects the server into a macOS app or an app in the iOS Simulator |
-| Platforms | Debugged apps: iOS, tvOS, visionOS (UIKit) and macOS (AppKit); visionOS requires Swift Package Manager. Client: macOS 14 or later |
+| Platforms | Debugged apps: iOS 15+, Mac Catalyst 15+, tvOS 15+, visionOS (UIKit) and macOS 12+ (AppKit). Client: macOS 14 or later |
 
 ## Download
 
