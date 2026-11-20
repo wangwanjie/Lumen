@@ -3,6 +3,43 @@
     <channel>
         <title>Lumen</title>
         <item>
+            <title>0.2.0</title>
+            <pubDate>Fri, 20 Nov 2026 11:36:06 +0800</pubDate>
+            <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.2.0</link>
+            <sparkle:version>3</sparkle:version>
+            <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/wangwanjie/Lumen/releases/download/v0.2.0/Lumen_v0.2.0_arm64.dmg" length="10003305" type="application/octet-stream" sparkle:edSignature="2TxvBSwNv9zEocu/i8y+kxDFaZLORBIHEVpmXE14A7Hf1EPiE7hOIrnTMlG4BGtpE1v6a3qamC/aohYyjTaNAA==" />
+            <description>&lt;h2&gt;Lumen 0.2.0&lt;/h2&gt;
+&lt;h3&gt;界面重新设计&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;侧栏大纲：节点类别图标、层级引导线与自适应缩进，列表单元格显示 section / row，位置徽标改为紧凑的“0 · 2”；修复悬停底色残留与类名横向截断&lt;/li&gt;&lt;li&gt;属性检查器、工具栏目标选择器与设置窗口重新设计&lt;/li&gt;&lt;li&gt;画布：胶囊浮动工具条、缩放控件、点阵背景，3D 模式自动适配；底部面板重新设计，工具栏新增“面板”按钮，一键显示或隐藏控制台、时间轴、点击诊断与修改记录&lt;/li&gt;&lt;li&gt;状态栏、窗口过渡与提示横幅重新设计；未连接状态页改为雷达扫描动画与接入方式卡片&lt;/li&gt;&lt;li&gt;新增使用向导：分步介绍接入、连接、画布操作、检查与修改，首次启动自动弹出，可在帮助菜单重新打开&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;操作&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;3D 视图中触控板双指滑动改为平移画布，旋转用拖动（⌥ 双指滑动仍可旋转）&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;接入&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;新增一键接入脚本 `lumen_setup.py`：在工程目录运行即可让 App 在 Debug 下集成采集端，不改 Podfile、Package 或代码，支持 `--remove` 原样撤销与 CocoaPods 钩子&lt;/li&gt;&lt;li&gt;采集端新增 Objective-C 入口类 `LumenServer`（`start` / `startAllowingNetworkConnections:` / `stop`），ObjC 工程无需 Swift 桥接文件&lt;/li&gt;&lt;li&gt;新增 ObjC、Swift、SwiftUI 与混编四个 iOS 示例工程&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;AI 助手&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;官网与 README 补充 Codex、ChatGPT 桌面 App 的 MCP 接入方式，新增“用 AI 排查、写页面、改 bug”使用示例&lt;/li&gt;&lt;li&gt;官网：&lt;a href="https://lumen.vanjay.cn"&gt;https://lumen.vanjay.cn&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</description>
+        </item>
+        <item>
+            <title>0.2.0</title>
+            <pubDate>Fri, 20 Nov 2026 11:36:07 +0800</pubDate>
+            <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.2.0</link>
+            <sparkle:version>3</sparkle:version>
+            <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/wangwanjie/Lumen/releases/download/v0.2.0/Lumen_v0.2.0_x86_64.dmg" length="10410855" type="application/octet-stream" sparkle:edSignature="jr2L0Nab6hbj1+xxqbqf2wPksmY9namnmxtYG5tYiUV3DOEvBk8iRp5u0AthDrmBkppIOnZXNvSZtrYCByjyDA==" />
+            <description>&lt;h2&gt;Lumen 0.2.0&lt;/h2&gt;
+&lt;h3&gt;界面重新设计&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;侧栏大纲：节点类别图标、层级引导线与自适应缩进，列表单元格显示 section / row，位置徽标改为紧凑的“0 · 2”；修复悬停底色残留与类名横向截断&lt;/li&gt;&lt;li&gt;属性检查器、工具栏目标选择器与设置窗口重新设计&lt;/li&gt;&lt;li&gt;画布：胶囊浮动工具条、缩放控件、点阵背景，3D 模式自动适配；底部面板重新设计，工具栏新增“面板”按钮，一键显示或隐藏控制台、时间轴、点击诊断与修改记录&lt;/li&gt;&lt;li&gt;状态栏、窗口过渡与提示横幅重新设计；未连接状态页改为雷达扫描动画与接入方式卡片&lt;/li&gt;&lt;li&gt;新增使用向导：分步介绍接入、连接、画布操作、检查与修改，首次启动自动弹出，可在帮助菜单重新打开&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;操作&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;3D 视图中触控板双指滑动改为平移画布，旋转用拖动（⌥ 双指滑动仍可旋转）&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;接入&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;新增一键接入脚本 `lumen_setup.py`：在工程目录运行即可让 App 在 Debug 下集成采集端，不改 Podfile、Package 或代码，支持 `--remove` 原样撤销与 CocoaPods 钩子&lt;/li&gt;&lt;li&gt;采集端新增 Objective-C 入口类 `LumenServer`（`start` / `startAllowingNetworkConnections:` / `stop`），ObjC 工程无需 Swift 桥接文件&lt;/li&gt;&lt;li&gt;新增 ObjC、Swift、SwiftUI 与混编四个 iOS 示例工程&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;AI 助手&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;官网与 README 补充 Codex、ChatGPT 桌面 App 的 MCP 接入方式，新增“用 AI 排查、写页面、改 bug”使用示例&lt;/li&gt;&lt;li&gt;官网：&lt;a href="https://lumen.vanjay.cn"&gt;https://lumen.vanjay.cn&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</description>
+        </item>
+        <item>
             <title>0.1.1</title>
             <pubDate>Fri, 20 Nov 2026 07:18:25 +0800</pubDate>
             <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.1.1</link>
