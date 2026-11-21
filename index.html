@@ -324,6 +324,26 @@
     .t-ans { margin-top: 12px !important; padding-top: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.1); color: #e8e5df; }
     .t-ans code { color: #f0c674; }
 
+
+    /* ---------- 0.3.0 新特性：宣传视频 + 图文 + 小卡片 ---------- */
+    .film { margin: 0 auto 88px; max-width: 1080px; }
+    .film-frame {
+      position: relative; border-radius: var(--radius-l); overflow: hidden; background: #0e0e0d;
+      border: 1px solid var(--line); box-shadow: var(--shadow-l); aspect-ratio: 16 / 9;
+    }
+    .film-frame video { display: block; width: 100%; height: 100%; object-fit: contain; background: #0e0e0d; }
+    .film-caption { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; margin: 16px 0 0; padding: 0; list-style: none; color: var(--muted); font-size: 13.5px; }
+    .film-caption li { display: inline-flex; align-items: center; gap: 6px; }
+    .film-caption li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    /* 完整截图 / 录屏：高度随内容，四角圆角，不做底部渐隐 */
+    .frow-media.shot { height: auto; padding: 32px; align-items: center; }
+    .frow-media.shot::after { display: none; }
+    .frow-media.shot img, .frow-media.shot video { width: 100%; height: auto; border-radius: 10px; box-shadow: var(--shadow-l); }
+    .frow-media.shot video { display: block; background: #0e0e0d; }
+    .new-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 104px; }
+    .new-grid .cap { padding: 22px; }
+    .new-grid .cap p { font-size: 14px; }
+
     /* ---------- 能力网格：图标 + 一行说明 ---------- */
     .cap-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
     .cap {
@@ -483,6 +503,8 @@
       .ai-setup { grid-template-columns: minmax(0, 1fr); gap: 32px; }
       .prompt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .privacy { grid-template-columns: minmax(0, 1fr); }
+      .new-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 72px; }
+      .film { margin-bottom: 64px; }
     }
     @media (max-width: 720px) {
       .nav { gap: 14px; }
@@ -499,7 +521,9 @@
       .feature-rows { gap: 72px; }
       .frow-media { height: 380px; padding: 24px 20px 0; }
       .float-tag { display: none; }
-      .cap-grid, .prompt-grid, .code-pair { grid-template-columns: minmax(0, 1fr); }
+      .cap-grid, .prompt-grid, .code-pair, .new-grid { grid-template-columns: minmax(0, 1fr); }
+      .frow-media.shot { padding: 16px; }
+      .film-frame { border-radius: 10px; }
       .cta-row .btn { flex: 1 1 auto; }
     }
 
@@ -550,6 +574,7 @@
       Lumen
     </a>
     <nav class="nav-links" aria-label="页面导航">
+      <a href="#new">新特性</a>
       <a href="#features">功能</a>
       <a href="#start">上手</a>
       <a href="#ai">AI 助手</a>
@@ -579,7 +604,7 @@
   <!-- Hero -->
   <section class="hero" aria-labelledby="hero-title">
     <div class="wrap">
-      <a class="eyebrow" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener"><b>v0.2.2</b>查看更新记录 →</a>
+      <a class="eyebrow" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener"><b>v0.3.0</b>查看更新记录 →</a>
       <h1 id="hero-title">把运行中的界面，<br><em>一层层</em>拆开看。</h1>
       <p class="lede">3D 分层查看 iOS、macOS App 的视图层级，实时改属性、查布局问题，还能交给 AI 助手直接操作。</p>
       <div class="cta-row">
@@ -615,6 +640,93 @@
       </ul>
     </div>
     <div class="hero-fade"></div>
+  </section>
+
+  <!-- 0.3.0 新特性 -->
+  <section class="section" id="new" aria-labelledby="new-title">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">0.3.0 新特性</span>
+        <h2 id="new-title">不改一行代码，启动就能调试</h2>
+        <p>选一个 App 点“启动”，Lumen 注入采集端、启动并自动连上。日志、检查器、画布也一起升级了。</p>
+      </div>
+
+      <figure class="film reveal">
+        <div class="film-frame">
+          <video controls playsinline preload="none" poster="assets/video/lumen-promo-poster.jpg" aria-label="Lumen 0.3.0 演示视频：启动调试、3D 画布、检查器、App 自定义属性与应用日志">
+            <source src="assets/video/lumen-promo.mp4" type="video/mp4">
+          </video>
+        </div>
+        <ul class="film-caption">
+          <li>启动调试</li>
+          <li>3D 分层与路径栏</li>
+          <li>几何读数卡</li>
+          <li>App 自定义属性</li>
+          <li>应用日志</li>
+        </ul>
+      </figure>
+
+      <div class="feature-rows">
+        <div class="frow reveal">
+          <div class="frow-text">
+            <h3>启动调试：<br>选中 App，一键注入连接</h3>
+            <p>“启动调试”窗口（⌘N）列出模拟器中的 App、Mac 应用、iOS 安装包与 USB 真机，启动过程逐步显示，成功后自动连接。</p>
+            <ul class="ticks">
+              <li><span><strong>模拟器</strong>未启动的模拟器自动开机，也可以先安装 .app 再启动</span></li>
+              <li><span><strong>iOS 安装包</strong>Apple 芯片的 Mac 上直接运行 .ipa，可按 iPhone 机型尺寸运行</span></li>
+              <li><span><strong>真机</strong>用 Xcode 中登录的 Apple ID 自动重签安装，免费账号即可，到期前提醒续签</span></li>
+              <li><span><strong>Mac 应用</strong>Hardened Runtime 的 App 自动重签副本，原 App 不改动</span></li>
+            </ul>
+          </div>
+          <div class="frow-media shot">
+            <video autoplay muted loop playsinline preload="metadata" poster="assets/video/launch-demo-poster.jpg" aria-label="启动调试演示：在模拟器标签中选择 LumenDemoMixed，点启动，注入完成后自动连接并显示 3D 层级">
+              <source src="assets/video/launch-demo.mp4" type="video/mp4">
+            </video>
+            <span class="float-tag" style="left:24px;bottom:28px"><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg>不改工程，自动连接</span>
+          </div>
+        </div>
+
+        <div class="frow flip reveal">
+          <div class="frow-text">
+            <h3>应用日志：<br>print、NSLog 与 os_log 一处看</h3>
+            <p>底部“应用日志”面板显示被调试 App 的输出。启动调试的 App 与集成了 LumenServer 的 App 都能看，断线重连只补发错过的部分。</p>
+            <ul class="ticks">
+              <li><span><strong>大量日志不卡</strong>虚拟化列表，每条一行，选中看完整内容</span></li>
+              <li><span><strong>过滤</strong>来源、os_log 级别、白名单与黑名单规则，支持正则</span></li>
+              <li><span><strong>不打断阅读</strong>向上滚动暂停跟随，滚回底部自动恢复</span></li>
+            </ul>
+          </div>
+          <div class="frow-media shot">
+            <img src="assets/screens/app-log.webp" width="1600" height="1000" alt="Lumen 应用日志面板：按行列出示例 App 的日志输出，下方显示选中日志的完整内容" loading="lazy">
+          </div>
+        </div>
+
+        <div class="frow reveal">
+          <div class="frow-text">
+            <h3>检查器：<br>尺寸边距一眼读出，业务状态也能看</h3>
+            <p>几何读数卡画出父视图与所选节点，四边距离、原点与窗口坐标都在一张卡上。App 还可以把自己的状态放进检查器。</p>
+            <ul class="ticks">
+              <li><span><strong>App 自定义属性</strong>实现 <code>lumen_debugInfo()</code>，带 setter 的项可直接修改</span></li>
+              <li><span><strong>设计色别名</strong>颜色旁显示“品牌 / brandPrimary”这样的名字</span></li>
+              <li><span><strong>枚举可读</strong><code>contentMode</code> 等显示名称并可下拉修改，nil 颜色与文本也能改</span></li>
+              <li><span><strong>事件处理</strong>列出控件的 target-action 与 <code>UIAction</code></span></li>
+            </ul>
+          </div>
+          <div class="frow-media shot">
+            <img src="assets/screens/inspector-custom.webp" width="1600" height="1000" alt="Lumen 检查器：顶部几何读数卡显示父视图与所选天气徽标的尺寸和边距，下方为 App 自定义的“天气徽标”属性分组" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <div class="new-grid">
+        <div class="cap reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-layers"/></svg></div><h3>画布工具条与路径栏</h3><p>工具条贴在画布上缘，底部路径栏从根到所选节点逐段可点；按遮罩裁剪，网页、Metal、Lottie 内容完整显示。</p></div>
+        <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-search"/></svg></div><h3>层级深度与聚焦</h3><p>⌥⌘1…⌥⌘5 按窗口与控制器展开；聚焦到某个节点只看它的子树，Esc 退出；按 App 记住展开状态。</p></div>
+        <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-bug"/></svg></div><h3>遮罩诊断</h3><p>审计找出被 <code>mask</code> 整个挡住或只露出一小部分的视图，并说明原因与修法。</p></div>
+        <div class="cap reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-history"/></svg></div><h3>断线保留现场</h3><p>App 退出或崩溃后，最后的层级、详情与纹理继续可看，可另存为快照；App 回来自动切回实时。</p></div>
+        <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-term"/></svg></div><h3>控制台补全</h3><p>方法名预测与 Tab 补全，参数按签名逐个填写；返回的对象可以继续调用。</p></div>
+        <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-sparkle"/></svg></div><h3>三种界面语言</h3><p>简体中文、English、繁體中文随时切换；外观可跟随系统、浅色或深色。</p></div>
+      </div>
+    </div>
   </section>
 
   <!-- 功能：图文交替 -->
@@ -702,7 +814,7 @@
         <div class="cap reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-a11y"/></svg></div><h3>无障碍检查</h3><p>按 VoiceOver 顺序列出元素与 traits。</p></div>
         <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-sparkle"/></svg></div><h3>外观覆盖</h3><p>运行时切深色、大字号、从右到左。</p></div>
         <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-archive"/></svg></div><h3>.lumen 归档</h3><p>完整快照存成单个文件，离线打开。</p></div>
-        <div class="cap reveal" style="--d:180ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg></div><h3>零改动注入</h3><p>不改工程，直接注入 Mac App 与模拟器。</p></div>
+        <div class="cap reveal" style="--d:180ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg></div><h3>零改动注入</h3><p>不改工程，一键注入 Mac App、模拟器、iOS 安装包与 USB 真机。</p></div>
         <div class="cap reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-target"/></svg></div><h3>手势面板</h3><p>大纲行首竖条标出手势，点按查看并开关。</p></div>
         <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></div><h3>屏蔽的类</h3><p>按类名隐藏图层及子树，可临时显示。</p></div>
         <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-usb"/></svg></div><h3>目标卡片</h3><p>按平台与设备分组，标明 USB、Wi-Fi、模拟器。</p></div>
@@ -765,7 +877,7 @@
 
           <div class="tab-panel" role="tabpanel" id="panel-spm" aria-labelledby="tab-spm">
             <p>Xcode 中 File → Add Package Dependencies，输入 <code>https://github.com/wangwanjie/Lumen.git</code>，把 <code>LumenServer</code> 加到 App target；或写进 <code>Package.swift</code>：</p>
-            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.2.2"),
+            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.0"),
 <span class="c">// target 依赖</span>
 .product(name: "LumenServer", package: "Lumen"),</code></pre></div>
             <p>启动时调用：</p>
@@ -790,7 +902,7 @@ LumenServer.start()
 
           <div class="tab-panel" role="tabpanel" id="panel-pods" aria-labelledby="tab-pods" hidden>
             <p>只在 Debug 配置中集成，启动代码与 SPM 相同：</p>
-            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.2.2/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
+            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.0/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
             <div class="code"><div class="code-bar"><span>Swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>#if DEBUG
 import LumenServer
 LumenServer.start()   <span class="c">// Objective-C：@import LumenServer; [LumenServer start];</span>
@@ -817,11 +929,13 @@ export IntegrateLumen=true</code></pre></div>
           </div>
 
           <div class="tab-panel" role="tabpanel" id="panel-launch" aria-labelledby="tab-launch" hidden>
-            <p>不修改工程，把采集端直接注入启动：</p>
+            <p>不修改工程，把采集端直接注入启动。在 Lumen 中点工具栏的“启动调试”（⌘N），或把 <code>.app</code> / <code>.ipa</code> 拖进窗口：Mac 应用、模拟器中的 App、iOS 安装包（Apple 芯片的 Mac 上直接运行）、USB 真机都可以一键启动并自动连接。命令行同样可用：</p>
             <div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>LUMEN=/Applications/Lumen.app/Contents/Helpers/lumen
-$LUMEN launch --mac /path/to/MyApp.app                     <span class="c"># macOS 程序</span>
-$LUMEN launch --simulator booted com.example.MyApp         <span class="c"># 模拟器中的 App</span></code></pre></div>
-            <p class="note">受 SIP 保护的系统程序、启用 Hardened Runtime 且未允许 DYLD 环境变量的程序无法注入，请改用其他方式。</p>
+$LUMEN launch --mac /Applications/SomeApp.app --resign     <span class="c"># Mac 程序（签名挡住注入时重签副本）</span>
+$LUMEN launch --simulator booted com.example.MyApp         <span class="c"># 模拟器中的 App</span>
+$LUMEN launch --ios MyApp.ipa                              <span class="c"># iOS 安装包在本机运行</span>
+$LUMEN launch --ios MyApp.ipa --device "我的 iPhone"         <span class="c"># 重签后安装到真机</span></code></pre></div>
+            <p class="note">真机签名使用 Xcode 中登录的 Apple ID（免费账号即可），Lumen 不接触你的密码。受 SIP 保护的系统程序与 FairPlay 加密的 App Store 应用无法注入。</p>
           </div>
 
           <details class="more">
@@ -959,7 +1073,7 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
         <p>所有数据只在本机的 Lumen 与被调试 App 之间传输，不上传任何服务器。</p>
       </div>
       <ul class="privacy">
-        <li class="reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></div><strong>只进 Debug 构建</strong>三种接入方式都只在 Debug 配置启用采集端。</li>
+        <li class="reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></div><strong>只进 Debug 构建</strong>各种接入方式都只在 Debug 配置启用采集端。</li>
         <li class="reveal" style="--d:80ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></div><strong>默认只听本机</strong>采集端监听 127.0.0.1，局域网访问需显式开启。</li>
         <li class="reveal" style="--d:160ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg></div><strong>密码框掩码</strong>安全输入框的文本一律以掩码返回。</li>
       </ul>

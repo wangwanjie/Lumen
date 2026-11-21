@@ -14,19 +14,20 @@ Lumen 用来查看运行中 App 的视图层级，并把同一套能力开放给
 
 | 能力 | 说明 |
 |---|---|
-| 2D / 3D 层级画布 | Metal 渲染，平面与分层 3D 视图切换，可调层间距、相机复位，显示隐藏节点与边框线，间距测量；“定位”后目标图层闪烁高亮；还原 iOS 26 / 27 标签栏的液态玻璃底板与选中镜片；加载与刷新时显示进度、耗时与图层数 |
-| 层级大纲 | 树形大纲与画布联动选中，按类名、文本等过滤；每行完整显示，宽度不够时横向滚动；可在设置中调整字号、行高与层级引导竖线 |
+| 2D / 3D 层级画布 | Metal 渲染，平面与分层 3D 视图切换（透视投影，3D 分层跟随大纲的展开与折叠），可调层间距（⌘[ / ⌘]）、相机复位，显示隐藏节点与边框线；间距测量分关闭、父视图边距、锁定两节点三档；按 `layer.mask` 裁剪，不画被遮罩挡住的内容；搜索结果在画布上着色、其余淡化；无内容图层可选透明、只描边框或淡色底板；“定位”后目标图层闪烁高亮；还原 iOS 26 / 27 标签栏的液态玻璃底板与选中镜片，以及网页、Metal、视频、Lottie 等图层的内容；顶部工具条、底部路径栏（从根到所选节点，逐段可点）与缩放百分比；状态栏显示加载阶段、纹理进度与耗时 |
+| 层级大纲 | 树形大纲与画布联动选中，悬停行时画布同步高亮；按类名、文本等过滤，搜索结果可继续下钻；键入类名或控制器名前缀直接定位；层级深度预设（⌥⌘1…⌥⌘5）按窗口与 ViewController 展开；聚焦模式只看某个节点的子树（Esc 退出）；按 App 记住展开状态；顶层列出 `UIWindowScene` 与 Layout Guide；层级很深时缩进自动收窄，深层节点也能看全；可在设置中调整字号、行高与层级引导竖线 |
 | 屏蔽的类 | 在设置中维护要屏蔽的类，画布不渲染命中的节点及其子树，大纲灰显标识，可临时显示、重新屏蔽或一键屏蔽此类 |
 | SwiftUI | 在宿主视图之下给出 SwiftUI 的逻辑视图树：`Text` 的文字、`Button` / `Toggle` / `TextField` 等控件、修饰符链与参数、调试数据中的属性值（含 `@State`），可按文本查找；集成 LumenServer 或注入后自动开启 |
-| 属性检查器 | 按类分组的属性、继承链、所属 ViewController、实例变量名、accessibilityIdentifier、窗口坐标 |
-| 运行时改属性 | 在检查器中直接修改可编辑属性（数值拖动微调、取色、文本等），修改记录可撤销、可复制为 AI 提示；命令行 `lumen set` |
-| 调用方法 | 控制台中列出并调用节点、layer 或所属 ViewController 上的方法；命令行 `lumen methods` / `lumen invoke` |
+| 属性检查器 | 几何读数卡（父视图与所选节点的尺寸、四边边距、原点与窗口坐标）；按类分组的属性、继承链（悬停显示所在的 framework）、所属 ViewController、实例变量名及其持有者、accessibilityIdentifier；`contentMode`、`textAlignment` 等枚举显示名称并可下拉修改；控件的“事件处理”栏列出 target-action 与 `UIAction` |
+| 运行时改属性 | 在检查器中直接修改可编辑属性（数值拖动微调、取色、文本等），值为 nil 的颜色与文本同样可改；修改记录可撤销、可复制为 AI 提示；命令行 `lumen set`（枚举可按名称设置，如 `scaleAspectFit`） |
+| App 自定义属性 | 在 view / layer / ViewController 上实现 `@objc lumen_debugInfo()`，把业务状态显示在检查器最前面，带 setter 的项可直接修改；实现 `+lumen_colorAliases` 后颜色属性旁显示设计色别名（见下文“自定义检查器内容”） |
+| 调用方法 | 控制台中列出并调用节点、layer 或所属 ViewController 上的方法，方法名输入时预测并支持 Tab 补全，参数按签名逐个填写（颜色参数可用取色面板）；返回的对象可继续作为调用目标、列出方法或在大纲中选中；命令行 `lumen methods` / `lumen invoke` |
 | 手势 | 大纲行首的竖条标出挂有手势识别器的视图，点按弹出手势面板；查看类名、父类、持有它的实例变量、状态、目标动作与代理，单独启用或禁用；命令行 `lumen gestures` |
 | 约束诊断 | Auto Layout 歧义、固有尺寸、抗拉伸与抗压缩优先级、影响该节点的全部约束；命令行 `lumen constraints` |
 | 点击诊断（hit-test） | 解释某一点命中了谁、其他视图为何被跳过、响应链与候选手势；命令行 `lumen hittest` |
 | 无障碍 | 按 VoiceOver 朗读顺序列出无障碍元素（label、value、hint、traits）；命令行 `lumen a11y` |
 | 外观覆盖 | 运行时切换深色模式、Dynamic Type 字号、从右到左布局；命令行 `lumen appearance` |
-| 审计 | 检查触控区域过小、文字截断、对比度低、遮挡、布局歧义、无障碍缺失等问题，可导出报告，可配置阈值作为 CI 判定；命令行 `lumen audit` |
+| 审计 | 检查触控区域过小、文字截断、对比度低、遮挡、布局歧义、无障碍缺失、遮罩把内容整个挡住或只露出一小部分等问题，并给出原因与修复建议；可导出报告，可配置阈值作为 CI 判定；命令行 `lumen audit` |
 | 时间轴 | 连接期间每次层级变化记入时间轴，可回看历史快照，并比较任意两个时间点之间的变化 |
 | 设计稿对比 | 在画布上叠加参考图（叠加 / 差异模式、可调不透明度），对齐窗口后给出还原度 |
 | 复制与导出 | 复制类名、Lumen 选择器、节点描述，复制为 AI 提示，导出节点截图 |
@@ -38,8 +39,11 @@ Lumen 用来查看运行中 App 的视图层级，并把同一套能力开放给
 | AI 助手 | `lumen mcp` 以 MCP 服务运行，提供层级、查询、节点详情、截图、快照对比、审计、hit-test、约束、无障碍、改属性、调用方法、外观覆盖、源码定位等工具 |
 | 目标选择 | 以卡片网格列出可调试的 App，按平台分组、按设备归类，标明 USB / Wi-Fi / 局域网 / 模拟器 / 本机，卡片显示主窗口预览 |
 | 后台提示 | 目标 App 进入后台或被挂起时给出提示与重试，恢复后自动重新拉取层级与纹理 |
+| 断线保留现场 | 目标 App 退出、崩溃或网络断开时，最后一份层级、已读取的详情与纹理继续以只读方式显示，可另存为 `.lumen` 快照；同一 App 重新出现时自动切回实时 |
+| 应用日志 | 底部“应用日志”面板显示标准输出 / 错误与 os_log，启动调试的 App 与集成了 LumenServer 的 App 都能看；虚拟化列表应对大量日志，支持文本筛选、来源与级别过滤、白名单与黑名单规则 |
+| 界面语言与外观 | 界面支持简体中文、English、繁體中文，切换后立即生效；外观可跟随系统、浅色或深色 |
 | 一键接入 | `python3 /Applications/Lumen.app/Contents/Resources/lumen_setup.py` 把采集端接入 Xcode 工程的 Debug 配置（iOS 模拟器 / 真机、tvOS、macOS），无需改 Podfile / Package，`--remove` 原样撤销 |
-| 零改动注入 | `lumen launch` 把采集端注入 macOS 程序或 iOS 模拟器中的 App，无需改动工程 |
+| 零改动注入 | “启动调试”窗口（⌘N）与 `lumen launch`：不改工程，注入启动 Mac App（含 Mac Catalyst）、模拟器中的 App、iOS 安装包（Apple 芯片的 Mac 上直接运行，可按 iPhone 机型尺寸运行）与 USB 真机上的 App；拖入 `.ipa` 时询问在本机还是真机运行；签名会挡住注入时自动重签副本，真机借 Xcode 中登录的 Apple ID（免费账号即可）自动签名，到期前提醒续签；最近启动可一键重启 |
 | 平台 | 被调试端：iOS 15+、Mac Catalyst 15+、tvOS 15+、visionOS（UIKit）与 macOS 12+（AppKit）；客户端：macOS 14 及以上 |
 
 ## 下载
@@ -91,7 +95,7 @@ Xcode 中 File → Add Package Dependencies，输入 `https://github.com/wangwan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.2.2"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.0"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -131,26 +135,52 @@ SPM 无法按配置链接依赖，Release 构建也会链接 LumenServer，但 `
 ### 3. CocoaPods（仅 Debug 配置）
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.2.2/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.0/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 代码同上（Swift：`#if DEBUG` 中 `import LumenServer` 并调用 `LumenServer.start()`；Objective-C：`@import LumenServer;` 后 `[LumenServer start]`）。
 
-### 4. 零改动注入：`lumen launch`
+### 4. 零改动注入：启动调试
 
-不修改工程，直接把采集端注入启动：
+不修改工程，直接把采集端注入启动。最省事的是在 Lumen 中点工具栏的“启动调试”（⌘N），或把 `.app` / `.ipa` 拖进窗口、拖到程序坞图标上：
+
+- **Mac 应用**：从列表中选择或选择任意 `.app` / 可执行文件。启用 Hardened Runtime、库验证的 App（多数从官网下载的 App 都是）会先列出重签的影响，确认后复制到 `~/Library/Caches/lumen/resigned/` 做 ad-hoc 重签再启动副本，原 App 不改动。Mac Catalyst App 经 LaunchServices 注入启动。
+- **模拟器**：选择模拟器与其中的 App（未启动的模拟器会自动启动），或安装模拟器构建的 `.app` 后启动。
+- **iOS 安装包**：在 Apple 芯片的 Mac 上直接运行 `.ipa` 或 iOS 真机构建的 `.app`——解包到缓存后把二进制改为 Mac Catalyst 平台、ad-hoc 签名运行；同一个包第二次启动复用副本。只适配 iPhone 的应用在 Mac 上默认是 iPad 布局，可在“屏幕尺寸”里选一个机型（或自定义尺寸）以该尺寸运行，方便用不同尺寸调 UI；要最真实的 iPhone 布局用模拟器或真机。
+- **真机**：选择 USB 连接的 iPhone / iPad 与安装包，Lumen 把注入库放进包内，用你的 Apple Development 证书重签后安装启动。证书与描述文件来自 Xcode 中登录的 Apple ID（免费账号即可，7 天有效，到期前一天提醒并可一键续签）；付费账号也可以在“设置 › 签名”中导入 App Store Connect API 密钥。Lumen 不接触你的 Apple ID 密码。
+
+无法启动时会说明原因并给出解决方案（例如 FairPlay 加密、Intel Mac 运行 iOS 包、设备未信任开发者），常见的处理可以一键执行。成功后自动连接；“重新启动当前 App”（⌥⌘R）沿用上次的方式重启并恢复选中的节点。
+
+App 的标准输出 / 错误与 os_log（`Logger`、`os_log`）都显示在底部的“应用日志”面板：Mac App 与 iOS 包在本机运行时用 `log stream` 跟随进程的 os_log，模拟器同样，真机由注入库把 os_log 转写进控制台（不含调试级别）。每条日志一行（多行消息折成一行），选中后在下方查看完整内容，⌘C 拷贝；错误红色、故障紫色、调试灰色。向上滚动会自动暂停“跟随最新”，滚回底部恢复，日志再多也不会把正在看的内容顶走。
+
+不是由“启动调试”启动的 App（例如在设备上手动打开已注入的 App，或用 CocoaPods / SPM 集成了 LumenServer 的 App），连接后由采集端经 Lumen 连接推送日志，面板同样能看到，只要在调试就一直有：注入的 App 从库加载起采集 print / NSLog（同时照常输出到原来的控制台），集成方式在连接后才开始采集；os_log 读取进程启动以来的全部记录（不含调试级别，需 iOS 15 / macOS 12 及以上）。采集端保留最近一段历史，断线重连只补发断开期间的部分。工具栏可按文本筛选；“过滤”里可以选择来源、os_log 最低级别，并同时设置白名单（只显示命中任一条规则的行）与黑名单（隐藏命中任一条规则的行），规则按整行、消息、子系统、类别或进程 / 库做包含、等于、开头是或正则匹配，忽略大小写，设置对所有 App 生效。在日志上右键可以把选中文本或所在行的子系统直接加入白名单或黑名单。
+
+命令行同样可用：
 
 ```bash
 LUMEN=/Applications/Lumen.app/Contents/Helpers/lumen
 
-# macOS 程序（可执行文件或 .app）
+# macOS 程序（可执行文件或 .app）；签名会挡住注入时加 --resign 启动重签副本
 $LUMEN launch --mac /path/to/MyApp.app
+$LUMEN launch --mac /Applications/SomeApp.app --resign
 
-# iOS 模拟器中已安装的 App（booted 或模拟器 UDID）
+# iOS 模拟器中已安装的 App（booted 或模拟器 UDID），或先安装模拟器构建的 .app
 $LUMEN launch --simulator booted com.example.MyApp
+$LUMEN launch --simulator <UDID> --install build/Debug-iphonesimulator/MyApp.app
+
+# iOS 安装包：在本机运行（可选机型尺寸），或重签后安装到真机
+$LUMEN launch --ios MyApp.ipa
+$LUMEN launch --ios MyApp.ipa --iphone-model iphone-16-pro   # 按机型尺寸运行
+$LUMEN launch --ios MyApp.ipa --device-size 393x852x3        # 自定义尺寸
+$LUMEN launch --ios MyApp.ipa --keep-titlebar                # 保留窗口标题栏（默认隐藏）
+$LUMEN launch --ios MyApp.ipa --allow-maximize               # 允许窗口最大化（默认禁用）
+$LUMEN launch --ios MyApp.ipa --device "我的 iPhone"
+
+$LUMEN simulators      # 列出模拟器与其中的 App
+$LUMEN identities      # 列出签名证书与开发描述文件
 ```
 
-注入库随 App 安装在 `/Applications/Lumen.app/Contents/Helpers/`，`lumen` 会自动找到。受 SIP 保护的系统程序、启用 Hardened Runtime 且未允许 DYLD 环境变量的程序无法注入，请改用前三种方式。
+注入库随 App 安装在 `/Applications/Lumen.app/Contents/Helpers/` 与 `Contents/Resources/`，`lumen` 会自动找到。受 SIP 保护的系统程序、经过 FairPlay 加密的 App Store 应用无法这样调试。自己的 App 推荐用前三种方式。
 
 启动被调试的 App 后打开 Lumen，它会自动发现本机的 App 并连接；同时运行多个 App 时在工具栏中切换。
 
@@ -190,6 +220,44 @@ lumen --device <UDID> hierarchy --depth 4       # 只看该设备上的 App
 
 3. 首次运行时在设备上允许本地网络权限；
 4. 在 Lumen 的设置中勾选“发现局域网设备”，或在命令行中加 `--network`（例如 `lumen apps --network`）。
+
+## 自定义检查器内容
+
+在 view、layer 或 ViewController 上实现 `@objc lumen_debugInfo()`，返回的属性显示在检查器最前面的自定义分组里，适合展示业务状态（订单号、实验分组、数据源等）。带 `retainedSetter` 的属性可以在检查器中直接修改，`enum` 用下拉菜单选择，`json` 按层级展开。只在 Debug 构建中编译即可：
+
+```swift
+#if DEBUG
+extension WeatherBadgeView {
+    @objc func lumen_debugInfo() -> [String: Any] {
+        let setTemperature: @convention(block) (NSNumber) -> Void = { [weak self] value in
+            self?.temperature = value.intValue
+        }
+        return [
+            "properties": [
+                ["section": "天气徽标", "title": "温度", "valueType": "number", "value": temperature,
+                 "retainedSetter": setTemperature, "help": "摄氏度"],
+                ["section": "天气徽标", "title": "天气图标", "valueType": "enum", "value": symbol,
+                 "allEnumCases": ["sun.max.fill", "cloud.fill", "snowflake"]],
+            ],
+        ]
+    }
+}
+#endif
+```
+
+`valueType` 可取 `string`、`number`、`bool`、`color`、`rect`、`size`、`point`、`insets`、`enum`、`shadow`、`json`，`help` 作为悬停提示。
+
+设计稿里的颜色有名字时，在 `NSObject` 的分类里实现类方法 `lumen_colorAliases`，返回“别名 → 颜色”或“分组 → 别名 → 颜色”；检查器、命令行与 MCP 输出中，与别名一致的颜色属性旁会显示“品牌 / brandPrimary”这样的别名：
+
+```swift
+#if DEBUG
+extension NSObject {
+    @objc class func lumen_colorAliases() -> [String: Any] {
+        return ["品牌": ["brandPrimary": UIColor.systemBlue], "textSecondary": UIColor.secondaryLabel]
+    }
+}
+#endif
+```
 
 ## AI 助手接入（MCP）
 
@@ -263,7 +331,9 @@ sudo ln -sf /Applications/Lumen.app/Contents/Helpers/lumen /usr/local/bin/lumen
 | `lumen archive save current.lumen` | 保存完整归档（层级、节点详情与纹理），可在 App 中离线打开 |
 | `lumen audit --fail-on error` | 审计界面问题，存在错误级发现时退出码为 1 |
 | `lumen set 12 UIView.alpha 0.5` | 运行时修改属性 |
-| `lumen launch --mac <App>` | 零改动注入启动 |
+| `lumen launch --mac <App> [--resign]` | 零改动注入启动；第三方 Hardened Runtime App 加 `--resign` 启动重签副本 |
+| `lumen launch --ios <ipa> [--device <设备>]` | iOS 安装包在本机运行，或重签后安装到真机 |
+| `lumen simulators` / `lumen identities` | 列出模拟器与其中的 App / 签名证书与描述文件 |
 | `lumen mcp` | 以 MCP 服务运行 |
 
 全局选项：`--json` 输出稳定的 JSON，`--app <名称|bundle id|pid|UDID>` 指定目标 App，`--device <UDID|设备名>` 只看该真机上的 App，`--network` 额外发现局域网中的 App，`--port N` 直连端口。`lumen help <命令>` 查看详细说明。
@@ -273,6 +343,7 @@ sudo ln -sf /Applications/Lumen.app/Contents/Helpers/lumen /usr/local/bin/lumen
 - 采集端只应在 Debug 构建中集成：一键脚本只在 Debug 配置把采集端拷进 App，SPM 用 `#if DEBUG` 包住启动代码，CocoaPods 用 `:configurations => ['Debug']`。
 - 默认只监听本机回环地址（127.0.0.1），并拒绝非本机来源的连接；模拟器、Mac App 与 USB 连接的真机使用这种方式。
 - 局域网访问需要显式开启：Info.plist 设置 `LumenAllowsNetworkConnections = YES` 或调用 `LumenServer.start(allowsNetworkConnections: true)`，开启后监听所有网卡并广播 Bonjour 服务 `_lumen._tcp`（见“调试真机”）。
+- 经“启动调试”重签安装到真机的副本会开启局域网连接，以便设备经 Wi-Fi 连接时也能被发现；同一局域网中的设备都能连上这个副本，请在可信的网络中调试。
 - 密码框（安全输入框）的文本一律以掩码返回，不会离开被调试的 App。
 - 所有数据只在本机的 Lumen、`lumen` 与被调试 App 之间传输，不上传任何服务器。
 
