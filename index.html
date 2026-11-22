@@ -1037,30 +1037,53 @@
       font-family: var(--mono);
       color: var(--accent);
     }
-    /* 宣传片下方的功能截图墙 */
+    /* 宣传片下方的功能截图墙：按“接入目标 / 调试能力”分组，每组一个网格 */
+    .shot-group {
+      max-width: 1176px;
+      margin: 56px auto 0;
+    }
+    .shot-group + .shot-group {
+      margin-top: 44px;
+    }
+    .shot-group-title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 4px 14px;
+      margin: 0 0 18px;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .shot-group-title span {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-3);
+    }
     .shot-wall {
-      max-width: 1040px;
-      margin: 36px auto 0;
+      margin: 0;
       padding: 0;
       list-style: none;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 26px 20px;
     }
     .shot-wall li {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      font-size: 14px;
-      color: var(--text-2);
+      gap: 12px;
     }
     .shot-wall a {
+      position: relative;
       display: block;
-      aspect-ratio: 16 / 10;
+      /* 截图原始比例 1600 × 945，卡片按原比例完整显示 */
+      aspect-ratio: 1600 / 945;
       border-radius: 10px;
       overflow: hidden;
       background: #0e0f11;
       box-shadow: var(--shadow);
+      cursor: zoom-in;
+      outline-offset: 3px;
     }
     .shot-wall img {
       display: block;
@@ -1068,14 +1091,249 @@
       height: 100%;
       object-fit: cover;
       object-position: top center;
-      transition: transform 0.3s ease;
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+    /* 竖图（iPhone App 跑在 Mac 上）居中完整显示，两侧留深色底 */
+    .shot-wall a.portrait img {
+      object-fit: contain;
+      object-position: center;
+    }
+    /* 悬停时右下角出现放大提示 */
+    .shot-wall a::after {
+      content: "";
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(10, 11, 13, .72) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7'/%3E%3C/svg%3E") center / 14px no-repeat;
+      opacity: 0;
+      transform: scale(.85);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .shot-wall a:hover::after,
+    .shot-wall a:focus-visible::after {
+      opacity: 1;
+      transform: none;
     }
     .shot-wall a:hover img {
-      transform: scale(1.03);
+      transform: scale(1.04);
+    }
+    .shot-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      line-height: 1.5;
+    }
+    .shot-text b {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .shot-text span {
+      font-size: 13px;
+      color: var(--text-3);
+    }
+    @media (max-width: 1080px) {
+      .shot-wall {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 760px) {
+      .shot-wall {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px 14px;
+      }
+    }
+
+    /* ================= 页内图片浏览器：大图 + 前后切换 + 缩略图条 ================= */
+    .lb {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto auto;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-width: none;
+      max-height: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      color: #eceef1;
+      background: rgba(8, 9, 11, .94);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      overscroll-behavior: contain;
+    }
+    .lb:not([open]) {
+      display: none;
+    }
+    .lb::backdrop {
+      background: transparent;
+    }
+    .lb[open] {
+      animation: lb-in .22s ease-out;
+    }
+    @keyframes lb-in {
+      from { opacity: 0; }
+    }
+    .lb-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+    }
+    .lb-count {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: #959ca6;
+    }
+    .lb-stage {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      padding: 0 76px;
+      touch-action: pan-y;
+    }
+    .lb-stage img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 10px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .08);
+      cursor: zoom-out;
+      transition: opacity .18s ease;
+    }
+    .lb-stage img.loading {
+      opacity: 0;
+    }
+    .lb-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 50%;
+      color: #eceef1;
+      background: rgba(32, 34, 39, .82);
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .lb-btn:hover {
+      background: rgba(52, 56, 63, .95);
+      border-color: rgba(255, 255, 255, .3);
+    }
+    .lb-btn:focus-visible {
+      outline: 2px solid #52c2cd;
+      outline-offset: 2px;
+    }
+    .lb-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+    .lb-prev,
+    .lb-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .lb-prev {
+      left: 18px;
+    }
+    .lb-next {
+      right: 18px;
+    }
+    .lb-cap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 18px 24px 6px;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .lb-cap b {
+      font-size: 17px;
+      font-weight: 600;
+    }
+    .lb-cap span {
+      font-size: 14px;
+      color: #b0b6bf;
+    }
+    .lb-thumbs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 0;
+      padding: 12px 18px 18px;
+      list-style: none;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .lb-thumbs::-webkit-scrollbar {
+      display: none;
+    }
+    .lb-thumbs button {
+      flex: none;
+      width: 72px;
+      height: 43px;
+      padding: 0;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #0e0f11;
+      opacity: .5;
+      cursor: pointer;
+      transition: opacity .15s ease, border-color .15s ease;
+    }
+    .lb-thumbs button:hover {
+      opacity: .85;
+    }
+    .lb-thumbs button[aria-current="true"] {
+      border-color: #52c2cd;
+      opacity: 1;
+    }
+    .lb-thumbs img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+    @media (max-width: 760px) {
+      .lb-stage {
+        padding: 0 12px;
+      }
+      /* 手机上左右按钮移到图片下方两侧，主要靠左右滑动切换 */
+      .lb-prev,
+      .lb-next {
+        top: auto;
+        bottom: -58px;
+        transform: none;
+      }
+      .lb-cap {
+        padding: 18px 64px 6px;
+      }
+      .lb-thumbs {
+        justify-content: flex-start;
+      }
     }
     @media (prefers-reduced-motion: reduce) {
-      .shot-wall img {
+      .shot-wall img,
+      .shot-wall a::after,
+      .lb-stage img {
         transition: none;
+      }
+      .lb[open] {
+        animation: none;
       }
     }
     .rel-switch {
@@ -2604,20 +2862,28 @@
         </figcaption>
       </figure>
 
-      <!-- 功能截图墙：点开看原图 -->
-      <ul class="shot-wall" aria-label="功能截图">
-        <li><a href="assets/shots/tour/platforms.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/platforms.jpg" loading="lazy" alt="目标选择窗口按平台列出 iOS、Mac Catalyst 与 macOS App"></a><span>完善的平台支持</span></li>
-        <li><a href="assets/shots/tour/switch-app.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/switch-app.jpg" loading="lazy" alt="切换调试目标的弹窗"></a><span>切换调试 App，多平台支持</span></li>
-        <li><a href="assets/shots/tour/simulator.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/simulator.jpg" loading="lazy" alt="启动调试的模拟器标签，列出模拟器中的系统与第三方 App"></a><span>模拟器应用一键调试，系统应用也能调</span></li>
-        <li><a href="assets/shots/tour/ipa.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/ipa.jpg" loading="lazy" alt="iOS 安装包标签，选择在本机运行或安装到真机"></a><span>可调试任意未加壳的 ipa 或 app（Apple 芯片）</span></li>
-        <li><a href="assets/shots/tour/device.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/device.jpg" loading="lazy" alt="真机标签，用 Xcode 登录的证书重签并安装"></a><span>用 Xcode 登录的证书，一键调试到真机</span></li>
-        <li><a href="assets/shots/tour/mac-app.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/mac-app.jpg" loading="lazy" alt="Mac 应用标签，列出本机安装的应用"></a><span>支持调试任意 Mac 应用</span></li>
-        <li><a href="assets/shots/tour/ipa-on-mac.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/ipa-on-mac.jpg" style="object-fit:contain" loading="lazy" alt="iOS App 以 Mac Catalyst 方式在 Mac 上运行"></a><span>ipa 直接在 Mac 上运行，窗口大小随意定制</span></li>
-        <li><a href="assets/shots/tour/perf.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/perf.jpg" loading="lazy" alt="5400 多个节点的层级在 3D 画布中秒级刷新"></a><span>5400+ 节点，秒级刷新</span></li>
-        <li><a href="assets/shots/tour/audit.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/audit.jpg" loading="lazy" alt="审计面板列出布局问题并在画布上定位"></a><span>布局问题一键诊断定位</span></li>
-        <li><a href="assets/shots/tour/log.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/log.jpg" loading="lazy" alt="应用日志面板的正则与黑白名单过滤设置"></a><span>日志重定向：正则、黑白名单，pre-main 日志也能看</span></li>
-        <li><a href="assets/shots/tour/records.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/records.jpg" loading="lazy" alt="修改记录面板列出每次属性修改的旧值与新值"></a><span>调试记录保留每次修改</span></li>
-      </ul>
+      <!-- 功能截图墙：分组网格，点开在页内图片浏览器里看大图（无 JS 时退回为打开原图） -->
+      <div class="shot-group">
+        <h3 class="shot-group-title">接入目标<span>模拟器、真机、Mac 应用、第三方 ipa，选中就能调</span></h3>
+        <ul class="shot-wall" aria-label="接入目标截图">
+          <li><a href="assets/shots/tour/platforms.jpg" target="_blank" rel="noopener" data-lightbox><img src="assets/shots/tour/platforms.jpg" width="1600" height="945" loading="lazy" alt="目标选择窗口按平台列出 iOS、Mac Catalyst 与 macOS App"></a><div class="shot-text"><b>三大平台全覆盖</b><span>iOS、Mac Catalyst、macOS 按平台分组列出，要调哪个一眼找到</span></div></li>
+          <li><a href="assets/shots/tour/switch-app.jpg" target="_blank" rel="noopener" data-lightbox><img src="assets/shots/tour/switch-app.jpg" width="1600" height="945" loading="lazy" alt="切换调试目标的弹窗"></a><div class="shot-text"><b>调试目标随时切换</b><span>在多个 App 与平台之间一键切换，Lumen 保持打开</span></div></li>
+          <li><a href="assets/shots/tour/simulator.jpg" target="_blank" rel="noopener" data-lightbox><img src="assets/shots/tour/simulator.jpg" width="1600" height="945" loading="lazy" alt="启动调试的模拟器标签，列出模拟器中的系统与第三方 App"></a><div class="shot-text"><b>模拟器 App 一键调试</b><span>第三方 App 与系统自带 App 都能直接注入</span></div></li>
+          <li><a href="assets/shots/tour/ipa.jpg" target="_blank" rel="noopener" data-lightbox><img src="assets/shots/tour/ipa.jpg" width="1600" height="945" loading="lazy" alt="iOS 安装包标签，选择在本机运行或安装到真机"></a><div class="shot-text"><b>拖入 ipa 就能调</b><span>任意未加壳的 ipa 或 .app 都可调试（Apple 芯片 Mac）</span></div></li>
+          <li><a href="assets/shots/tour/device.jpg" target="_blank" rel="noopener" data-lightbox><img src="assets/shots/tour/device.jpg" width="1600" height="945" loading="lazy" alt="真机标签，用 Xcode 登录的证书重签并安装"></a><div class="shot-text"><b>一键调试到真机</b><span>沿用 Xcode 已登录的开发者证书，自动重签并安装</span></div></li>
+          <li><a href="assets/shots/tour/mac-app.jpg" target="_blank" rel="noopener" data-lightbox><img src="assets/shots/tour/mac-app.jpg" width="1600" height="945" loading="lazy" alt="Mac 应用标签，列出本机安装的应用"></a><div class="shot-text"><b>任意 Mac 应用都能调</b><span>本机安装的应用直接列出，选中即开始调试</span></div></li>
+          <li><a href="assets/shots/tour/ipa-on-mac.jpg" target="_blank" rel="noopener" data-lightbox class="portrait"><img src="assets/shots/tour/ipa-on-mac.jpg" width="736" height="1600" loading="lazy" alt="iOS App 以 Mac Catalyst 方式在 Mac 上运行"></a><div class="shot-text"><b>iPhone App 跑在 Mac 上</b><span>ipa 直接在 Mac 上启动，窗口尺寸随意调整</span></div></li>
+        </ul>
+      </div>
+      <div class="shot-group">
+        <h3 class="shot-group-title">调试能力<span>大层级流畅、问题自动定位、日志与改动全程留痕</span></h3>
+        <ul class="shot-wall" aria-label="调试能力截图">
+          <li><a href="assets/shots/tour/perf.jpg" target="_blank" rel="noopener" data-lightbox><img src="assets/shots/tour/perf.jpg" width="1600" height="945" loading="lazy" alt="5400 多个节点的层级在 3D 画布中秒级刷新"></a><div class="shot-text"><b>5400+ 节点，秒级刷新</b><span>复杂页面的层级树与 3D 画布依然流畅</span></div></li>
+          <li><a href="assets/shots/tour/audit.jpg" target="_blank" rel="noopener" data-lightbox><img src="assets/shots/tour/audit.jpg" width="1600" height="945" loading="lazy" alt="审计面板列出布局问题并在画布上定位"></a><div class="shot-text"><b>布局问题一键诊断</b><span>自动找出布局问题，并在画布上标出位置</span></div></li>
+          <li><a href="assets/shots/tour/log.jpg" target="_blank" rel="noopener" data-lightbox><img src="assets/shots/tour/log.jpg" width="1600" height="945" loading="lazy" alt="应用日志面板的正则与黑白名单过滤设置"></a><div class="shot-text"><b>日志重定向</b><span>正则、黑白名单过滤，pre-main 阶段的日志也看得到</span></div></li>
+          <li><a href="assets/shots/tour/records.jpg" target="_blank" rel="noopener" data-lightbox><img src="assets/shots/tour/records.jpg" width="1600" height="945" loading="lazy" alt="修改记录面板列出每次属性修改的旧值与新值"></a><div class="shot-text"><b>每次改动都有记录</b><span>每次属性修改都保留旧值与新值，随时回看</span></div></li>
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -3298,6 +3564,21 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
   </div>
 </footer>
 
+<!-- 页内图片浏览器：由脚本根据 .shot-wall 里带 data-lightbox 的链接填充 -->
+<dialog class="lb" id="lightbox" aria-label="功能截图浏览">
+  <div class="lb-bar">
+    <span class="lb-count" aria-live="polite"></span>
+    <button class="lb-btn lb-close" type="button" aria-label="关闭（Esc）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="lb-stage">
+    <button class="lb-btn lb-prev" type="button" aria-label="上一张（←）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <img alt="">
+    <button class="lb-btn lb-next" type="button" aria-label="下一张（→）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+  <div class="lb-cap"><b></b><span></span></div>
+  <ul class="lb-thumbs" aria-label="全部截图"></ul>
+</dialog>
+
 <script>
 (function () {
   "use strict";
@@ -3848,6 +4129,139 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
     spec.addEventListener("focus", on);
     spec.addEventListener("blur", off);
   });
+  /* ---------- 功能截图：页内图片浏览器（点击放大、←/→ 与滑动切换、缩略图跳转、Esc 关闭） ---------- */
+  var lb = document.getElementById("lightbox");
+  var lbLinks = Array.prototype.slice.call(document.querySelectorAll(".shot-wall a[data-lightbox]"));
+  if (lb && lbLinks.length && typeof lb.showModal === "function") {
+    var lbImg = lb.querySelector(".lb-stage img");
+    var lbTitle = lb.querySelector(".lb-cap b");
+    var lbDesc = lb.querySelector(".lb-cap span");
+    var lbCount = lb.querySelector(".lb-count");
+    var lbThumbs = lb.querySelector(".lb-thumbs");
+    var lbIndex = 0;
+    var lbOpener = null;
+    // 每张图的地址、替代文本与标题说明都取自截图墙本身，文案只维护一处
+    var lbItems = lbLinks.map(function (a) {
+      var li = a.closest("li");
+      return {
+        src: a.getAttribute("href"),
+        alt: a.querySelector("img").getAttribute("alt") || "",
+        title: li.querySelector(".shot-text b").textContent,
+        desc: li.querySelector(".shot-text span").textContent
+      };
+    });
+    var thumbButtons = lbItems.map(function (item, i) {
+      var li = document.createElement("li");
+      var b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", (i + 1) + "．" + item.title);
+      var t = document.createElement("img");
+      t.src = item.src;
+      t.alt = "";
+      t.loading = "lazy";
+      b.appendChild(t);
+      b.addEventListener("click", function () {
+        lbShow(i);
+      });
+      li.appendChild(b);
+      lbThumbs.appendChild(li);
+      return b;
+    });
+    function lbPreload(i) {
+      var img = new Image();
+      img.src = lbItems[(i + lbItems.length) % lbItems.length].src;
+    }
+    function lbShow(i) {
+      // 首尾相接循环浏览
+      lbIndex = (i + lbItems.length) % lbItems.length;
+      var item = lbItems[lbIndex];
+      if (lbImg.getAttribute("src") !== item.src) {
+        lbImg.classList.add("loading");
+        lbImg.src = item.src;
+      }
+      lbImg.alt = item.alt;
+      lbTitle.textContent = item.title;
+      lbDesc.textContent = item.desc;
+      lbCount.textContent = (lbIndex + 1) + " / " + lbItems.length;
+      thumbButtons.forEach(function (b, k) {
+        b.setAttribute("aria-current", String(k === lbIndex));
+      });
+      thumbButtons[lbIndex].scrollIntoView({ block: "nearest", inline: "center", behavior: reduceMotion.matches ? "auto" : "smooth" });
+      lbPreload(lbIndex + 1);
+      lbPreload(lbIndex - 1);
+    }
+    lbImg.addEventListener("load", function () {
+      lbImg.classList.remove("loading");
+    });
+    lbLinks.forEach(function (a, i) {
+      a.addEventListener("click", function (e) {
+        // 保留 Cmd / Ctrl / 中键点击在新标签打开原图的习惯
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) {
+          return;
+        }
+        e.preventDefault();
+        lbOpener = a;
+        lbShow(i);
+        lb.showModal();
+        document.documentElement.style.overflow = "hidden";
+      });
+    });
+    lb.addEventListener("close", function () {
+      document.documentElement.style.overflow = "";
+      if (lbOpener) {
+        lbOpener.focus();
+      }
+    });
+    lb.querySelector(".lb-close").addEventListener("click", function () {
+      lb.close();
+    });
+    lb.querySelector(".lb-prev").addEventListener("click", function () {
+      lbShow(lbIndex - 1);
+    });
+    lb.querySelector(".lb-next").addEventListener("click", function () {
+      lbShow(lbIndex + 1);
+    });
+    // 点大图本身或图片外的空白处关闭
+    lb.addEventListener("click", function (e) {
+      if (e.target === lb || e.target === lbImg || e.target.classList.contains("lb-stage") || e.target.classList.contains("lb-cap")) {
+        lb.close();
+      }
+    });
+    lb.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        lbShow(lbIndex - 1);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        lbShow(lbIndex + 1);
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        lbShow(0);
+      } else if (e.key === "End") {
+        e.preventDefault();
+        lbShow(lbItems.length - 1);
+      }
+    });
+    // 触屏左右滑动切换：水平位移超过 50px 且大于竖直位移才算
+    var touchX = null;
+    var touchY = null;
+    var stage = lb.querySelector(".lb-stage");
+    stage.addEventListener("touchstart", function (e) {
+      touchX = e.touches[0].clientX;
+      touchY = e.touches[0].clientY;
+    }, { passive: true });
+    stage.addEventListener("touchend", function (e) {
+      if (touchX === null) {
+        return;
+      }
+      var dx = e.changedTouches[0].clientX - touchX;
+      var dy = e.changedTouches[0].clientY - touchY;
+      touchX = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+        lbShow(lbIndex + (dx < 0 ? 1 : -1));
+      }
+    });
+  }
   /* ---------- 截图标注：第一次进入视口时画出引线（内容默认可见，只是额外的编排） ---------- */
   var annoSec = document.querySelector(".shot-sec");
   if (annoSec && "IntersectionObserver" in window && !reduceMotion.matches) {
