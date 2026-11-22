@@ -1,20 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="zh-Hans" data-theme="system">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Lumen：iOS / macOS 界面调试工具</title>
   <meta name="description" content="Lumen：3D 分层查看 iOS / tvOS / visionOS / macOS App 的界面层级，实时修改属性，并提供命令行与 MCP 接口。">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f5f5f3" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#181817" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#141518" media="(prefers-color-scheme: dark)">
   <meta property="og:title" content="Lumen：iOS / macOS 界面调试工具">
   <meta property="og:description" content="3D 分层查看运行中 App 的界面层级，实时修改属性，并通过 MCP 交给 AI 助手。">
-  <meta property="og:image" content="assets/screens/app-3d.webp">
+  <meta property="og:image" content="assets/screens/lumen-3d-dark.webp">
   <link rel="icon" href="assets/AppIcon.png">
-  <link rel="preload" as="image" href="assets/screens/app-3d.webp">
   <script>
-    // 首屏前应用用户手动选择的外观，避免先按系统外观渲染再切换造成闪烁
+    // 首屏渲染前应用外观：默认跟随系统；用户选过“浅色 / 深色 / 跟随系统”时按 localStorage 的 lumen-theme 恢复
     (function () {
       var theme = null;
       try {
@@ -22,555 +21,2199 @@
       } catch (e) {
         theme = null;
       }
-      if (theme === "light" || theme === "dark") {
+      if (theme === "light" || theme === "dark" || theme === "system") {
         document.documentElement.setAttribute("data-theme", theme);
       }
       document.documentElement.classList.add("js");
     })();
   </script>
   <style>
-    /* ---------- 色彩：中性石墨 + 单一青色强调色（取自 App 图标顶层的青色，降低饱和度） ---------- */
+    /* ================= 颜色：深色为主外观（取 App 画布的深石墨 + 选中青），浅色可用 ================= */
     :root {
-      color-scheme: light;
-      --bg: #f5f5f3;
-      --surface: #ffffff;
-      --sunken: #ecebe8;
-      --ink: #1d1c1a;
-      --ink-2: #4f4c47;
-      --muted: #7a766f;
-      --line: #e0ded9;
-      --line-strong: #cfccc6;
-      --accent: #0b7a88;
-      --accent-hover: #086572;
-      --accent-soft: rgba(11, 122, 136, 0.1);
-      --accent-glow: rgba(11, 122, 136, 0.22);
-      --on-accent: #ffffff;
-      --code-bg: #f0efec;
-      --code-ink: #2a2926;
-      --code-comment: #8a867f;
-      --shadow: 0 1px 2px rgba(29, 28, 26, 0.05), 0 8px 24px -12px rgba(29, 28, 26, 0.18);
-      --shadow-l: 0 2px 6px rgba(29, 28, 26, 0.06), 0 30px 60px -24px rgba(29, 28, 26, 0.35);
-    }
-    :root[data-theme="dark"] {
-      color-scheme: dark;
-      --bg: #181817;
-      --surface: #212120;
-      --sunken: #121211;
-      --ink: #edebe7;
-      --ink-2: #bdb9b2;
-      --muted: #8e8a83;
-      --line: #2f2e2c;
-      --line-strong: #3d3c39;
+      --bg: #141518;
+      --bg-2: #191b1f;
+      --surface: #202227;
+      --surface-2: #272a30;
+      --line: rgba(255, 255, 255, .09);
+      --line-2: rgba(255, 255, 255, .17);
+      --line-3: rgba(255, 255, 255, .32);
+      --text: #eceef1;
+      --text-2: #b0b6bf;
+      --text-3: #959ca6;
       --accent: #52c2cd;
-      --accent-hover: #74d0d9;
-      --accent-soft: rgba(82, 194, 205, 0.12);
-      --accent-glow: rgba(82, 194, 205, 0.2);
-      --on-accent: #0f1a1b;
-      --code-bg: #141413;
-      --code-ink: #dedad3;
-      --code-comment: #7f7b74;
-      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -14px rgba(0, 0, 0, 0.6);
-      --shadow-l: 0 2px 6px rgba(0, 0, 0, 0.35), 0 40px 80px -30px rgba(0, 0, 0, 0.85);
+      --accent-ink: #0b2a2e;
+      --accent-soft: rgba(82, 194, 205, .14);
+      --measure: #ff825f;
+      --canvas: #17181b;
+      --canvas-dot: rgba(255, 255, 255, .06);
+      --code-bg: #101114;
+      --shadow: 0 30px 80px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .07);
+      --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      color-scheme: dark;
     }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        color-scheme: dark;
-        --bg: #181817;
-        --surface: #212120;
-        --sunken: #121211;
-        --ink: #edebe7;
-        --ink-2: #bdb9b2;
-        --muted: #8e8a83;
-        --line: #2f2e2c;
-        --line-strong: #3d3c39;
-        --accent: #52c2cd;
-        --accent-hover: #74d0d9;
-        --accent-soft: rgba(82, 194, 205, 0.12);
-        --accent-glow: rgba(82, 194, 205, 0.2);
-        --on-accent: #0f1a1b;
-        --code-bg: #141413;
-        --code-ink: #dedad3;
-        --code-comment: #7f7b74;
-        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -14px rgba(0, 0, 0, 0.6);
-        --shadow-l: 0 2px 6px rgba(0, 0, 0, 0.35), 0 40px 80px -30px rgba(0, 0, 0, 0.85);
+    /* 浅色：手动选择，或“跟随系统”且系统为浅色时 */
+    :root[data-theme="light"] {
+      --bg: #f4f5f7;
+      --bg-2: #eceef1;
+      --surface: #ffffff;
+      --surface-2: #f2f3f5;
+      --line: rgba(0, 0, 0, .09);
+      --line-2: rgba(0, 0, 0, .16);
+      --line-3: rgba(0, 0, 0, .34);
+      --text: #16181b;
+      --text-2: #4a5058;
+      --text-3: #5e646c;
+      --accent: #086a76;
+      --accent-ink: #ffffff;
+      --accent-soft: rgba(11, 122, 136, .11);
+      --measure: #b0381a;
+      --canvas: #e3e6ea;
+      --canvas-dot: rgba(0, 0, 0, .07);
+      --code-bg: #ffffff;
+      --shadow: 0 24px 60px rgba(20, 30, 40, .16), 0 0 0 1px rgba(0, 0, 0, .08);
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: light) {
+      :root[data-theme="system"] {
+        --bg: #f4f5f7;
+        --bg-2: #eceef1;
+        --surface: #ffffff;
+        --surface-2: #f2f3f5;
+        --line: rgba(0, 0, 0, .09);
+        --line-2: rgba(0, 0, 0, .16);
+        --line-3: rgba(0, 0, 0, .34);
+        --text: #16181b;
+        --text-2: #4a5058;
+        --text-3: #5e646c;
+        --accent: #086a76;
+        --accent-ink: #ffffff;
+        --accent-soft: rgba(11, 122, 136, .11);
+        --measure: #b0381a;
+        --canvas: #e3e6ea;
+        --canvas-dot: rgba(0, 0, 0, .07);
+        --code-bg: #ffffff;
+        --shadow: 0 24px 60px rgba(20, 30, 40, .16), 0 0 0 1px rgba(0, 0, 0, .08);
+        color-scheme: light;
       }
     }
 
-    /* ---------- 基础排版：只用系统字体栈，保证离线可用 ---------- */
-    :root {
-      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
-      --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
-      --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-      --wrap: 1160px;
-      --ease: cubic-bezier(0.22, 1, 0.36, 1);
-      --radius-s: 6px;
-      --radius-m: 10px;
-      --radius-l: 16px;
+    /* ================= 基础排版：系统字体 + 等宽读数 ================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
     }
-    *, *::before, *::after { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-padding-top: 72px;
+    }
     body {
       margin: 0;
-      font-family: var(--font);
-      font-size: 16px;
-      line-height: 1.7;
-      color: var(--ink);
       background: var(--bg);
+      color: var(--text);
+      font: 16px/1.65 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
       overflow-x: hidden;
     }
-    img { max-width: 100%; height: auto; display: block; }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { color: var(--accent-hover); }
-    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-    code, kbd, pre { font-family: var(--mono); }
-    p code, li code, td code, dd code, summary code {
-      font-size: 0.86em;
-      padding: 0.12em 0.4em;
-      border-radius: 4px;
-      background: var(--sunken);
-      color: var(--ink);
-      word-break: break-word;
+    .mono, code, pre, kbd {
+      font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
     }
-    .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
-    svg.icon { width: 16px; height: 16px; flex: none; fill: currentColor; }
-    .ico { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-
-    /* ---------- 顶部导航 ---------- */
-    .site-header {
-      position: sticky; top: 0; z-index: 20;
-      background: color-mix(in srgb, var(--bg) 82%, transparent);
-      -webkit-backdrop-filter: saturate(1.4) blur(14px);
-      backdrop-filter: saturate(1.4) blur(14px);
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.3s;
+    a {
+      color: var(--accent);
+      text-decoration: none;
     }
-    .site-header.scrolled { border-bottom-color: var(--line); }
-    .nav { display: flex; align-items: center; gap: 28px; height: 60px; }
-    .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font-weight: 650; font-size: 17px; letter-spacing: -0.01em; }
-    .brand:hover { color: var(--ink); }
-    .brand img { width: 26px; height: 26px; }
-    .nav-links { display: flex; gap: 24px; margin-right: auto; }
-    .nav-links a { color: var(--ink-2); font-size: 14px; display: inline-flex; align-items: center; gap: 4px; }
-    .nav-links a:hover { color: var(--ink); }
-    .ext { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.6; }
-    .nav-tools { display: flex; align-items: center; gap: 10px; }
-    .gh-link {
-      display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px;
-      border-radius: 8px; color: var(--ink-2); font-size: 14px;
+    a:hover {
+      text-decoration: underline;
+    }
+    h1, h2, h3, h4 {
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      line-height: 1.2;
+    }
+    p {
+      margin: 0;
+    }
+    code {
+      font-size: max(14px, .92em);
+      background: var(--surface-2);
       border: 1px solid var(--line);
-      transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+      padding: 1px 6px;
+      border-radius: 5px;
+      overflow-wrap: anywhere;
     }
-    .gh-link:hover { color: var(--ink); border-color: var(--line-strong); background: var(--surface); }
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+    .icon {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      flex: none;
+    }
+    .ico {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex: none;
+    }
+
+    /* ================= 顶栏 ================= */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      -webkit-backdrop-filter: saturate(160%) blur(14px);
+      backdrop-filter: saturate(160%) blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      height: 60px;
+      max-width: none;
+      padding: 0 32px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 17px;
+      min-height: 44px;
+    }
+    .brand:hover {
+      text-decoration: none;
+    }
+    .brand img {
+      border-radius: 6px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      margin-left: 12px;
+    }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 44px;
+      padding: 0 12px;
+      color: var(--text-2);
+      font-size: 15px;
+      border-radius: 8px;
+    }
+    .nav-links a:hover {
+      color: var(--text);
+      background: var(--surface);
+      text-decoration: none;
+    }
+    .ext {
+      width: 13px;
+      height: 13px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .nav-tools {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gh-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 12px;
+      color: var(--text-2);
+      font-size: 15px;
+      border-radius: 8px;
+    }
+    .gh-link:hover {
+      color: var(--text);
+      text-decoration: none;
+      background: var(--surface);
+    }
     .theme-switch {
-      display: inline-flex; padding: 2px; gap: 2px; border-radius: 9px;
-      background: var(--sunken); border: 1px solid var(--line);
+      display: flex;
+      padding: 3px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--line);
     }
     .theme-switch button {
-      display: grid; place-items: center; width: 28px; height: 26px; padding: 0;
-      border: 0; border-radius: 7px; background: transparent; color: var(--muted); cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
+      width: 44px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--text-3);
+      cursor: pointer;
     }
-    .theme-switch button:hover { color: var(--ink); }
-    .theme-switch button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
-    .theme-switch svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .theme-switch button[aria-pressed="true"] {
+      background: var(--surface-2);
+      color: var(--text);
+      box-shadow: 0 0 0 1px var(--line-2);
+    }
+    .theme-switch svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
-    /* ---------- 按钮 ---------- */
+    /* ================= 按钮 ================= */
     .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      height: 44px; padding: 0 18px; border-radius: var(--radius-m);
-      font: inherit; font-size: 15px; font-weight: 560; line-height: 1;
-      border: 1px solid transparent; cursor: pointer; white-space: nowrap;
-      transition: transform 0.18s var(--ease), background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 11px;
+      font-size: 16px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
     }
-    .btn:active { transform: translateY(1px) scale(0.99); }
-    .btn-primary { background: var(--ink); color: var(--bg); }
-    .btn-primary:hover { color: var(--bg); background: color-mix(in srgb, var(--ink) 86%, var(--accent)); box-shadow: var(--shadow); transform: translateY(-1px); }
-    .btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--line); }
-    .btn-secondary:hover { color: var(--ink); border-color: var(--line-strong); box-shadow: var(--shadow); transform: translateY(-1px); }
-    .btn-ghost { color: var(--ink-2); }
-    .btn-ghost:hover { color: var(--ink); background: var(--sunken); }
-    .btn small { font-weight: 450; opacity: 0.66; font-size: 13px; }
+    .btn:hover {
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+    .btn-primary:hover {
+      filter: brightness(1.08);
+    }
+    .btn-primary small {
+      font-weight: 500;
+      font-size: 14px;
+      opacity: .85;
+    }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--line-2);
+    }
+    .btn-secondary:hover {
+      border-color: var(--line-3);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-2);
+      border-color: var(--line);
+    }
 
-    /* ---------- Hero：居中标题 + 真实界面截图 ---------- */
-    .hero { position: relative; padding: 76px 0 0; text-align: center; overflow: hidden; }
-    .hero::before {
-      /* 截图背后的柔和光晕 */
-      content: ""; position: absolute; left: 50%; top: 360px; width: 1100px; height: 700px; transform: translateX(-50%);
-      background: radial-gradient(closest-side, var(--accent-glow), transparent 72%);
-      pointer-events: none; z-index: 0;
+    /* ================= 首屏：左 40% 标题与读数，右 60% 可玩模型 ================= */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+      grid-template-rows: 1fr auto auto 1fr;
+      grid-template-areas: ". stage" "text stage" "ro stage" ". stage";
+      min-height: calc(100vh - 61px);
+      min-height: calc(100svh - 61px);
+      border-bottom: 1px solid var(--line);
     }
-    .hero > .wrap { position: relative; z-index: 1; }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 8px; margin: 0 0 22px; padding: 5px 12px 5px 6px;
-      border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
-      font-size: 13px; color: var(--ink-2);
+    .hero-text {
+      grid-area: text;
+      padding: 28px 40px 22px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      justify-content: center;
     }
-    .eyebrow b { padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 12px; }
     .hero h1 {
-      font-family: var(--font-display);
-      font-size: clamp(38px, 6vw, 68px);
-      line-height: 1.08;
-      font-weight: 680;
-      letter-spacing: -0.035em;
-      margin: 0 auto 20px;
-      max-width: 13em;
+      font-size: clamp(34px, 3.3vw, 50px);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.14;
+      text-wrap: balance;
     }
-    .hero h1 em { font-style: normal; color: var(--accent); }
-    .hero .lede { font-size: 19px; line-height: 1.65; color: var(--ink-2); max-width: 32em; margin: 0 auto 32px; }
-    .cta-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
-    .meta-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin: 20px 0 0; padding: 0; list-style: none; color: var(--muted); font-size: 13.5px; }
-    .meta-row li { display: inline-flex; align-items: center; gap: 6px; }
-    .meta-row svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .lede {
+      text-wrap: pretty;
+      color: var(--text-2);
+      font-size: 17px;
+      max-width: 34em;
+    }
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      color: var(--text-3);
+      font-size: 14px;
+    }
+    .meta-row a {
+      color: var(--text-2);
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+    }
 
-    .showcase { margin: 56px auto 0; max-width: 1080px; }
-    .mode-switch {
-      display: inline-flex; padding: 3px; border-radius: 10px; background: var(--sunken); border: 1px solid var(--line); margin-bottom: 18px;
-    }
-    .mode-switch button {
-      font: 560 13px/1 var(--font); color: var(--muted); background: transparent; border: 0;
-      padding: 8px 16px; border-radius: 7px; cursor: pointer; transition: background-color 0.2s, color 0.2s;
-    }
-    .mode-switch button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
-    .mode-switch kbd { font: 500 11px/1 var(--mono); color: var(--muted); margin-left: 6px; }
-    .window {
-      position: relative; border-radius: 14px; overflow: hidden;
-      background: #1c1c1e; border: 1px solid var(--line-strong);
-      box-shadow: var(--shadow-l);
-      aspect-ratio: 1600 / 1000;
-    }
-    .window img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s var(--ease); }
-    .window img + img { position: absolute; inset: 0; }
-    .window img[data-hidden] { opacity: 0; }
-    .hero-fade { height: 80px; }
-
-    /* 平台条 */
-    .platforms { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 34px; padding: 36px 0 8px; margin: 0; list-style: none; color: var(--muted); font-size: 14px; }
-    .platforms li { display: inline-flex; align-items: center; gap: 8px; }
-    .platforms .ico { width: 18px; height: 18px; color: var(--ink-2); }
-
-    /* ---------- 通用区块 ---------- */
-    section[id] { scroll-margin-top: 76px; }
-    .section { padding: 104px 0; }
-    .section + .section { border-top: 1px solid var(--line); }
-    .section-head { max-width: 36em; margin: 0 auto 56px; text-align: center; }
-    .kicker { display: block; margin-bottom: 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--accent); }
-    .section-head h2 {
-      font-family: var(--font-display);
-      font-size: clamp(28px, 3.6vw, 42px); line-height: 1.2; font-weight: 660; letter-spacing: -0.025em; margin: 0 0 14px;
-    }
-    .section-head p { margin: 0; color: var(--ink-2); font-size: 17px; }
-
-    /* ---------- 图文功能行：左右交替 ---------- */
-    .feature-rows { display: grid; gap: 112px; }
-    .frow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 72px; align-items: center; }
-    .frow.flip { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
-    .frow.flip .frow-text { order: 2; }
-    .frow-text h3 { font-family: var(--font-display); font-size: clamp(24px, 2.6vw, 32px); line-height: 1.25; font-weight: 650; letter-spacing: -0.02em; margin: 0 0 14px; }
-    .frow-text > p { margin: 0 0 24px; color: var(--ink-2); font-size: 17px; max-width: 26em; }
-    .ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-    .ticks li { display: flex; gap: 12px; align-items: flex-start; color: var(--ink-2); font-size: 15.5px; line-height: 1.55; }
-    .ticks li::before {
-      content: ""; flex: none; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%;
-      background: var(--accent-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b7a88' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center / 12px no-repeat;
-    }
-    .ticks strong { color: var(--ink); font-weight: 600; margin-right: 8px; }
-    .frow-media {
-      position: relative; display: flex; justify-content: center; align-items: flex-start;
-      height: 560px; padding: 40px 36px 0; border-radius: var(--radius-l); overflow: hidden;
-      background:
-        radial-gradient(120% 80% at 50% 0%, var(--accent-glow), transparent 70%),
-        var(--sunken);
+    /* 读数面板：随模型的选中层改变 */
+    .readout {
+      grid-area: ro;
+      margin: 0 40px 28px 48px;
+      background: var(--surface);
       border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 18px 14px;
+      min-height: 432px;
     }
-    .frow-media img {
-      border-radius: 12px 12px 0 0; box-shadow: var(--shadow-l); border: 1px solid rgba(255, 255, 255, 0.08);
-      background: #232325;
+    .ro-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .frow-media.tall img { width: min(320px, 74%); }
-    .frow-media.wide img { width: min(440px, 92%); }
-    .frow-media::after {
-      /* 底部渐隐，暗示截图还有更多内容 */
-      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 90px;
-      background: linear-gradient(to bottom, transparent, var(--sunken));
+    .ro-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+      flex: none;
     }
-    .float-tag {
-      position: absolute; z-index: 1; display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px;
-      border-radius: 10px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow);
-      font-size: 13px; color: var(--ink); white-space: nowrap;
+    .ro-title {
+      min-width: 0;
     }
-    .float-tag .ico { width: 16px; height: 16px; color: var(--accent); }
+    .ro-cls {
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+    .ro-q {
+      margin-left: 8px;
+      font-weight: 500;
+      color: var(--text-2);
+    }
+    .ro-tag {
+      color: var(--text-3);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .ro-depth {
+      margin-left: auto;
+      font-size: 13px;
+      color: var(--text-3);
+      white-space: nowrap;
+    }
+    .geo {
+      margin-top: 14px;
+      border-radius: 10px;
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      padding: 10px 14px 10px;
+    }
+    .geo-top {
+      font-size: 12px;
+      color: var(--text-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .geo-box {
+      position: relative;
+      height: 116px;
+      margin-top: 6px;
+      border: 1px dashed var(--line-3);
+      border-radius: 3px;
+    }
+    .geo-in {
+      position: absolute;
+      left: 27%;
+      right: 27%;
+      top: 32px;
+      bottom: 32px;
+      border: 1.5px solid var(--accent);
+      background: var(--accent-soft);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 16px;
+      white-space: nowrap;
+    }
+    /* 四边距离：测量橙红只用于距离数字 */
+    .gl {
+      position: absolute;
+      border-color: var(--measure);
+      border-style: solid;
+      border-width: 0;
+    }
+    .gl b {
+      position: absolute;
+      color: var(--measure);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .gl-t, .gl-b {
+      left: 50%;
+      height: 32px;
+      border-left-width: 1px;
+    }
+    .gl-t {
+      top: 0;
+    }
+    .gl-b {
+      bottom: 0;
+    }
+    .gl-t b, .gl-b b {
+      left: 6px;
+      top: 10px;
+    }
+    .gl-l, .gl-r {
+      top: 50%;
+      width: 27%;
+      border-top-width: 1px;
+    }
+    .gl-l {
+      left: 0;
+    }
+    .gl-r {
+      right: 0;
+    }
+    .gl-l b, .gl-r b {
+      left: 50%;
+      top: -18px;
+      transform: translateX(-50%);
+    }
+    .geo-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-3);
+    }
+    .geo-foot b {
+      color: var(--text);
+      font-weight: 600;
+      margin-left: 6px;
+    }
+    .ro-rows {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px 16px;
+      margin: 12px 0 0;
+      font-size: 14px;
+    }
+    .ro-rows dt {
+      color: var(--text-3);
+    }
+    .ro-rows dd {
+      margin: 0;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .ro-swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      background: #fff;
+      box-shadow: 0 0 0 1px var(--line-3);
+      vertical-align: -2px;
+      margin-right: 6px;
+    }
+    .ro-note {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--text-2);
+    }
 
-    /* AI 终端示意 */
-    .term {
-      width: min(480px, 100%); border-radius: 12px; overflow: hidden; text-align: left;
-      background: #1b1b1c; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: var(--shadow-l);
-      font: 12.5px/1.65 var(--mono); color: #d9d6cf;
+    /* 舞台：深石墨画布 + 点阵，模型居中 */
+    .stage-col {
+      grid-area: stage;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: var(--canvas);
+      border-left: 1px solid var(--line);
+      min-width: 0;
     }
-    .term-bar { display: flex; align-items: center; gap: 7px; padding: 10px 12px; background: #252526; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
-    .term-bar i { width: 11px; height: 11px; border-radius: 50%; background: #4a4a4c; }
-    .term-bar i:nth-child(1) { background: #ff5f57; }
-    .term-bar i:nth-child(2) { background: #febc2e; }
-    .term-bar i:nth-child(3) { background: #28c840; }
-    .term-bar span { margin-left: 8px; color: #8d8a84; font-size: 12px; }
-    .term-body { padding: 16px 18px 20px; }
-    .term-body p { margin: 0 0 10px; }
-    .t-user { color: #fff; }
-    .t-user::before { content: "› "; color: #52c2cd; }
-    .t-tool { display: flex; gap: 8px; color: #a9a59e; margin: 0 0 4px !important; }
-    .t-tool b { color: #52c2cd; font-weight: 500; }
-    .t-tool::before { content: "●"; color: #28c840; font-size: 9px; line-height: 20px; }
-    .t-ans { margin-top: 12px !important; padding-top: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.1); color: #e8e5df; }
-    .t-ans code { color: #f0c674; }
+    .stage-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--canvas) 70%, var(--bg));
+      flex-wrap: wrap;
+    }
+    .seg {
+      display: flex;
+      padding: 3px;
+      border-radius: 9px;
+      background: var(--line);
+    }
+    .seg button {
+      min-width: 52px;
+      min-height: 44px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--text-2);
+      font: 600 15px/1 inherit;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .seg button[aria-pressed="true"] {
+      background: var(--surface-2);
+      color: var(--text);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+    }
+    .gap-ctl {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-2);
+      flex: 1 1 220px;
+      min-width: 0;
+    }
+    .gap-ctl input {
+      flex: 1;
+      min-width: 0;
+      accent-color: var(--accent);
+      height: 44px;
+    }
+    .gap-ctl output {
+      min-width: 3.5em;
+      text-align: right;
+      color: var(--text);
+      font-size: 14px;
+    }
+    .stage {
+      position: relative;
+      flex: 1;
+      min-height: 480px;
+      perspective: 2200px;
+      perspective-origin: 50% 40%;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+      background-image: radial-gradient(var(--canvas-dot) 1px, transparent 1.2px);
+      background-size: 22px 22px;
+    }
+    .stage.dragging {
+      cursor: grabbing;
+    }
+    .stage:focus-visible {
+      outline-offset: -3px;
+    }
+    .stage-hint {
+      position: absolute;
+      left: 16px;
+      bottom: 12px;
+      font-size: 13px;
+      color: var(--text-3);
+      pointer-events: none;
+    }
+    /* 模型坐标系：1064 × 780（与演示 App 的窗口点数一致），由 JS 按舞台尺寸缩放 */
+    .rig {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 1064px;
+      height: 780px;
+      margin: -390px 0 0 -532px;
+      transform-style: preserve-3d;
+      --s: .62;
+      --rx: 18deg;
+      --ry: 44deg;
+      --gap: 84;
+      --wire: .5;
+      --tx: 0px;
+      --ty: 0px;
+      transform: translate(var(--tx), var(--ty)) scale(var(--s)) rotateX(var(--rx)) rotateY(var(--ry)) translateZ(calc(var(--gap) * -3px));
+    }
+    .ly {
+      position: absolute;
+      transform: translateZ(calc(var(--d) * var(--gap) * 1px));
+      transform-style: preserve-3d;
+      cursor: pointer;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      line-height: 1.3;
+    }
+    /* 线框：层间距越大越清楚，模拟 Lumen 画布里每层的细边框 */
+    .ly::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1.5px solid rgba(150, 205, 215, var(--wire));
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    .ly:hover::after {
+      border-color: rgba(82, 194, 205, .8);
+    }
+    .ly.sel::after {
+      border: 3px solid #52c2cd;
+      background: rgba(82, 194, 205, .22);
+    }
+    /* 各层的内容（演示 App 的深色行程页） */
+    .l-win {
+      background: #000;
+    }
+    .l-vc {
+      background: #1c1c1e;
+    }
+    .l-header {
+      background: linear-gradient(160deg, #ee8a7e 0%, #e7925f 62%, #dc8a4f 100%);
+    }
+    .l-img svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .l-badge {
+      border-radius: 6px;
+      background: rgba(0, 0, 0, .34);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .l-kyoto {
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 47px;
+      white-space: nowrap;
+    }
+    .l-nights {
+      font-size: 14px;
+      line-height: 19px;
+      white-space: nowrap;
+      color: rgba(255, 255, 255, .9);
+    }
+    .l-card {
+      background: #2a2a2d;
+      border-radius: 14px;
+      padding: 16px 20px;
+    }
+    .mc-h {
+      font-size: 19px;
+      font-weight: 700;
+    }
+    .mc-p {
+      margin-top: 6px;
+      font-size: 14px;
+      color: #b9b9be;
+    }
+    .mc-tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .mc-tags span {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .mc-stars {
+      position: absolute;
+      right: 20px;
+      top: 16px;
+      display: flex;
+      gap: 4px;
+    }
+    .mc-stars svg {
+      width: 22px;
+      height: 22px;
+    }
+    .mc-budget {
+      display: flex;
+      gap: 22px;
+      margin-top: 10px;
+      align-items: center;
+    }
+    .mc-ring {
+      position: relative;
+      width: 92px;
+      height: 92px;
+      flex: none;
+    }
+    .mc-ring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .mc-ring span {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      text-align: center;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .mc-ring small {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: #a9a9ae;
+    }
+    .mc-bars {
+      flex: 1;
+      display: grid;
+      gap: 7px;
+    }
+    .mc-bar {
+      display: grid;
+      grid-template-columns: 36px 1fr 64px;
+      gap: 10px;
+      align-items: center;
+      font-size: 12px;
+      color: #c9c9cd;
+    }
+    .mc-bar i {
+      display: block;
+      height: 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .1);
+      position: relative;
+      overflow: hidden;
+    }
+    .mc-bar i::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: var(--w);
+      background: var(--c);
+      border-radius: inherit;
+    }
+    .mc-bar em {
+      font-style: normal;
+      text-align: right;
+      color: #a9a9ae;
+    }
+    .mc-ok {
+      position: absolute;
+      right: 20px;
+      top: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6fd685;
+      background: rgba(111, 214, 133, .14);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .mc-day {
+      display: grid;
+      grid-template-columns: 14px 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .mc-day::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e8485a;
+      margin-top: 5px;
+    }
+    .mc-day small {
+      display: block;
+      font-size: 12px;
+      color: #a9a9ae;
+    }
+    .mc-day b {
+      display: block;
+      font-size: 16px;
+    }
+    .mc-day span {
+      font-size: 13px;
+      color: #b9b9be;
+    }
 
+    /* 路径栏：选中节点从根到自身的路径，每段可点 */
+    .pathbar {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 12px;
+      border-top: 1px solid var(--line);
+      background: color-mix(in srgb, var(--canvas) 70%, var(--bg));
+      min-height: 52px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .pathbar button, .pathbar .more {
+      min-height: 44px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--text-2);
+      font: 14px/1 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      cursor: pointer;
+      flex: none;
+    }
+    .pathbar button:hover {
+      color: var(--text);
+      background: var(--line);
+    }
+    .pathbar button[aria-current="true"] {
+      color: var(--text);
+      background: var(--accent-soft);
+      font-weight: 600;
+    }
+    .pathbar .sep {
+      color: var(--text-3);
+      font-size: 13px;
+      flex: none;
+    }
+    .pathbar .more {
+      cursor: default;
+      display: inline-flex;
+      align-items: center;
+    }
 
-    /* ---------- 0.3.0 新特性：宣传视频 + 图文 + 小卡片 ---------- */
-    .film { margin: 0 auto 88px; max-width: 1080px; }
+    /* 首屏载入编排：标题先到，模型展开，读数最后填入（无 JS 时直接显示终态） */
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    .js .hero-text > * {
+      animation: rise .6s cubic-bezier(.2, .7, .2, 1) both;
+    }
+    .js .hero-text > :nth-child(2) {
+      animation-delay: .08s;
+    }
+    .js .hero-text > :nth-child(3) {
+      animation-delay: .14s;
+    }
+    .js .hero-text > :nth-child(4) {
+      animation-delay: .2s;
+    }
+    .js .readout {
+      animation: rise .4s cubic-bezier(.2, .7, .2, 1) .3s both;
+    }
+
+    /* ================= 通用区块 ================= */
+    .section {
+      padding: 104px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .section-head {
+      max-width: 720px;
+      margin-bottom: 44px;
+    }
+    .section-head h2 {
+      text-wrap: balance;
+      font-size: clamp(28px, 3vw, 40px);
+      letter-spacing: -.02em;
+    }
+    .section-head p {
+      margin-top: 14px;
+      color: var(--text-2);
+      font-size: 17px;
+    }
+
+    /* ================= 0.3.0 新特性 ================= */
+    .release-head, .film {
+      max-width: 1040px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .release-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 36px;
+    }
+    .release-head .section-head {
+      margin-bottom: 0;
+    }
+    .ver-link {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 14px;
+      border: 1px solid var(--line-2);
+      border-radius: 10px;
+      color: var(--accent);
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .ver-link:hover {
+      border-color: var(--accent);
+    }
+    .film {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
     .film-frame {
-      position: relative; border-radius: var(--radius-l); overflow: hidden; background: #0e0e0d;
-      border: 1px solid var(--line); box-shadow: var(--shadow-l); aspect-ratio: 16 / 9;
+      aspect-ratio: 16 / 9;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0e0f11;
+      box-shadow: var(--shadow);
     }
-    .film-frame video { display: block; width: 100%; height: 100%; object-fit: contain; background: #0e0e0d; }
-    .film-caption { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; margin: 16px 0 0; padding: 0; list-style: none; color: var(--muted); font-size: 13.5px; }
-    .film-caption li { display: inline-flex; align-items: center; gap: 6px; }
-    .film-caption li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-    /* 完整截图 / 录屏：高度随内容，四角圆角，不做底部渐隐 */
-    .frow-media.shot { height: auto; padding: 32px; align-items: center; }
-    .frow-media.shot::after { display: none; }
-    .frow-media.shot img, .frow-media.shot video { width: 100%; height: auto; border-radius: 10px; box-shadow: var(--shadow-l); }
-    .frow-media.shot video { display: block; background: #0e0e0d; }
-    .new-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 104px; }
-    .new-grid .cap { padding: 22px; }
-    .new-grid .cap p { font-size: 14px; }
+    .film-frame video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .film figcaption {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px 20px;
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--text-3);
+    }
+    /* 视频章节：编号是真实的播放顺序 */
+    .film-chapters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 20px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: ch;
+      color: var(--text-2);
+    }
+    .film-chapters li {
+      counter-increment: ch;
+    }
+    .film-chapters li::before {
+      content: counter(ch);
+      margin-right: 6px;
+      font-family: var(--mono);
+      color: var(--accent);
+    }
+    .rel-switch {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      gap: 0 40px;
+      margin-top: 72px;
+    }
+    .rel-list {
+      grid-row: 1 / 3;
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid var(--line);
+    }
+    .rel-list button {
+      display: grid;
+      gap: 2px;
+      min-height: 64px;
+      padding: 14px 0 14px 16px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      border-left: 2px solid transparent;
+      background: transparent;
+      text-align: left;
+      color: var(--text-2);
+      font: inherit;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+    .rel-list b {
+      font-size: 17px;
+      color: var(--text);
+    }
+    .rel-list span {
+      font-size: 14px;
+    }
+    .rel-list button:hover b {
+      color: var(--accent);
+    }
+    .rel-list button[aria-selected="true"] {
+      border-left-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .rel-panel {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+    }
+    .rel-panel[hidden] {
+      display: none;
+    }
+    .rel-media {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: #0e0f11;
+    }
+    .rel-media img, .rel-media video {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+    }
+    .rel-text > p {
+      margin: 0;
+      font-size: 16px;
+      color: var(--text-2);
+    }
+    .caps.caps-new {
+      margin-top: 72px;
+    }
+    @media (max-width: 1100px) {
+      .rel-switch {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
+      .rel-list {
+        grid-row: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        border-top: 0;
+        border-bottom: 1px solid var(--line-2);
+        scrollbar-width: none;
+      }
+      .rel-list button {
+        flex: none;
+        min-height: 48px;
+        padding: 10px 14px;
+        border: 0;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+      }
+      .rel-list button[aria-selected="true"] {
+        border-bottom-color: var(--accent);
+        background: transparent;
+      }
+      .rel-list span {
+        display: none;
+      }
+      .rel-panel {
+        grid-column: auto;
+        grid-row: auto;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
+    }
+    @media (max-width: 640px) {
+      .release-head {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .rel-text > p, .film figcaption {
+        font-size: 16px;
+      }
+    }
 
-    /* ---------- 能力网格：图标 + 一行说明 ---------- */
-    .cap-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-    .cap {
-      padding: 22px 20px 20px; border-radius: var(--radius-l); background: var(--surface); border: 1px solid var(--line);
-      transition: transform 0.25s var(--ease), box-shadow 0.25s, border-color 0.25s;
+    /* 真实截图：全宽 */
+    .shot-sec {
+      padding: 96px 0 64px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg-2);
     }
-    .cap:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--line-strong); }
-    .cap-ico { display: grid; place-items: center; width: 38px; height: 38px; margin-bottom: 14px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); }
-    .cap h3 { margin: 0 0 4px; font-size: 15.5px; font-weight: 640; }
-    .cap p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .shot-frame {
+      max-width: 1376px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+    .shot-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+    .shot-light {
+      display: none !important;
+    }
+    :root[data-theme="light"] .shot-light {
+      display: block !important;
+    }
+    :root[data-theme="light"] .shot-dark {
+      display: none !important;
+    }
+    @media (prefers-color-scheme: light) {
+      :root[data-theme="system"] .shot-light {
+        display: block !important;
+      }
+      :root[data-theme="system"] .shot-dark {
+        display: none !important;
+      }
+    }
+    .shot-sec { --stage-w: min(1360px, calc(100vw - 48px), calc((100svh - 168px) * 1.8889)); }
+    .anno-stage { position: relative; width: var(--stage-w); aspect-ratio: 1360 / 720; margin: 0 auto; }
+    .anno-object {
+      position: absolute; margin: 0; left: 14.706%; top: 2.778%; width: 70.588%; height: 83.333%;
+      border-radius: 10px; overflow: hidden; box-shadow: var(--shadow);
+      outline: 1px solid var(--line-2); outline-offset: -1px;
+    }
+    .anno-object img { width: 100%; height: 100%; object-fit: cover; }
+    /* 深色截图读数与浅色不同（0.59 s、缩放 74%），按当前外观只显示对应的一份 */
+    .on-light { display: none !important; }
+    :root[data-theme="light"] .on-light { display: inline !important; }
+    :root[data-theme="light"] .on-dark { display: none !important; }
+    @media (prefers-color-scheme: light) {
+      :root[data-theme="system"] .on-light { display: inline !important; }
+      :root[data-theme="system"] .on-dark { display: none !important; }
+    }
+    .anno-spec .v.on-light, .anno-spec .v.on-dark { display: block; }
 
-    /* ---------- 上手：三步卡片 ---------- */
-    .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 48px; counter-reset: step; }
-    .step-card {
-      position: relative; display: flex; flex-direction: column; gap: 10px; padding: 26px 24px 24px;
-      border-radius: var(--radius-l); background: var(--surface); border: 1px solid var(--line);
-    }
-    .step-card .num {
-      display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
-      font: 650 14px/1 var(--font); background: var(--accent); color: var(--on-accent);
-    }
-    .step-card h3 { margin: 4px 0 0; font-size: 18px; font-weight: 650; }
-    .step-card p { margin: 0; color: var(--ink-2); font-size: 14.5px; line-height: 1.6; }
-    .step-card .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 8px; }
-    .step-card .actions .btn { height: 36px; padding: 0 13px; font-size: 13.5px; }
-    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
-    .chips li { padding: 3px 10px; border-radius: 999px; background: var(--sunken); color: var(--ink-2); font-size: 12.5px; }
-    .chips.mono li { font-family: var(--mono); font-size: 11.5px; color: var(--accent); background: var(--accent-soft); }
+    /* 引线层：viewBox 与舞台坐标系一致 */
+    .anno-leaders { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+    .anno-leaders polyline { fill: none; stroke-width: 1; vector-effect: non-scaling-stroke; }
+    .anno-leaders .l-sel { stroke: var(--accent); }
+    .anno-leaders .l-mea { stroke: var(--measure); }
+    .anno-leaders circle { vector-effect: non-scaling-stroke; stroke-width: 1; }
+    .anno-leaders .dot-sel { fill: var(--accent); }
+    .anno-leaders .dot-mea { fill: var(--measure); }
+    .anno-leaders .ring { fill: none; stroke: currentColor; opacity: 0; transition: opacity .2s; }
+    .anno-leaders g.on .ring { opacity: 1; }
+    .anno-leaders g.on polyline { stroke-width: 2; }
 
-    .integrate { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 48px; align-items: start; }
-    .integrate-aside h3 { margin: 0 0 10px; font-size: 20px; font-weight: 650; }
-    .integrate-aside p { margin: 0 0 18px; color: var(--ink-2); font-size: 15px; }
-    .connect-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-    .connect-list li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: var(--radius-m); background: var(--surface); border: 1px solid var(--line); font-size: 14px; color: var(--ink-2); line-height: 1.5; }
-    .connect-list .ico { color: var(--accent); margin-top: 1px; }
-    .connect-list strong { display: block; color: var(--ink); font-weight: 600; font-size: 14.5px; }
+    /* 规格块：读数式小块，位于引线末端 */
+    .anno-spec {
+      position: absolute; width: 13.3%; font-size: 13px; line-height: 1.45;
+      padding: 7px 0 0; border-top: 1px solid var(--line-2); color: var(--text-2);
+      text-decoration: none; cursor: default;
+    }
+    .anno-spec b { display: flex; align-items: center; gap: 6px; color: var(--text); font-weight: 600; font-size: 13px; }
+    .anno-spec b i { font: 600 12px var(--mono); font-style: normal; color: var(--text-2); }
+    .anno-spec .v { display: block; font-family: var(--mono); font-size: 12.5px; color: var(--text); }
+    .anno-spec .m { color: var(--measure); }
+    .anno-spec .s { color: var(--accent); }
+    .anno-spec.r { text-align: left; }
+    .anno-spec:hover b, .anno-spec.on b { color: var(--accent); }
+    .anno-marker { display: none; }
 
-    /* 标签页 */
-    .tablist { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 18px; overflow-x: auto; scrollbar-width: none; }
-    .tablist::-webkit-scrollbar { display: none; }
-    .tablist button {
-      position: relative; padding: 10px 14px 12px; border: 0; background: none; cursor: pointer;
-      font: 500 14.5px/1 var(--font); color: var(--muted); white-space: nowrap; transition: color 0.2s;
+    /* 首屏载入编排：引线先画出，规格块随后出现（只在载入时一次） */
+    @media (prefers-reduced-motion: no-preference) {
+      .shot-sec.intro .anno-object { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+      .shot-sec.intro .anno-leaders polyline { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .5s ease-out .35s forwards; }
+      .shot-sec.intro .anno-leaders circle.dot-sel, .shot-sec.intro .anno-leaders circle.dot-mea { animation: fade .3s ease-out .3s both; }
+      .shot-sec.intro .anno-spec { animation: reveal .45s ease-out both; animation-delay: calc(.6s + var(--k, 0) * 50ms); }
+      @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+      @keyframes draw { to { stroke-dashoffset: 0; } }
+      @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes reveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
     }
-    .tablist button:hover { color: var(--ink); }
-    .tablist button[aria-selected="true"] { color: var(--ink); font-weight: 600; }
-    .tablist button::after {
-      content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px;
-      background: var(--accent); transform: scaleX(0); transition: transform 0.3s var(--ease);
+    .anno-legend { display: none; }
+    @media (max-width: 1099px) {
+      .shot-sec { --stage-w: min(100vw - 32px, 900px); }
+      .anno-stage { aspect-ratio: 1600 / 1000; }
+      .anno-object { left: 0; top: 0; width: 100%; height: 100%; }
+      .anno-leaders, .anno-spec { display: none; }
+      .anno-marker {
+        display: grid; place-items: center; position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+        border-radius: 50%; background: var(--accent); color: #fff; font: 600 12px var(--mono);
+        box-shadow: 0 0 0 2px var(--bg-2);
+      }
+      .anno-marker.m { background: var(--measure); }
+      .anno-legend {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; width: var(--stage-w); margin: 20px auto 0; padding: 0; list-style: none;
+      }
+      .anno-legend li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line-2); font-size: 14px; }
+      .anno-legend .n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font: 600 12px var(--mono); color: #fff; background: var(--accent); }
+      .anno-legend .n.m { background: var(--measure); }
+      .anno-legend b { display: block; }
+      .anno-legend span { color: var(--text-2); font-family: var(--mono); font-size: 13px; }
     }
-    .tablist button[aria-selected="true"]::after { transform: scaleX(1); }
-    .tab-panel[hidden] { display: none; }
-    .tab-panel { animation: panel-in 0.35s var(--ease); }
-    @keyframes panel-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-    .tab-panel > p { margin: 0 0 12px; color: var(--ink-2); font-size: 15px; }
-    .note {
-      margin: 4px 0 0; padding: 10px 14px; border-radius: var(--radius-m);
-      background: var(--sunken); color: var(--ink-2); font-size: 13.5px; line-height: 1.6;
+    /* 标注截图居中，标题也居中对齐 */
+    .shot-sec .section-head { margin-left: auto; margin-right: auto; text-align: center; }
+    /* 手机：图例改单列，读数字号不低于 14px */
+    @media (max-width: 560px) {
+      .anno-legend { grid-template-columns: 1fr; }
+      .anno-legend li { font-size: 16px; }
+      .anno-legend span { font-size: 14px; }
+    }
+    .anno-foot { margin-top: 28px; display: flex; justify-content: center; }
+    .shot-cap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px 40px;
+      align-items: start;
+      margin-top: 28px;
+    }
+    .shot-cap p {
+      color: var(--text-2);
+      font-size: 16px;
+      max-width: 46em;
+    }
+    .shot-cap p b {
+      color: var(--text);
+    }
+    .platforms {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      color: var(--text-2);
+      font-size: 14px;
+    }
+    .platforms li {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
     }
 
-    /* 代码块与复制按钮 */
-    .code { position: relative; margin: 0 0 14px; border-radius: var(--radius-m); background: var(--code-bg); border: 1px solid var(--line); }
+    /* 操作 → 结果：三段小演示 */
+    .demo {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 56px;
+      align-items: center;
+      padding: 56px 0;
+      border-top: 1px solid var(--line);
+    }
+    .demo:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+    .demo h3 {
+      font-size: 26px;
+      letter-spacing: -.015em;
+    }
+    .demo-text > p {
+      margin-top: 12px;
+      color: var(--text-2);
+    }
+    .ticks {
+      list-style: none;
+      margin: 20px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+      font-size: 15px;
+      color: var(--text-2);
+    }
+    .ticks li {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 10px;
+    }
+    .ticks li::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      margin: 9px 0 0 4px;
+      border-radius: 2px;
+      background: var(--accent);
+    }
+    .ticks strong {
+      color: var(--text);
+      margin-right: 8px;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .panel-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px 8px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      color: var(--text-2);
+      min-height: 52px;
+    }
+    .panel-bar .btn {
+      margin-left: auto;
+      min-height: 44px;
+      font-size: 14px;
+      padding: 0 14px;
+    }
+
+    .demos {
+      padding-top: 72px;
+    }
+
+    /* 演示 1：改属性 */
+    .edit-demo {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .edit-view {
+      background: #1c1c1e;
+      padding: 22px;
+      display: flex;
+      align-items: center;
+    }
+    .ev-head {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      border-radius: 12px;
+      background: linear-gradient(160deg, #ee8a7e 0%, #e7925f 62%, #dc8a4f 100%);
+      overflow: hidden;
+    }
+    .ev-stack {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      color: #fff;
+    }
+    .ev-label {
+      position: relative;
+      display: inline-block;
+      font-weight: 800;
+      font-size: 40px;
+      line-height: 1.175;
+      white-space: nowrap;
+      outline: 2px solid #52c2cd;
+      outline-offset: 1px;
+      background: rgba(82, 194, 205, .18);
+    }
+    .ev-sub {
+      font-size: 14px;
+      opacity: .9;
+    }
+    .edit-props {
+      padding: 14px 16px 16px;
+      display: grid;
+      gap: 6px;
+      align-content: start;
+      border-left: 1px solid var(--line);
+    }
+    .prop {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      min-height: 44px;
+      font-size: 14px;
+    }
+    .prop > span {
+      color: var(--text-2);
+    }
+    .prop input[type="text"] {
+      width: 100%;
+      min-height: 40px;
+      padding: 0 10px;
+      border-radius: 8px;
+      border: 1px solid var(--line-2);
+      background: var(--bg-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 16px;
+    }
+    .prop input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      height: 40px;
+      margin: 0;
+    }
+    .prop .rv {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .prop .rv output {
+      min-width: 3.4em;
+      text-align: right;
+      font-size: 14px;
+    }
+    .swatches {
+      display: flex;
+      gap: 6px;
+    }
+    .swatches button {
+      width: 44px;
+      height: 40px;
+      border-radius: 8px;
+      border: 1px solid var(--line-2);
+      background: var(--bg-2);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .swatches button i {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 0 1px rgba(127, 127, 127, .5);
+    }
+    .swatches button[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .cmd-line {
+      border-top: 1px solid var(--line);
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--text-2);
+      background: var(--code-bg);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .cmd-line b {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* 演示 2：审计 */
+    .audit-demo {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+    .audit-view {
+      position: relative;
+      background: #1c1c1e;
+      padding: 20px;
+      color: #fff;
+      overflow: hidden;
+    }
+    .av-card {
+      position: relative;
+      background: #2a2a2d;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+    }
+    .av-card + .av-card {
+      margin-top: 12px;
+    }
+    .av-trunc {
+      display: block;
+      max-width: 90px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .av-mark {
+      position: absolute;
+      border: 2px solid var(--mk);
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--mk) 14%, transparent);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+    }
+    .av-mark i {
+      position: absolute;
+      left: calc(100% + 6px);
+      top: 50%;
+      transform: translateY(-50%);
+      font: 700 12px/20px -apple-system, "PingFang SC", sans-serif;
+      font-style: normal;
+      color: #fff;
+      background: var(--mk);
+      padding: 0 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .av-mark.side-b i {
+      left: -2px;
+      top: calc(100% + 4px);
+      transform: none;
+    }
+    .av-mark.side-l i {
+      left: auto;
+      right: calc(100% + 6px);
+    }
+    .av-mark.focus {
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--mk) 35%, transparent);
+    }
+    .audit-view.scanning .av-mark {
+      opacity: 0;
+      transform: scale(.96);
+    }
+    .scan {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 2px;
+      background: #52c2cd;
+      box-shadow: 0 0 16px #52c2cd;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .audit-view.scanning .scan {
+      animation: scan .9s ease-in-out;
+    }
+    @keyframes scan {
+      0% {
+        top: 0;
+        opacity: 1;
+      }
+      100% {
+        top: 100%;
+        opacity: .2;
+      }
+    }
+    .audit-list {
+      list-style: none;
+      margin: 0;
+      padding: 6px;
+      border-left: 1px solid var(--line);
+    }
+    .audit-list button {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 12px 1fr;
+      gap: 10px;
+      align-items: start;
+      text-align: left;
+      min-height: 44px;
+      padding: 10px 10px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .audit-list button:hover, .audit-list button[aria-pressed="true"] {
+      background: var(--surface-2);
+    }
+    .audit-list button::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      margin-top: 6px;
+      background: var(--mk);
+    }
+    .audit-list small {
+      display: block;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+
+    /* 演示 3：AI 终端 */
+    .term-body {
+      padding: 16px 18px 18px;
+      font-size: 14px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+    .term-body p {
+      transition: opacity .25s;
+    }
+    .term-body.playing p {
+      opacity: 0;
+    }
+    .term-body.playing p.on {
+      opacity: 1;
+    }
+    .t-user {
+      color: var(--text);
+      font-weight: 600;
+    }
+    .t-tool {
+      color: var(--text-2);
+      font-size: 14px;
+      padding-left: 14px;
+      border-left: 2px solid var(--line-2);
+    }
+    .t-tool b {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .t-ans {
+      margin-top: 4px;
+      color: var(--text);
+    }
+
+    /* ================= 代码块与复制 ================= */
+    .code {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--code-bg);
+      overflow: hidden;
+      margin: 12px 0;
+      min-width: 0;
+    }
     .code-bar {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 6px 6px 6px 14px; border-bottom: 1px solid var(--line);
-      font-size: 12.5px; color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px 0 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--text-3);
+      min-height: 46px;
     }
-    .code pre { margin: 0; padding: 14px 16px 16px; overflow-x: auto; font-size: 13px; line-height: 1.65; color: var(--code-ink); tab-size: 4; }
-    .code .c { color: var(--code-comment); }
+    .code pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .code pre code {
+      background: none;
+      border: 0;
+      padding: 0;
+      font-size: inherit;
+      overflow-wrap: normal;
+    }
+    .code .c {
+      color: var(--text-3);
+    }
     .copy-btn {
-      display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px;
-      border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--muted);
-      font: 500 12.5px/1 var(--font); cursor: pointer; transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-2);
+      font: 13px -apple-system, "PingFang SC", sans-serif;
+      cursor: pointer;
     }
-    .copy-btn:hover { color: var(--ink); background: var(--surface); border-color: var(--line); }
-    .copy-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-    .copy-btn .ok { display: none; }
-    .copy-btn.copied { color: var(--accent); }
-    .copy-btn.copied .ok { display: block; }
-    .copy-btn.copied .cp { display: none; }
-    .code-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-
-    /* 折叠说明 */
-    details.more { margin-top: 12px; border-radius: var(--radius-m); border: 1px solid var(--line); background: var(--surface); }
-    details.more > summary {
-      list-style: none; cursor: pointer; padding: 12px 16px; font-size: 14px; font-weight: 560; color: var(--ink);
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    .copy-btn:hover {
+      background: var(--line);
+      color: var(--text);
     }
-    details.more > summary::-webkit-details-marker { display: none; }
-    details.more > summary::after { content: "+"; font: 400 18px/1 var(--font); color: var(--muted); transition: transform 0.25s var(--ease); }
-    details.more[open] > summary::after { transform: rotate(45deg); }
-    details.more > div { padding: 0 16px 14px; color: var(--ink-2); font-size: 14px; }
-    details.more > div p { margin: 0 0 10px; }
-    details.more ol { margin: 0 0 10px; padding-left: 1.3em; }
-    details.more li { margin: 4px 0; }
+    .copy-btn svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .copy-btn .ok {
+      display: none;
+    }
+    .copy-btn.copied {
+      color: var(--accent);
+    }
+    .copy-btn.copied .ok {
+      display: block;
+    }
+    .copy-btn.copied .cp {
+      display: none;
+    }
 
-    /* ---------- AI：接入 + 提示词卡片 ---------- */
-    .ai-setup { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; margin-bottom: 72px; }
-    .ai-setup-text h3 { margin: 0 0 10px; font-size: 22px; font-weight: 650; letter-spacing: -0.01em; }
-    .ai-setup-text > p { margin: 0 0 20px; color: var(--ink-2); font-size: 15.5px; }
-    .prompts-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-    .prompts-head h3 { margin: 0; font-size: 22px; font-weight: 650; letter-spacing: -0.01em; }
-    .prompts-head p { margin: 0; color: var(--muted); font-size: 14px; }
-    .prompt-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    /* ================= 上手（文档式） ================= */
+    .steps {
+      list-style: none;
+      margin: 0 0 56px;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 1px solid var(--line-2);
+    }
+    .steps li {
+      padding: 22px 28px 0 0;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 4px 12px;
+      align-content: start;
+    }
+    .steps .n {
+      grid-row: span 3;
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--accent);
+    }
+    .steps h3 {
+      font-size: 19px;
+    }
+    .steps p {
+      color: var(--text-2);
+      font-size: 15px;
+    }
+    .steps .actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .steps .actions .btn {
+      min-height: 44px;
+      font-size: 15px;
+      padding: 0 16px;
+    }
+    .doc {
+      display: grid;
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      gap: 48px;
+    }
+    .doc-aside h3 {
+      font-size: 21px;
+    }
+    .doc-aside > p {
+      margin-top: 10px;
+      color: var(--text-2);
+      font-size: 15px;
+    }
+    .connect-list {
+      list-style: none;
+      margin: 20px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--line);
+    }
+    .connect-list li {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 15px;
+      color: var(--text-2);
+    }
+    .connect-list .ico {
+      margin-top: 3px;
+      color: var(--accent);
+    }
+    .connect-list strong {
+      display: block;
+      color: var(--text);
+    }
+    .tablist {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--line-2);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tablist button {
+      min-height: 46px;
+      padding: 0 14px;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      background: transparent;
+      color: var(--text-2);
+      font: 600 15px -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .tablist button[aria-selected="true"] {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+    }
+    .tab-panel {
+      padding-top: 16px;
+      font-size: 15px;
+      color: var(--text-2);
+      min-width: 0;
+    }
+    .tab-panel > p {
+      margin: 10px 0;
+    }
+    .code-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .note {
+      font-size: 14px;
+      color: var(--text-3);
+    }
+    details.more {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    details.more summary {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 15px;
+    }
+    details.more ol {
+      padding-left: 22px;
+      margin: 4px 0 8px;
+      display: grid;
+      gap: 6px;
+    }
+    .ai-block {
+      margin-top: 80px;
+      padding-top: 56px;
+      border-top: 1px solid var(--line);
+    }
+    .ai-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 40px;
+    }
+    .ai-grid h3 {
+      font-size: 19px;
+      margin-bottom: 6px;
+    }
+    .ai-grid .sub {
+      color: var(--text-2);
+      font-size: 15px;
+    }
+    .prompts-head {
+      margin: 56px 0 8px;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .prompts-head h3 {
+      font-size: 21px;
+    }
+    .prompts-head p {
+      color: var(--text-3);
+      font-size: 14px;
+    }
+    .prompt-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 40px;
+    }
     .prompt {
-      display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: var(--radius-l);
-      background: var(--surface); border: 1px solid var(--line);
-      transition: transform 0.25s var(--ease), box-shadow 0.25s, border-color 0.25s;
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
     }
-    .prompt:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--line-strong); }
-    .prompt-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .prompt-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--accent); }
-    .prompt-tag .ico { width: 15px; height: 15px; }
-    .prompt h4 { margin: 0; font-size: 16px; font-weight: 640; line-height: 1.4; }
+    .prompt-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .prompt h4 {
+      font-size: 16px;
+    }
+    .prompt-kind {
+      font-size: 12px;
+      color: var(--text-3);
+      border: 1px solid var(--line-2);
+      border-radius: 5px;
+      padding: 1px 6px;
+    }
+    .prompt .copy-btn {
+      margin-left: auto;
+    }
     .prompt blockquote {
-      margin: 0; padding: 12px 14px; border-radius: var(--radius-m); background: var(--sunken);
-      color: var(--ink-2); font-size: 13.5px; line-height: 1.65;
+      margin: 6px 0 8px;
+      color: var(--text-2);
+      font-size: 15px;
     }
-    .prompt .chips { margin-top: auto; }
-
-    /* ---------- 隐私 ---------- */
-    .privacy { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
-    .privacy li { padding: 24px; border-radius: var(--radius-l); background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); font-size: 14.5px; line-height: 1.6; }
-    .privacy .cap-ico { margin-bottom: 14px; }
-    .privacy strong { display: block; color: var(--ink); font-weight: 640; font-size: 16px; margin-bottom: 6px; }
-
-    /* ---------- 收尾下载 ---------- */
-    .final { padding: 104px 0 112px; text-align: center; border-top: 1px solid var(--line); position: relative; overflow: hidden; }
-    .final::before {
-      content: ""; position: absolute; left: 50%; top: 40%; width: 760px; height: 420px; transform: translate(-50%, -50%);
-      background: radial-gradient(closest-side, var(--accent-glow), transparent 70%); pointer-events: none;
-    }
-    .final > .wrap { position: relative; }
-    .final img { width: 96px; height: 96px; margin: 0 auto 20px; filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2)); }
-    .final h2 { font-family: var(--font-display); font-size: clamp(28px, 3.6vw, 40px); font-weight: 660; letter-spacing: -0.025em; margin: 0 0 12px; }
-    .final p { margin: 0 0 28px; color: var(--ink-2); }
-
-    /* ---------- 页脚 ---------- */
-    .site-footer { border-top: 1px solid var(--line); padding: 36px 0 52px; color: var(--muted); font-size: 14px; }
-    .footer-grid { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; }
-    .footer-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
-    .footer-links a { color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
-    .footer-links a:hover { color: var(--ink); }
-
-    /* ---------- 滚动进入渐显（仅在脚本可用时隐藏初始状态） ---------- */
-    .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); transition-delay: var(--d, 0ms); }
-    .js .reveal.in { opacity: 1; transform: none; }
-
-    /* ---------- 响应式 ---------- */
-    @media (max-width: 980px) {
-      .frow, .frow.flip { grid-template-columns: minmax(0, 1fr); gap: 32px; }
-      .frow.flip .frow-text { order: 0; }
-      .frow-media { height: 440px; }
-      .cap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .steps { grid-template-columns: minmax(0, 1fr); }
-      .integrate { grid-template-columns: minmax(0, 1fr); gap: 32px; }
-      .ai-setup { grid-template-columns: minmax(0, 1fr); gap: 32px; }
-      .prompt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .privacy { grid-template-columns: minmax(0, 1fr); }
-      .new-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 72px; }
-      .film { margin-bottom: 64px; }
-    }
-    @media (max-width: 720px) {
-      .nav { gap: 14px; }
-      .nav-links { display: none; }
-      .nav-tools { margin-left: auto; }
-      .gh-link span { display: none; }
-      .gh-link { padding: 0 9px; }
-      .hero { padding-top: 44px; }
-      .hero .lede { font-size: 16.5px; }
-      .showcase { margin-top: 40px; }
-      .window { border-radius: 10px; }
-      .section { padding: 72px 0; }
-      .section-head { margin-bottom: 40px; }
-      .feature-rows { gap: 72px; }
-      .frow-media { height: 380px; padding: 24px 20px 0; }
-      .float-tag { display: none; }
-      .cap-grid, .prompt-grid, .code-pair, .new-grid { grid-template-columns: minmax(0, 1fr); }
-      .frow-media.shot { padding: 16px; }
-      .film-frame { border-radius: 10px; }
-      .cta-row .btn { flex: 1 1 auto; }
+    .tools {
+      font-size: 14px;
+      color: var(--text-3);
     }
 
+    /* ================= 能力清单：紧凑两栏 ================= */
+    .caps {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 56px;
+      margin: 0;
+    }
+    .cap {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 16px;
+      padding: 13px 0;
+      border-top: 1px solid var(--line);
+      font-size: 15px;
+    }
+    .cap dt {
+      font-weight: 600;
+    }
+    .cap dd {
+      margin: 0;
+      color: var(--text-2);
+    }
+
+    /* ================= 隐私 ================= */
+    .privacy {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 56px;
+      align-items: start;
+    }
+    .privacy .section-head {
+      margin: 0;
+    }
+    .priv-list {
+      margin: 0;
+      display: grid;
+    }
+    .priv-list div {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 20px;
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+    }
+    .priv-list dt {
+      font-weight: 700;
+      font-size: 17px;
+    }
+    .priv-list dd {
+      margin: 0;
+      color: var(--text-2);
+    }
+
+    /* ================= 下载 ================= */
+    .final {
+      padding: 112px 0 104px;
+      text-align: center;
+    }
+    .final img {
+      display: block;
+      margin: 0 auto 22px;
+    }
+    .final h2 {
+      font-size: clamp(30px, 3.4vw, 44px);
+      letter-spacing: -.02em;
+    }
+    .final p {
+      margin-top: 12px;
+      color: var(--text-2);
+    }
+    .final .cta-row {
+      justify-content: center;
+      margin-top: 28px;
+    }
+    .site-footer {
+      border-top: 1px solid var(--line);
+      padding: 24px 0 32px;
+      font-size: 14px;
+      color: var(--text-3);
+    }
+    .footer-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 6px;
+    }
+    .footer-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 44px;
+      padding: 0 8px;
+      color: var(--text-2);
+    }
+
+    /* ================= 响应式 ================= */
+    @media (max-width: 1100px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: none;
+        grid-template-areas: "text" "stage" "ro";
+      }
+      .readout {
+        margin: 24px 32px 32px;
+      }
+      .hero-text {
+        padding: 40px 32px 28px;
+      }
+      .stage-col {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+      .demo, .doc, .ai-grid, .privacy {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 28px;
+      }
+    }
+    @media (max-width: 860px) {
+      .nav-links, .gh-link span {
+        display: none;
+      }
+      .steps {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .steps li {
+        padding-bottom: 22px;
+        border-bottom: 1px solid var(--line);
+      }
+      .caps, .prompt-list {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .edit-demo, .audit-demo {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .edit-props, .audit-list {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+      .code-pair {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .shot-cap {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 16px;
+      }
+      .wrap, .nav, .shot-frame {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+      .nav {
+        gap: 10px;
+      }
+      .theme-switch button {
+        width: 44px;
+      }
+      .hero-text {
+        padding: 30px 18px 24px;
+        gap: 16px;
+      }
+      .hero h1 {
+        font-size: 34px;
+      }
+      .lede {
+        font-size: 16px;
+      }
+      .stage {
+        min-height: 340px;
+      }
+      .stage-bar {
+        padding: 8px 12px;
+        gap: 8px 12px;
+      }
+      .readout {
+        padding: 14px;
+        min-height: 0;
+        margin: 20px 18px 28px;
+      }
+      .section {
+        padding: 72px 0;
+      }
+      .shot-sec {
+        padding: 64px 0;
+      }
+      .demo {
+        padding: 40px 0;
+      }
+      .demo h3 {
+        font-size: 23px;
+      }
+      .ticks, .steps p, .connect-list li, .tab-panel, .doc-aside > p, .ai-grid .sub, .prompt blockquote, .cap, .shot-cap p {
+        font-size: 16px;
+      }
+      .cap {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2px;
+      }
+      .priv-list div {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+      }
+      .prop {
+        grid-template-columns: 84px minmax(0, 1fr);
+      }
+      .ev-head {
+        height: 170px;
+      }
+      .btn {
+        padding: 0 16px;
+      }
+    }
+
+    /* 减少动效：关掉编排与过渡 */
     @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0ms !important; animation: none !important; }
-      .js .reveal { opacity: 1; transform: none; }
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
     }
   </style>
 </head>
 <body>
-<!-- 图标集：内联 SVG，避免外部请求 -->
+<!-- 图标集：内联 SVG，不发外部请求 -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-github" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></symbol>
   <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0013.5 4h-7A2.5 2.5 0 004 6.5v7A2.5 2.5 0 006.5 16H8"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></symbol>
-  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 12.5l9 5 9-5"/><path d="M3 17l9 5 9-5"/></symbol>
-  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></symbol>
-  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
-  <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.5 9.5 0 00-6.5 2.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7.5V12l3 2"/></symbol>
-  <symbol id="i-term" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 9.5l3 2.5-3 2.5M12.5 15H17"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></symbol>
   <symbol id="i-mac" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8.5 20h7M12 16.5V20"/></symbol>
   <symbol id="i-tv" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="12" rx="2"/><path d="M8 20h8"/></symbol>
   <symbol id="i-vision" viewBox="0 0 24 24"><path d="M3 11c0-2.5 2-4 4.5-4h9C19 7 21 8.5 21 11v1.5c0 2.5-1.8 4.5-4.2 4.5-1.6 0-2.6-.8-3.3-2-.5-.8-.9-1.2-1.5-1.2s-1 .4-1.5 1.2c-.7 1.2-1.7 2-3.3 2C4.8 17 3 15 3 12.5V11z"/></symbol>
-  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
-  <symbol id="i-ruler" viewBox="0 0 24 24"><path d="M4 7h16v10H4z"/><path d="M8 7v3M12 7v4M16 7v3"/></symbol>
-  <symbol id="i-a11y" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="1.8"/><path d="M5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5L9 21M12 14.5l3 6.5"/></symbol>
   <symbol id="i-swift" viewBox="0 0 24 24"><path d="M4 5c4 3.5 7.5 6 10 7.5-3.8-3.5-6-6.8-6-6.8 4.5 4 9 6.6 10.5 7.6.6-2.5-.4-5.6-3-8.3 4 2.6 6.3 7 5.2 10.6 1 1.4 1.4 2.5 1.2 3.4-.6-1.1-1.7-1.4-2.6-1.2C16.4 19.5 9.3 19.7 4 13.5c3 2 6.4 2.6 9.2 1.6C9.5 12.8 6.2 9.3 4 5z"/></symbol>
-  <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9M10 13h4"/></symbol>
-  <symbol id="i-compare" viewBox="0 0 24 24"><rect x="3" y="5" width="11" height="14" rx="2"/><rect x="10" y="3" width="11" height="14" rx="2" opacity=".55"/></symbol>
-  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6L13 3z"/></symbol>
-  <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v15M12 18a2 2 0 100 4 2 2 0 000-4zM12 13l-4-2.5V8M12 15.5l4-2.5V10"/><rect x="6.5" y="6" width="3" height="2" rx=".5"/><circle cx="16" cy="9" r="1.2"/></symbol>
-  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0119 0M5.5 12.3a9.5 9.5 0 0113 0M8.6 15.5a5 5 0 016.8 0"/><circle cx="12" cy="19" r="1"/></symbol>
-  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4.2-3 7.7-7 9.5-4-1.8-7-5.3-7-9.5V6l7-3z"/><path d="M9 12l2 2 4-4"/></symbol>
-  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/></symbol>
-  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V20h12V9.5"/></symbol>
-  <symbol id="i-bug" viewBox="0 0 24 24"><rect x="7.5" y="7" width="9" height="13" rx="4.5"/><path d="M12 7V4.5M9 4l1.5 1.5M15 4l-1.5 1.5M4 12h3.5M16.5 12H20M4.5 17.5l3-1.5M19.5 17.5l-3-1.5M4.5 7.5l3 1.5M19.5 7.5l-3 1.5"/></symbol>
-  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/><path d="M19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7L19 16z"/></symbol>
+  <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v14M12 3l-2.5 3M12 3l2.5 3M12 13l-4-2.5V8M12 15l4-2.5V10"/><circle cx="12" cy="19" r="2"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M3.5 9.5a12 12 0 0117 0M6.5 12.5a7.5 7.5 0 0111 0M9.5 15.5a3 3 0 015 0"/><circle cx="12" cy="18.5" r=".8"/></symbol>
+  <symbol id="i-label" viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h9"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="15" height="15" rx="2"/></symbol>
+  <symbol id="i-stack" viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="15" height="15" rx="2"/><path d="M4.5 12h15"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 16l4.5-4.5 4 4 2.5-2.5L20 18"/><circle cx="15.5" cy="9.5" r="1.3"/></symbol>
+  <symbol id="i-scroll" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M15.5 7v5"/></symbol>
+  <symbol id="i-window" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 9h17"/></symbol>
 </svg>
 
 <header class="site-header" id="top">
   <div class="wrap nav">
     <a class="brand" href="#top" aria-label="Lumen 首页">
-      <img src="assets/AppIcon.png" alt="" width="26" height="26">
+      <img src="assets/AppIcon.png" alt="" width="28" height="28">
       Lumen
     </a>
     <nav class="nav-links" aria-label="页面导航">
@@ -587,7 +2230,7 @@
       </a>
       <div class="theme-switch" role="group" aria-label="外观">
         <button type="button" data-theme-choice="light" title="浅色" aria-label="浅色">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>
         </button>
         <button type="button" data-theme-choice="dark" title="深色" aria-label="深色">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg>
@@ -601,11 +2244,10 @@
 </header>
 
 <main>
-  <!-- Hero -->
+  <!-- ================= 首屏：可以亲手拆开的模型 ================= -->
   <section class="hero" aria-labelledby="hero-title">
-    <div class="wrap">
-      <a class="eyebrow" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener"><b>v0.3.0</b>查看更新记录 →</a>
-      <h1 id="hero-title">把运行中的界面，<br><em>一层层</em>拆开看。</h1>
+    <div class="hero-text">
+      <h1 id="hero-title">把运行中的界面，<br>一层层拆开看。</h1>
       <p class="lede">3D 分层查看 iOS、macOS App 的视图层级，实时改属性、查布局问题，还能交给 AI 助手直接操作。</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="https://github.com/wangwanjie/Lumen/releases/latest/download/Lumen_arm64.dmg">
@@ -616,60 +2258,177 @@
       <ul class="meta-row">
         <li>免费使用</li>
         <li>macOS 14 及以上</li>
-        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.2-3 7.7-7 9.5-4-1.8-7-5.3-7-9.5V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>Apple 公证</li>
+        <li>Apple 公证</li>
         <li>内置自动更新</li>
+        <li><a class="mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">v0.3.0</a></li>
       </ul>
 
-      <div class="showcase">
-        <div class="mode-switch" role="group" aria-label="截图视图">
-          <button type="button" data-mode="2d" aria-pressed="false">2D 平面<kbd>⌘1</kbd></button>
-          <button type="button" data-mode="3d" aria-pressed="true">3D 分层<kbd>⌘2</kbd></button>
+    </div>
+
+      <!-- 读数面板：显示模型里选中那一层的类名、frame 与几何读数卡 -->
+    <div class="readout" id="readout" aria-live="polite">
+      <div class="ro-head">
+        <div class="ro-badge"><svg class="ico" aria-hidden="true"><use id="ro-icon" href="#i-label"/></svg></div>
+        <div class="ro-title">
+          <div class="ro-cls" id="ro-cls">UILabel<span class="ro-q">“京都”</span></div>
+          <div class="ro-tag" id="ro-tag">UIView › UIResponder › NSObject</div>
         </div>
-        <div class="window">
-          <img src="assets/screens/app-3d.webp" width="2000" height="1250" alt="Lumen 主窗口：左侧层级大纲，中间 3D 分层画布展示电商示例 App 首页，右侧检查器显示所选商品卡片的属性" data-shot="3d">
-          <img src="assets/screens/app-2d.webp" width="2000" height="1250" alt="Lumen 主窗口：2D 平面画布与检查器" data-shot="2d" data-hidden loading="lazy">
+        <div class="ro-depth mono" id="ro-depth">第 6 层</div>
+      </div>
+      <div class="geo">
+        <div class="geo-top mono" id="geo-parent">UIStackView  76 × 66</div>
+        <div class="geo-box">
+          <span class="gl gl-t"><b class="mono" id="g-t">0</b></span>
+          <span class="gl gl-b"><b class="mono" id="g-b">19</b></span>
+          <span class="gl gl-l"><b class="mono" id="g-l">0</b></span>
+          <span class="gl gl-r"><b class="mono" id="g-r">0</b></span>
+          <div class="geo-in mono" id="geo-size">76 × 47</div>
+        </div>
+        <div class="geo-foot">
+          <span>原点<b class="mono" id="geo-origin">0, 0</b></span>
+          <span>窗口坐标<b class="mono" id="geo-win">20, 186</b></span>
         </div>
       </div>
-
-      <ul class="platforms" aria-label="支持的平台">
-        <li><svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>iOS / iPadOS</li>
-        <li><svg class="ico" aria-hidden="true"><use href="#i-tv"/></svg>tvOS</li>
-        <li><svg class="ico" aria-hidden="true"><use href="#i-vision"/></svg>visionOS</li>
-        <li><svg class="ico" aria-hidden="true"><use href="#i-mac"/></svg>macOS AppKit</li>
-        <li><svg class="ico" aria-hidden="true"><use href="#i-swift"/></svg>SwiftUI</li>
-      </ul>
+      <dl class="ro-rows" id="ro-rows">
+        <dt>NodeID</dt><dd class="mono">#36</dd>
+        <dt>text</dt><dd>京都</dd>
+        <dt>font</dt><dd class="mono">.SFNS-Heavy 40.0</dd>
+        <dt>textColor</dt><dd class="mono"><span class="ro-swatch"></span>#FFFFFF 100%</dd>
+      </dl>
+      <p class="ro-note" id="ro-note">这一层的读数取自 App 本身。点模型里的其他层，读数跟着换。</p>
     </div>
-    <div class="hero-fade"></div>
+
+    <div class="stage-col">
+      <div class="stage-bar">
+        <div class="seg" role="group" aria-label="画布模式">
+          <button type="button" data-view="2d" aria-pressed="false">2D</button>
+          <button type="button" data-view="3d" aria-pressed="true">3D</button>
+        </div>
+        <label class="gap-ctl">
+          <span>层间距</span>
+          <input type="range" id="gap" min="0" max="120" step="1" value="84" aria-label="层间距">
+          <output class="mono" id="gap-out" for="gap">84 pt</output>
+        </label>
+      </div>
+      <div class="stage" id="stage" tabindex="0" role="group" aria-label="可拖动的 3D 模型：左右方向键旋转，上下方向键切换选中的层" aria-describedby="stage-hint">
+        <div class="rig" id="rig">
+          <!-- 按演示 App 的真实层级重画的“京都”行程页；data-id 对应脚本里的层数据 -->
+          <div class="ly l-win" data-id="win" style="--d:0;left:0;top:0;width:1064px;height:780px"></div>
+          <div class="ly l-vc" data-id="vc" style="--d:1;left:0;top:0;width:1064px;height:780px"></div>
+          <div class="ly" data-id="scroll" style="--d:2;left:0;top:50px;width:1064px;height:730px"></div>
+          <div class="ly" data-id="stack" style="--d:3;left:0;top:50px;width:1064px;height:730px"></div>
+          <div class="ly l-header" data-id="header" style="--d:4;left:0;top:50px;width:1064px;height:222px"></div>
+          <div class="ly l-card" data-id="date" style="--d:4;left:16px;top:288px;width:1032px;height:116px">
+            <div class="mc-h">12月5日 - 12月10日</div>
+            <div class="mc-p">京都 · 日本，5 晚。古城漫步、地道美食与山海风光，一次说走就走的旅行。</div>
+            <div class="mc-tags"><span style="background:#a65f08">美食</span><span style="background:#5865e0">人文</span><span style="background:#2f8040">徒步</span></div>
+            <div class="mc-stars" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-2.9-5.4 2.9 1.1-6-4.5-4.2 6.1-.8z" fill="#f1a630"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-2.9-5.4 2.9 1.1-6-4.5-4.2 6.1-.8z" fill="#f1a630"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-2.9-5.4 2.9 1.1-6-4.5-4.2 6.1-.8z" fill="#f1a630"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-2.9-5.4 2.9 1.1-6-4.5-4.2 6.1-.8z" fill="none" stroke="#f1a630" stroke-width="1.6"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-2.9-5.4 2.9 1.1-6-4.5-4.2 6.1-.8z" fill="none" stroke="#f1a630" stroke-width="1.6"/></svg>
+            </div>
+          </div>
+          <div class="ly l-card" data-id="budget" style="--d:4;left:16px;top:420px;width:1032px;height:150px">
+            <div class="mc-h" style="font-size:16px">预算 (SwiftUI)</div>
+            <span class="mc-ok">正常</span>
+            <div class="mc-budget">
+              <div class="mc-ring">
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4fc8d6"/><stop offset="1" stop-color="#3b82f0"/></linearGradient></defs>
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="11"/>
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="url(#rg)" stroke-width="11" stroke-linecap="round" stroke-dasharray="88 252"/>
+                </svg>
+                <span>35%<small>已花费</small></span>
+              </div>
+              <div class="mc-bars">
+                <div class="mc-bar"><span>交通</span><i style="--w:46%;--c:#4fc3d0"></i><em>¥1,634</em></div>
+                <div class="mc-bar"><span>住宿</span><i style="--w:36%;--c:#6670e8"></i><em>¥1,376</em></div>
+                <div class="mc-bar"><span>餐饮</span><i style="--w:22%;--c:#f0963a"></i><em>¥860</em></div>
+                <div class="mc-bar"><span>门票</span><i style="--w:11%;--c:#e8485a"></i><em>¥430</em></div>
+              </div>
+            </div>
+          </div>
+          <div class="ly l-card" data-id="trip" style="--d:4;left:16px;top:586px;width:1032px;height:180px">
+            <div class="mc-h" style="font-size:18px">行程安排</div>
+            <div class="mc-day"><div><small>第 1 天</small><b>抵达 · 入住町家</b><span>下午逛锦市场，晚上祇园散步</span></div></div>
+            <div class="mc-day"><div><small>第 2 天</small><b>清水寺与二年坂</b></div></div>
+          </div>
+          <div class="ly l-img" data-id="img" style="--d:5;left:904px;top:118px;width:124px;height:124px">
+            <svg viewBox="0 0 120 120" aria-hidden="true" fill="rgba(255,255,255,.55)">
+              <path d="M60 14L106 40H14z"/>
+              <rect x="18" y="44" width="84" height="8" rx="2"/>
+              <rect x="26" y="58" width="11" height="38" rx="2"/>
+              <rect x="45" y="58" width="11" height="38" rx="2"/>
+              <rect x="64" y="58" width="11" height="38" rx="2"/>
+              <rect x="83" y="58" width="11" height="38" rx="2"/>
+              <rect x="12" y="100" width="96" height="10" rx="3"/>
+            </svg>
+          </div>
+          <div class="ly" data-id="title" style="--d:5;left:20px;top:186px;width:76px;height:66px"></div>
+          <div class="ly l-badge" data-id="badge" style="--d:5;left:990px;top:66px;width:58px;height:24px">
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="#ffd34d"/></svg>30°
+          </div>
+          <div class="ly l-kyoto sel" data-id="kyoto" style="--d:6;left:20px;top:186px;width:76px;height:47px">京都</div>
+          <div class="ly l-nights" data-id="nights" style="--d:6;left:20px;top:233px;width:76px;height:19px">日本 · 5 晚</div>
+        </div>
+        <p class="stage-hint" id="stage-hint">拖动旋转，点任一层看读数</p>
+      </div>
+      <nav class="pathbar" id="pathbar" aria-label="选中节点的路径"></nav>
+    </div>
   </section>
 
-  <!-- 0.3.0 新特性 -->
-  <section class="section" id="new" aria-labelledby="new-title">
+  <!-- ================= 0.3.0 新特性：宣传片 + 三项可切换的新特性 + 六项新能力 ================= -->
+  <section class="section release" id="new" aria-labelledby="new-title">
     <div class="wrap">
-      <div class="section-head reveal">
-        <span class="kicker">0.3.0 新特性</span>
-        <h2 id="new-title">不改一行代码，启动就能调试</h2>
-        <p>选一个 App 点“启动”，Lumen 注入采集端、启动并自动连上。日志、检查器、画布也一起升级了。</p>
+      <div class="release-head">
+        <div class="section-head">
+          <h2 id="new-title">不改一行代码，启动就能调试</h2>
+          <p>选一个 App 点“启动”，Lumen 注入采集端、启动并自动连上。日志、检查器、画布也一起升级了。</p>
+        </div>
+        <a class="ver-link mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">0.3.0 新版本</a>
       </div>
 
-      <figure class="film reveal">
+      <figure class="film">
         <div class="film-frame">
           <video controls playsinline preload="none" poster="assets/video/lumen-promo-poster.jpg" aria-label="Lumen 0.3.0 演示视频：启动调试、3D 画布、检查器、App 自定义属性与应用日志">
             <source src="assets/video/lumen-promo.mp4" type="video/mp4">
           </video>
         </div>
-        <ul class="film-caption">
-          <li>启动调试</li>
-          <li>3D 分层与路径栏</li>
-          <li>几何读数卡</li>
-          <li>App 自定义属性</li>
-          <li>应用日志</li>
-        </ul>
+        <figcaption>
+          <span>演示视频</span>
+          <ol class="film-chapters">
+            <li>启动调试</li>
+            <li>3D 分层与路径栏</li>
+            <li>几何读数卡</li>
+            <li>App 自定义属性</li>
+            <li>应用日志</li>
+          </ol>
+        </figcaption>
       </figure>
 
-      <div class="feature-rows">
-        <div class="frow reveal">
-          <div class="frow-text">
-            <h3>启动调试：<br>选中 App，一键注入连接</h3>
+      <!-- 三项主要新特性：左侧列表切换，右侧显示录屏或截图 -->
+      <div class="rel-switch">
+        <div class="rel-list" role="tablist" aria-label="0.3.0 主要新特性" aria-orientation="vertical">
+          <button type="button" role="tab" id="rel-tab-launch" aria-controls="rel-launch" aria-selected="true">
+            <b>启动调试</b><span>选中 App，一键注入连接</span>
+          </button>
+          <button type="button" role="tab" id="rel-tab-log" aria-controls="rel-log" aria-selected="false" tabindex="-1">
+            <b>应用日志</b><span>print、NSLog 与 os_log 一处看</span>
+          </button>
+          <button type="button" role="tab" id="rel-tab-insp" aria-controls="rel-insp" aria-selected="false" tabindex="-1">
+            <b>检查器</b><span>尺寸边距一眼读出，业务状态也能看</span>
+          </button>
+        </div>
+
+        <div class="rel-panel" role="tabpanel" id="rel-launch" aria-labelledby="rel-tab-launch">
+          <div class="rel-media">
+            <video autoplay muted loop playsinline preload="metadata" poster="assets/video/launch-demo-poster.jpg" width="1280" height="800" aria-label="启动调试演示：在模拟器标签中选择 LumenDemoMixed，点启动，注入完成后自动连接并显示 3D 层级">
+              <source src="assets/video/launch-demo.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="rel-text">
             <p>“启动调试”窗口（⌘N）列出模拟器中的 App、Mac 应用、iOS 安装包与 USB 真机，启动过程逐步显示，成功后自动连接。</p>
             <ul class="ticks">
               <li><span><strong>模拟器</strong>未启动的模拟器自动开机，也可以先安装 .app 再启动</span></li>
@@ -678,17 +2437,13 @@
               <li><span><strong>Mac 应用</strong>Hardened Runtime 的 App 自动重签副本，原 App 不改动</span></li>
             </ul>
           </div>
-          <div class="frow-media shot">
-            <video autoplay muted loop playsinline preload="metadata" poster="assets/video/launch-demo-poster.jpg" aria-label="启动调试演示：在模拟器标签中选择 LumenDemoMixed，点启动，注入完成后自动连接并显示 3D 层级">
-              <source src="assets/video/launch-demo.mp4" type="video/mp4">
-            </video>
-            <span class="float-tag" style="left:24px;bottom:28px"><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg>不改工程，自动连接</span>
-          </div>
         </div>
 
-        <div class="frow flip reveal">
-          <div class="frow-text">
-            <h3>应用日志：<br>print、NSLog 与 os_log 一处看</h3>
+        <div class="rel-panel" role="tabpanel" id="rel-log" aria-labelledby="rel-tab-log" hidden>
+          <div class="rel-media">
+            <img src="assets/screens/app-log.webp" width="1600" height="1000" alt="Lumen 应用日志面板：按行列出示例 App 的日志输出，下方显示选中日志的完整内容" loading="lazy">
+          </div>
+          <div class="rel-text">
             <p>底部“应用日志”面板显示被调试 App 的输出。启动调试的 App 与集成了 LumenServer 的 App 都能看，断线重连只补发错过的部分。</p>
             <ul class="ticks">
               <li><span><strong>大量日志不卡</strong>虚拟化列表，每条一行，选中看完整内容</span></li>
@@ -696,14 +2451,13 @@
               <li><span><strong>不打断阅读</strong>向上滚动暂停跟随，滚回底部自动恢复</span></li>
             </ul>
           </div>
-          <div class="frow-media shot">
-            <img src="assets/screens/app-log.webp" width="1600" height="1000" alt="Lumen 应用日志面板：按行列出示例 App 的日志输出，下方显示选中日志的完整内容" loading="lazy">
-          </div>
         </div>
 
-        <div class="frow reveal">
-          <div class="frow-text">
-            <h3>检查器：<br>尺寸边距一眼读出，业务状态也能看</h3>
+        <div class="rel-panel" role="tabpanel" id="rel-insp" aria-labelledby="rel-tab-insp" hidden>
+          <div class="rel-media">
+            <img src="assets/screens/inspector-custom.webp" width="1600" height="1000" alt="Lumen 检查器：顶部几何读数卡显示父视图与所选天气徽标的尺寸和边距，下方为 App 自定义的“天气徽标”属性分组" loading="lazy">
+          </div>
+          <div class="rel-text">
             <p>几何读数卡画出父视图与所选节点，四边距离、原点与窗口坐标都在一张卡上。App 还可以把自己的状态放进检查器。</p>
             <ul class="ticks">
               <li><span><strong>App 自定义属性</strong>实现 <code>lumen_debugInfo()</code>，带 setter 的项可直接修改</span></li>
@@ -712,152 +2466,244 @@
               <li><span><strong>事件处理</strong>列出控件的 target-action 与 <code>UIAction</code></span></li>
             </ul>
           </div>
-          <div class="frow-media shot">
-            <img src="assets/screens/inspector-custom.webp" width="1600" height="1000" alt="Lumen 检查器：顶部几何读数卡显示父视图与所选天气徽标的尺寸和边距，下方为 App 自定义的“天气徽标”属性分组" loading="lazy">
-          </div>
         </div>
       </div>
 
-      <div class="new-grid">
-        <div class="cap reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-layers"/></svg></div><h3>画布工具条与路径栏</h3><p>工具条贴在画布上缘，底部路径栏从根到所选节点逐段可点；按遮罩裁剪，网页、Metal、Lottie 内容完整显示。</p></div>
-        <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-search"/></svg></div><h3>层级深度与聚焦</h3><p>⌥⌘1…⌥⌘5 按窗口与控制器展开；聚焦到某个节点只看它的子树，Esc 退出；按 App 记住展开状态。</p></div>
-        <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-bug"/></svg></div><h3>遮罩诊断</h3><p>审计找出被 <code>mask</code> 整个挡住或只露出一小部分的视图，并说明原因与修法。</p></div>
-        <div class="cap reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-history"/></svg></div><h3>断线保留现场</h3><p>App 退出或崩溃后，最后的层级、详情与纹理继续可看，可另存为快照；App 回来自动切回实时。</p></div>
-        <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-term"/></svg></div><h3>控制台补全</h3><p>方法名预测与 Tab 补全，参数按签名逐个填写；返回的对象可以继续调用。</p></div>
-        <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-sparkle"/></svg></div><h3>三种界面语言</h3><p>简体中文、English、繁體中文随时切换；外观可跟随系统、浅色或深色。</p></div>
-      </div>
+      <dl class="caps caps-new" aria-label="0.3.0 其他新能力">
+        <div class="cap"><dt>画布工具条与路径栏</dt><dd>工具条贴在画布上缘，底部路径栏从根到所选节点逐段可点；按遮罩裁剪，网页、Metal、Lottie 内容完整显示。</dd></div>
+        <div class="cap"><dt>层级深度与聚焦</dt><dd>⌥⌘1…⌥⌘5 按窗口与控制器展开；聚焦到某个节点只看它的子树，Esc 退出；按 App 记住展开状态。</dd></div>
+        <div class="cap"><dt>遮罩诊断</dt><dd>审计找出被 <code>mask</code> 整个挡住或只露出一小部分的视图，并说明原因与修法。</dd></div>
+        <div class="cap"><dt>断线保留现场</dt><dd>App 退出或崩溃后，最后的层级、详情与纹理继续可看，可另存为快照；App 回来自动切回实时。</dd></div>
+        <div class="cap"><dt>控制台补全</dt><dd>方法名预测与 Tab 补全，参数按签名逐个填写；返回的对象可以继续调用。</dd></div>
+        <div class="cap"><dt>三种界面语言</dt><dd>简体中文、English、繁體中文随时切换；外观可跟随系统、浅色或深色。</dd></div>
+      </dl>
     </div>
   </section>
 
-  <!-- 功能：图文交替 -->
-  <section class="section" id="features" aria-labelledby="features-title">
+  <!-- ================= 真实 App 截图：全宽 ================= -->
+  <section class="shot-sec" id="features" aria-labelledby="shot-title">
+    <div class="wrap section-head" style="margin-bottom:36px">
+      <h2 id="shot-title">看清、改动、诊断，一个窗口完成</h2>
+      <p>上面的模型照着这一屏画。连上运行中的 App，层级、3D 画布与检查器同屏，指向任一标注看它对应的部件。</p>
+    </div>
+    <div class="anno-stage">
+      <figure class="anno-object">
+        <img class="shot-light" src="assets/screens/lumen-3d-light.webp" width="2560" height="1600" alt="Lumen 浅色界面：左侧层级树选中 UILabel“京都”，中间 3D 画布把“京都”行程页一层层展开，右侧几何读数卡显示 76 × 47 与四边距离，底部状态栏显示加载完成 0.60 s、190 个节点">
+        <img class="shot-dark" src="assets/screens/lumen-3d-dark.webp" width="2560" height="1600" alt="Lumen 深色界面：3D 分层展开“京都”行程页，选中 UILabel“京都”，几何读数卡 76 × 47" loading="lazy">
+      </figure>
+
+      <!-- 引线：坐标系 1360 × 720；截图占 x 200–1160、y 20–620。锚点 = 截图内部件的真实位置 -->
+      <svg class="anno-leaders" viewBox="0 0 1360 720" preserveAspectRatio="none" aria-hidden="true">
+        <g data-k="1" style="color:var(--accent)">
+          <polyline class="l-sel" points="281.6,536 192,536" pathLength="1"/>
+          <circle class="dot-sel" cx="281.6" cy="536" r="3"/><circle class="ring" cx="281.6" cy="536" r="9"/>
+        </g>
+        <g data-k="2" style="color:var(--accent)">
+          <polyline class="l-sel" points="545.6,189.4 192,189.4" pathLength="1"/>
+          <circle class="dot-sel" cx="545.6" cy="189.4" r="3"/><circle class="ring" cx="545.6" cy="189.4" r="9"/>
+        </g>
+        <g data-k="3" style="color:var(--measure)">
+          <polyline class="l-mea" points="1097.6,174.8 1168,174.8" pathLength="1"/>
+          <circle class="dot-mea" cx="1097.6" cy="174.8" r="3"/><circle class="ring" cx="1097.6" cy="174.8" r="9"/>
+        </g>
+        <g data-k="4" style="color:var(--accent)">
+          <polyline class="l-sel" points="1092.8,347 1168,347" pathLength="1"/>
+          <circle class="dot-sel" cx="1092.8" cy="347" r="3"/><circle class="ring" cx="1092.8" cy="347" r="9"/>
+        </g>
+        <g data-k="5" style="color:var(--accent)">
+          <polyline class="l-sel" points="687.2,591.2 687.2,646" pathLength="1"/>
+          <circle class="dot-sel" cx="687.2" cy="591.2" r="3"/><circle class="ring" cx="687.2" cy="591.2" r="9"/>
+        </g>
+        <g data-k="6" style="color:var(--measure)">
+          <polyline class="l-mea" points="912.8,611.6 912.8,646" pathLength="1"/>
+          <circle class="dot-mea" cx="912.8" cy="611.6" r="3"/><circle class="ring" cx="912.8" cy="611.6" r="9"/>
+        </g>
+      </svg>
+
+      <!-- 规格块：位置 = 引线末端（百分比，相对舞台） -->
+      <div class="anno-spec" data-k="2" tabindex="0" style="left:0.6%;top:25.4%;--k:0"><b><i>1</i>3D 画布</b>图层逐层展开<span class="v">层间距可调</span><span class="v on-light">缩放 69%</span><span class="v on-dark">缩放 74%</span></div>
+      <div class="anno-spec" data-k="1" tabindex="0" style="left:0.6%;top:74.4%;--k:1"><b><i>2</i>层级树</b><span class="v">190 个节点</span><span class="v s">UILabel “京都”</span></div>
+      <div class="anno-spec" data-k="3" tabindex="0" style="left:86.2%;top:23.6%;--k:2"><b><i>3</i>几何读数卡</b><span class="v s">76 × 47</span><span class="v">父 UIStackView 76 × 66</span><span class="v m">上 0　左 0</span><span class="v m">右 0　下 19</span></div>
+      <div class="anno-spec" data-k="4" tabindex="0" style="left:86.2%;top:48.2%;--k:3"><b><i>4</i>属性检查器</b>UILabel 12 项，可直接改<span class="v">text 京都</span><span class="v">font .SFNS-Heavy 40.0</span></div>
+      <div class="anno-spec" data-k="5" tabindex="0" style="left:50.53%;top:89.7%;width:16%;--k:4"><b><i>5</i>路径栏</b><span class="v">… › UIStackView › UILabel</span></div>
+      <div class="anno-spec" data-k="6" tabindex="0" style="left:67.12%;top:89.7%;width:16%;--k:5"><b><i>6</i>状态栏</b><span class="v m on-light">加载完成 0.60 s</span><span class="v m on-dark">加载完成 0.59 s</span><span class="v">190 个节点</span></div>
+
+      <!-- 窄屏：编号标记，位置与引线锚点相同（相对截图） -->
+      <span class="anno-marker" style="left:36%;top:28.2%" aria-hidden="true">1</span>
+      <span class="anno-marker" style="left:8.5%;top:86%" aria-hidden="true">2</span>
+      <span class="anno-marker m" style="left:93.5%;top:25.8%" aria-hidden="true">3</span>
+      <span class="anno-marker" style="left:93%;top:54.5%" aria-hidden="true">4</span>
+      <span class="anno-marker" style="left:50.75%;top:95.2%" aria-hidden="true">5</span>
+      <span class="anno-marker m" style="left:74.25%;top:96.5%" aria-hidden="true">6</span>
+    </div>
+
+    <!-- 窄屏图例：替代引线 -->
+    <ol class="anno-legend" aria-label="截图标注">
+      <li><span class="n">1</span><div><b>3D 画布</b><span>图层逐层展开，层间距可调</span></div></li>
+      <li><span class="n">2</span><div><b>层级树</b><span>190 个节点，选中 UILabel “京都”</span></div></li>
+      <li><span class="n m">3</span><div><b>几何读数卡</b><span>76 × 47，下边距 19</span></div></li>
+      <li><span class="n">4</span><div><b>属性检查器</b><span>UILabel 12 项，可直接改</span></div></li>
+      <li><span class="n">5</span><div><b>路径栏</b><span>… › UIStackView › UILabel</span></div></li>
+      <li><span class="n m">6</span><div><b>状态栏</b><span><span class="on-light">加载完成 0.60 s</span><span class="on-dark">加载完成 0.59 s</span>，190 个节点</span></div></li>
+    </ol>
+    <div class="wrap anno-foot">
+      <ul class="platforms" aria-label="支持的平台">
+          <li><svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>iOS / iPadOS</li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-tv"/></svg>tvOS</li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-vision"/></svg>visionOS</li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-mac"/></svg>macOS AppKit</li>
+          <li><svg class="ico" aria-hidden="true"><use href="#i-swift"/></svg>SwiftUI</li>
+        </ul>
+    </div>
+  </section>
+
+  <!-- ================= 操作与结果：三段小演示 ================= -->
+  <section class="section demos" aria-label="三个常用操作">
     <div class="wrap">
-      <div class="section-head reveal">
-        <span class="kicker">功能</span>
-        <h2 id="features-title">看清、改动、诊断，一个窗口完成</h2>
-        <p>连上运行中的 App，所见即所得。</p>
-      </div>
-
-      <div class="feature-rows">
-        <div class="frow reveal">
-          <div class="frow-text">
-            <h3>选中任意视图，<br>属性立刻可改</h3>
-            <p>检查器按类分组列出属性，改完 App 里马上生效，不用重新编译。</p>
-            <ul class="ticks">
-              <li><span><strong>拖动微调</strong>数值、取色、改文本，修改可撤销</span></li>
-              <li><span><strong>看清来历</strong>继承链、所属 ViewController、实例变量名</span></li>
-              <li><span><strong>调用方法</strong>在控制台调用节点、layer 或 VC 上的方法</span></li>
-            </ul>
-          </div>
-          <div class="frow-media tall">
-            <img src="assets/screens/crop-inspector.webp" width="562" height="1640" alt="Lumen 检查器：LSProductCell 的继承链、所属 ViewController、frame 与可编辑属性" loading="lazy">
-            <span class="float-tag" style="left:24px;bottom:28px"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg>实时修改，无需重编译</span>
-          </div>
+      <!-- 演示 1：改属性 -->
+      <div class="demo">
+        <div class="demo-text">
+          <h3>选中任意视图，属性立刻可改</h3>
+          <p>检查器按类分组列出属性，改完 App 里马上生效，不用重新编译。右边就是那层“京都”，试着改一下。</p>
+          <ul class="ticks">
+            <li><span><strong>拖动微调</strong>数值、取色、改文本，修改可撤销</span></li>
+            <li><span><strong>看清来历</strong>继承链、所属 ViewController、实例变量名</span></li>
+            <li><span><strong>调用方法</strong>在控制台调用节点、layer 或 VC 上的方法</span></li>
+          </ul>
         </div>
-
-        <div class="frow flip reveal">
-          <div class="frow-text">
-            <h3>一键审计，<br>问题直接标在画布上</h3>
-            <p>文字截断、对比度不足、触控区域过小、遮挡、无障碍缺失，逐条列出并定位到视图。</p>
-            <ul class="ticks">
-              <li><span><strong>点击诊断</strong>某一点命中了谁、其他视图为何被跳过</span></li>
-              <li><span><strong>约束诊断</strong>Auto Layout 歧义与优先级一目了然</span></li>
-              <li><span><strong>可进 CI</strong>导出报告，按阈值判定构建失败</span></li>
-            </ul>
-          </div>
-          <div class="frow-media wide">
-            <img src="assets/screens/crop-audit.webp" width="720" height="1258" alt="Lumen 审计面板：按文本被截断、文字对比度不足、触控区域过小分组列出 16 条警告" loading="lazy">
-            <span class="float-tag" style="right:24px;bottom:28px"><svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>16 条警告，点击即定位</span>
-          </div>
-        </div>
-
-        <div class="frow reveal">
-          <div class="frow-text">
-            <h3>让 AI 助手<br>亲眼看到你的界面</h3>
-            <p>内置 MCP 服务，Claude Code、Codex、Cursor 能读层级、截图、审计、改属性，再回到源码修复。</p>
-            <ul class="ticks">
-              <li><span><strong>一行命令接入</strong>Claude Code、Codex、ChatGPT、Cursor</span></li>
-              <li><span><strong>选择器查询</strong><code>UIButton[text*="登录"]:visible</code></span></li>
-              <li><span><strong>命令行同样可用</strong>脚本与 CI 直接调用 <code>lumen</code></span></li>
-            </ul>
-          </div>
-          <div class="frow-media" style="align-items:center;padding-bottom:36px">
-            <div class="term" role="img" aria-label="AI 助手调用 Lumen 工具排查按钮无响应的示意">
-              <div class="term-bar"><i></i><i></i><i></i><span>claude — MyApp</span></div>
-              <div class="term-body">
-                <p class="t-user">「忘记密码」按钮点了没反应，查一下原因</p>
-                <p class="t-tool"><span><b>lumen_find_text</b> "忘记密码" → #212 UIButton</span></p>
-                <p class="t-tool"><span><b>lumen_hit_test</b> (196, 540) → #198 UIView</span></p>
-                <p class="t-tool"><span><b>lumen_get_node</b> #198 alpha 0.01, 覆盖按钮</span></p>
-                <p class="t-tool"><span><b>lumen_locate_source</b> → LoginView.swift:88</span></p>
-                <p class="t-ans">按钮被一个几乎透明的 <code>UIView</code> 盖住了。它在 <code>LoginView.swift:88</code> 创建，设置 <code>isUserInteractionEnabled = false</code> 即可。</p>
+        <div class="panel">
+          <div class="panel-bar"><span class="mono">UILabel #36</span><button type="button" class="btn btn-ghost" id="edit-reset">撤销修改</button></div>
+          <div class="edit-demo">
+            <div class="edit-view">
+              <div class="ev-head">
+                <div class="ev-stack">
+                  <div class="ev-label" id="ev-label">京都</div>
+                  <div class="ev-sub">日本 · 5 晚</div>
+                </div>
+              </div>
+            </div>
+            <div class="edit-props">
+              <label class="prop"><span>text</span><input type="text" id="p-text" value="京都" maxlength="8"></label>
+              <div class="prop"><span>font</span>
+                <div class="rv"><input type="range" id="p-size" min="24" max="48" step="1" value="40" aria-label="字号"><output class="mono" id="p-size-out" for="p-size">40.0</output></div>
+              </div>
+              <div class="prop"><span>alpha</span>
+                <div class="rv"><input type="range" id="p-alpha" min="0.2" max="1" step="0.05" value="1" aria-label="alpha"><output class="mono" id="p-alpha-out" for="p-alpha">1</output></div>
+              </div>
+              <div class="prop"><span>textColor</span>
+                <div class="swatches" role="group" aria-label="textColor">
+                  <button type="button" data-color="#FFFFFF" aria-pressed="true" aria-label="#FFFFFF"><i style="background:#fff"></i></button>
+                  <button type="button" data-color="#FFE3B8" aria-pressed="false" aria-label="#FFE3B8"><i style="background:#ffe3b8"></i></button>
+                  <button type="button" data-color="#1C1C1E" aria-pressed="false" aria-label="#1C1C1E"><i style="background:#1c1c1e"></i></button>
+                </div>
               </div>
             </div>
           </div>
+          <div class="cmd-line mono" id="cmd-line">$ lumen set 36 UIView.alpha <b id="cmd-alpha">1</b></div>
+        </div>
+      </div>
+
+      <!-- 演示 2：审计 -->
+      <div class="demo">
+        <div class="demo-text">
+          <h3>一键审计，问题直接标在画布上</h3>
+          <p>文字截断、对比度不足、触控区域过小、遮挡、无障碍缺失，逐条列出并定位到视图。点右侧一条，画布上对应的框会亮起。</p>
+          <ul class="ticks">
+            <li><span><strong>点击诊断</strong>某一点命中了谁、其他视图为何被跳过</span></li>
+            <li><span><strong>约束诊断</strong>Auto Layout 歧义与优先级一目了然</span></li>
+            <li><span><strong>可进 CI</strong>导出报告，按阈值判定构建失败</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="panel-bar"><span>审计</span><button type="button" class="btn btn-secondary" id="audit-run">重新审计</button></div>
+          <div class="audit-demo">
+            <div class="audit-view" id="audit-view">
+              <div class="scan" aria-hidden="true"></div>
+              <div class="av-card">
+                <div style="font-weight:700;font-size:16px">12月5日 - 12月10日</div>
+                <div style="display:flex;gap:6px;margin-top:8px">
+                  <span style="background:#a65f08;font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px">美食</span>
+                  <span style="background:#5865e0;font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px">人文</span>
+                  <span id="av-tag" style="background:#8fd49b;color:#d9f2de;font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px">徒步</span>
+                </div>
+                <svg id="av-star" viewBox="0 0 24 24" width="16" height="16" style="position:absolute;right:16px;top:16px" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-2.9-5.4 2.9 1.1-6-4.5-4.2 6.1-.8z" fill="#f1a630"/></svg>
+              </div>
+              <div class="av-card">
+                <div style="font-weight:700">行程安排</div>
+                <div style="margin-top:8px;font-size:12px;color:#a9a9ae">第 1 天</div>
+                <span class="av-trunc" id="av-trunc">抵达 · 入住町家</span>
+                <div style="font-size:13px;color:#b9b9be">下午逛锦市场，晚上祇园散步</div>
+              </div>
+              <div class="av-mark" data-mark="trunc" style="--mk:#d13438"><i>截断</i></div>
+              <div class="av-mark side-b" data-mark="contrast" style="--mk:#a65f08"><i>对比度</i></div>
+              <div class="av-mark side-l" data-mark="touch" style="--mk:#6d50dc"><i>触控区域</i></div>
+            </div>
+            <ul class="audit-list" id="audit-list">
+              <li><button type="button" data-target="trunc" style="--mk:#d13438" aria-pressed="false"><span>文本被截断<small>UILabel “抵达 · 入住町…”</small></span></button></li>
+              <li><button type="button" data-target="contrast" style="--mk:#a65f08" aria-pressed="false"><span>文字对比度不足<small>标签“徒步”</small></span></button></li>
+              <li><button type="button" data-target="touch" style="--mk:#6d50dc" aria-pressed="false"><span>触控区域过小<small>评分星标</small></span></button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 演示 3：AI -->
+      <div class="demo">
+        <div class="demo-text">
+          <h3>让 AI 助手亲眼看到你的界面</h3>
+          <p>内置 MCP 服务，Claude Code、Codex、Cursor 能读层级、截图、审计、改属性，再回到源码修复。</p>
+          <ul class="ticks">
+            <li><span><strong>一行命令接入</strong>Claude Code、Codex、ChatGPT、Cursor</span></li>
+            <li><span><strong>选择器查询</strong><code>UIButton[text*="登录"]:visible</code></span></li>
+            <li><span><strong>命令行同样可用</strong>脚本与 CI 直接调用 <code>lumen</code></span></li>
+          </ul>
+        </div>
+        <div class="panel" role="img" aria-label="AI 助手调用 Lumen 工具排查按钮无响应的示意">
+          <div class="panel-bar"><span class="mono">claude — MyApp</span><button type="button" class="btn btn-secondary" id="term-play">重放</button></div>
+          <div class="term-body mono" id="term-body">
+            <p class="t-user">「忘记密码」按钮点了没反应，查一下原因</p>
+            <p class="t-tool"><b>lumen_find_text</b> "忘记密码" → #212 UIButton</p>
+            <p class="t-tool"><b>lumen_hit_test</b> (196, 540) → #198 UIView</p>
+            <p class="t-tool"><b>lumen_get_node</b> #198 alpha 0.01, 覆盖按钮</p>
+            <p class="t-tool"><b>lumen_locate_source</b> → LoginView.swift:88</p>
+            <p class="t-ans">按钮被一个几乎透明的 <code>UIView</code> 盖住了。它在 <code>LoginView.swift:88</code> 创建，设置 <code>isUserInteractionEnabled = false</code> 即可。</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 更多能力 -->
-  <section class="section" aria-labelledby="caps-title">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <span class="kicker">更多能力</span>
-        <h2 id="caps-title">调试界面要用的，都在这里</h2>
-      </div>
-      <div class="cap-grid">
-        <div class="cap reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-layers"/></svg></div><h3>2D / 3D 画布</h3><p>Metal 渲染，可调层间距，间距测量。</p></div>
-        <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-swift"/></svg></div><h3>SwiftUI 视图树</h3><p>控件、修饰符链与 <code>@State</code> 值。</p></div>
-        <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-history"/></svg></div><h3>时间轴</h3><p>回看每次层级变化，比较两个时间点。</p></div>
-        <div class="cap reveal" style="--d:180ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-compare"/></svg></div><h3>设计稿对比</h3><p>叠加参考图，给出还原度。</p></div>
-        <div class="cap reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-a11y"/></svg></div><h3>无障碍检查</h3><p>按 VoiceOver 顺序列出元素与 traits。</p></div>
-        <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-sparkle"/></svg></div><h3>外观覆盖</h3><p>运行时切深色、大字号、从右到左。</p></div>
-        <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-archive"/></svg></div><h3>.lumen 归档</h3><p>完整快照存成单个文件，离线打开。</p></div>
-        <div class="cap reveal" style="--d:180ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-bolt"/></svg></div><h3>零改动注入</h3><p>不改工程，一键注入 Mac App、模拟器、iOS 安装包与 USB 真机。</p></div>
-        <div class="cap reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-target"/></svg></div><h3>手势面板</h3><p>大纲行首竖条标出手势，点按查看并开关。</p></div>
-        <div class="cap reveal" style="--d:60ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></div><h3>屏蔽的类</h3><p>按类名隐藏图层及子树，可临时显示。</p></div>
-        <div class="cap reveal" style="--d:120ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-usb"/></svg></div><h3>目标卡片</h3><p>按平台与设备分组，标明 USB、Wi-Fi、模拟器。</p></div>
-        <div class="cap reveal" style="--d:180ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg></div><h3>后台自动恢复</h3><p>App 进入后台时提示，回到前台自动刷新。</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 上手 -->
+  <!-- ================= 上手与接入（文档式） ================= -->
   <section class="section" id="start" aria-labelledby="start-title">
     <div class="wrap">
-      <div class="section-head reveal">
-        <span class="kicker">上手</span>
+      <div class="section-head">
         <h2 id="start-title">三步连上你的 App</h2>
         <p>采集端 <code>LumenServer</code> 只进 Debug 构建，发布包里没有它。</p>
       </div>
-
-      <div class="steps">
-        <div class="step-card reveal">
-          <span class="num">1</span>
+      <ol class="steps">
+        <li>
+          <span class="n" aria-hidden="true">1</span>
           <h3>下载安装</h3>
           <p>按芯片选择安装包，拖进「应用程序」。不确定芯片时看「关于本机」。</p>
           <div class="actions">
             <a class="btn btn-primary" href="https://github.com/wangwanjie/Lumen/releases/latest/download/Lumen_arm64.dmg"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>Apple 芯片</a>
             <a class="btn btn-secondary" href="https://github.com/wangwanjie/Lumen/releases/latest/download/Lumen_x86_64.dmg">Intel</a>
           </div>
-        </div>
-        <div class="step-card reveal" style="--d:80ms">
-          <span class="num">2</span>
+        </li>
+        <li>
+          <span class="n" aria-hidden="true">2</span>
           <h3>接入 App</h3>
-          <p>四种方式任选：SPM、CocoaPods、一键脚本，或不改工程直接注入启动。</p>
-          <ul class="chips actions"><li>Swift</li><li>Objective-C</li><li>SwiftUI</li><li>AppKit</li></ul>
-        </div>
-        <div class="step-card reveal" style="--d:160ms">
-          <span class="num">3</span>
+          <p>四种方式任选：SPM、CocoaPods、一键脚本，或不改工程直接注入启动。Swift、Objective-C、SwiftUI、AppKit 都支持。</p>
+        </li>
+        <li>
+          <span class="n" aria-hidden="true">3</span>
           <h3>打开 Lumen</h3>
           <p>启动被调试的 App，Lumen 自动发现并连接。模拟器、Mac App、USB 真机都无需配置。</p>
-          <ul class="chips actions"><li>模拟器</li><li>USB 真机</li><li>局域网</li></ul>
-        </div>
-      </div>
+        </li>
+      </ol>
 
-      <div class="integrate reveal">
-        <div class="integrate-aside">
+      <div class="doc">
+        <aside class="doc-aside">
           <h3>接入方式</h3>
           <p>不想改依赖时，推荐一键脚本：只改本机 Debug 配置，可原样撤销。</p>
           <ul class="connect-list">
@@ -865,8 +2711,7 @@
             <li><svg class="ico" aria-hidden="true"><use href="#i-usb"/></svg><span><strong>USB 真机</strong>插线并信任此电脑即可</span></li>
             <li><svg class="ico" aria-hidden="true"><use href="#i-wifi"/></svg><span><strong>局域网</strong>需显式开启，见“局域网连接设置”</span></li>
           </ul>
-        </div>
-
+        </aside>
         <div class="tabs">
           <div class="tablist" role="tablist" aria-label="接入方式">
             <button type="button" role="tab" id="tab-spm" aria-controls="panel-spm" aria-selected="true">Swift Package</button>
@@ -874,7 +2719,6 @@
             <button type="button" role="tab" id="tab-setup" aria-controls="panel-setup" aria-selected="false" tabindex="-1">一键脚本</button>
             <button type="button" role="tab" id="tab-launch" aria-controls="panel-launch" aria-selected="false" tabindex="-1">注入启动</button>
           </div>
-
           <div class="tab-panel" role="tabpanel" id="panel-spm" aria-labelledby="tab-spm">
             <p>Xcode 中 File → Add Package Dependencies，输入 <code>https://github.com/wangwanjie/Lumen.git</code>，把 <code>LumenServer</code> 加到 App target；或写进 <code>Package.swift</code>：</p>
             <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.0"),
@@ -899,7 +2743,6 @@ LumenServer.start()
             </div>
             <p class="note">SPM 会在 Release 中也链接 LumenServer，<code>#if DEBUG</code> 保证它不启动。希望 Release 包完全不含采集端时，用 CocoaPods 或一键脚本。</p>
           </div>
-
           <div class="tab-panel" role="tabpanel" id="panel-pods" aria-labelledby="tab-pods" hidden>
             <p>只在 Debug 配置中集成，启动代码与 SPM 相同：</p>
             <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.0/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
@@ -908,7 +2751,6 @@ import LumenServer
 LumenServer.start()   <span class="c">// Objective-C：@import LumenServer; [LumenServer start];</span>
 #endif</code></pre></div>
           </div>
-
           <div class="tab-panel" role="tabpanel" id="panel-setup" aria-labelledby="tab-setup" hidden>
             <p>在含 <code>.xcworkspace</code> / <code>.xcodeproj</code> 的工程目录运行，无需改 Podfile、Package 或写代码：</p>
             <div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>python3 /Applications/Lumen.app/Contents/Resources/lumen_setup.py</code></pre></div>
@@ -927,7 +2769,6 @@ export IntegrateLumen=true</code></pre></div>
               </div>
             </details>
           </div>
-
           <div class="tab-panel" role="tabpanel" id="panel-launch" aria-labelledby="tab-launch" hidden>
             <p>不修改工程，把采集端直接注入启动。在 Lumen 中点工具栏的“启动调试”（⌘N），或把 <code>.app</code> / <code>.ipa</code> 拖进窗口：Mac 应用、模拟器中的 App、iOS 安装包（Apple 芯片的 Mac 上直接运行）、USB 真机都可以一键启动并自动连接。命令行同样可用：</p>
             <div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>LUMEN=/Applications/Lumen.app/Contents/Helpers/lumen
@@ -937,7 +2778,6 @@ $LUMEN launch --ios MyApp.ipa                              <span class="c"># iOS
 $LUMEN launch --ios MyApp.ipa --device "我的 iPhone"         <span class="c"># 重签后安装到真机</span></code></pre></div>
             <p class="note">真机签名使用 Xcode 中登录的 Apple ID（免费账号即可），Lumen 不接触你的密码。受 SIP 保护的系统程序与 FairPlay 加密的 App Store 应用无法注入。</p>
           </div>
-
           <details class="more">
             <summary>局域网连接设置</summary>
             <div>
@@ -950,50 +2790,45 @@ $LUMEN launch --ios MyApp.ipa --device "我的 iPhone"         <span class="c">#
 &lt;string&gt;用于 Lumen 界面调试（仅 Debug 构建）&lt;/string&gt;
 &lt;key&gt;NSBonjourServices&lt;/key&gt;
 &lt;array&gt;
-    &lt;string&gt;_lumen._tcp&lt;/string&gt;
+  &lt;string&gt;_lumen._tcp&lt;/string&gt;
 &lt;/array&gt;</code></pre></div>
             </div>
           </details>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- AI -->
-  <section class="section" id="ai" aria-labelledby="ai-title">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <span class="kicker">AI 助手</span>
-        <h2 id="ai-title">一行命令，让 AI 看见界面</h2>
-        <p><code>lumen mcp</code> 以 MCP 服务运行，读层级、截图、审计、改属性、定位源码都能交给 AI。</p>
-      </div>
-
-      <div class="ai-setup reveal">
-        <div class="tabs">
-          <div class="tablist" role="tablist" aria-label="接入目标">
-            <button type="button" role="tab" id="tab-claude" aria-controls="panel-claude" aria-selected="true">Claude Code</button>
-            <button type="button" role="tab" id="tab-codex" aria-controls="panel-codex" aria-selected="false" tabindex="-1">Codex / ChatGPT</button>
-            <button type="button" role="tab" id="tab-cursor" aria-controls="panel-cursor" aria-selected="false" tabindex="-1">Cursor 等</button>
-          </div>
-          <div class="tab-panel" role="tabpanel" id="panel-claude" aria-labelledby="tab-claude">
-            <div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>claude mcp add lumen -- /Applications/Lumen.app/Contents/Helpers/lumen mcp</code></pre></div>
-            <p>输入 <code>/mcp</code> 确认已连接；内置排查流程 <code>/mcp__lumen__lumen_ui_debug_workflow</code> 可直接使用。</p>
-          </div>
-          <div class="tab-panel" role="tabpanel" id="panel-codex" aria-labelledby="tab-codex" hidden>
-            <div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>codex mcp add lumen -- /Applications/Lumen.app/Contents/Helpers/lumen mcp</code></pre></div>
-            <p>Codex CLI、IDE 插件与 ChatGPT 桌面 App 共用 <code>~/.codex/config.toml</code>，添加一次即可。</p>
-            <details class="more">
-              <summary>手动编辑配置 / ChatGPT 桌面 App</summary>
-              <div>
-                <div class="code"><div class="code-bar"><span>~/.codex/config.toml</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>[mcp_servers.lumen]
+      <!-- 接入 AI 助手 -->
+      <div class="ai-block" id="ai">
+        <div class="section-head">
+          <h2>一行命令，让 AI 看见界面</h2>
+          <p><code>lumen mcp</code> 以 MCP 服务运行，读层级、截图、审计、改属性、定位源码都能交给 AI。</p>
+        </div>
+        <div class="ai-grid">
+          <div class="tabs">
+            <div class="tablist" role="tablist" aria-label="接入目标">
+              <button type="button" role="tab" id="tab-claude" aria-controls="panel-claude" aria-selected="true">Claude Code</button>
+              <button type="button" role="tab" id="tab-codex" aria-controls="panel-codex" aria-selected="false" tabindex="-1">Codex / ChatGPT</button>
+              <button type="button" role="tab" id="tab-cursor" aria-controls="panel-cursor" aria-selected="false" tabindex="-1">Cursor 等</button>
+            </div>
+            <div class="tab-panel" role="tabpanel" id="panel-claude" aria-labelledby="tab-claude">
+              <div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>claude mcp add lumen -- /Applications/Lumen.app/Contents/Helpers/lumen mcp</code></pre></div>
+              <p>输入 <code>/mcp</code> 确认已连接；内置排查流程 <code>/mcp__lumen__lumen_ui_debug_workflow</code> 可直接使用。</p>
+            </div>
+            <div class="tab-panel" role="tabpanel" id="panel-codex" aria-labelledby="tab-codex" hidden>
+              <div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>codex mcp add lumen -- /Applications/Lumen.app/Contents/Helpers/lumen mcp</code></pre></div>
+              <p>Codex CLI、IDE 插件与 ChatGPT 桌面 App 共用 <code>~/.codex/config.toml</code>，添加一次即可。</p>
+              <details class="more">
+                <summary>手动编辑配置 / ChatGPT 桌面 App</summary>
+                <div>
+                  <div class="code"><div class="code-bar"><span>~/.codex/config.toml</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>[mcp_servers.lumen]
 command = "/Applications/Lumen.app/Contents/Helpers/lumen"
 args = ["mcp"]</code></pre></div>
-                <p>ChatGPT 桌面 App 也可在设置的「MCP 服务器」中添加：名称 <code>lumen</code>，类型 STDIO，命令填上面的路径，参数 <code>mcp</code>。网页版 ChatGPT 只能连接公网的远程 MCP 服务，无法使用本机 Lumen。</p>
-              </div>
-            </details>
-          </div>
-          <div class="tab-panel" role="tabpanel" id="panel-cursor" aria-labelledby="tab-cursor" hidden>
-            <div class="code"><div class="code-bar"><span>mcpServers</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>{
+                  <p>ChatGPT 桌面 App 也可在设置的「MCP 服务器」中添加：名称 <code>lumen</code>，类型 STDIO，命令填上面的路径，参数 <code>mcp</code>。网页版 ChatGPT 只能连接公网的远程 MCP 服务，无法使用本机 Lumen。</p>
+                </div>
+              </details>
+            </div>
+            <div class="tab-panel" role="tabpanel" id="panel-cursor" aria-labelledby="tab-cursor" hidden>
+              <div class="code"><div class="code-bar"><span>mcpServers</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>{
   "mcpServers": {
     "lumen": {
       "command": "/Applications/Lumen.app/Contents/Helpers/lumen",
@@ -1001,88 +2836,107 @@ args = ["mcp"]</code></pre></div>
     }
   }
 }</code></pre></div>
+            </div>
           </div>
-        </div>
-
-        <div class="ai-setup-text">
-          <h3>命令行同样好用</h3>
-          <p><code>lumen</code> 随 App 安装，<code>--json</code> 输出稳定结构，适合脚本和 CI。</p>
-          <div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>sudo ln -sf /Applications/Lumen.app/Contents/Helpers/lumen /usr/local/bin/lumen
-
+          <div>
+            <h3>命令行同样好用</h3>
+            <p class="sub"><code>lumen</code> 随 App 安装，<code>--json</code> 输出稳定结构，适合脚本和 CI。</p>
+            <div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>sudo ln -sf /Applications/Lumen.app/Contents/Helpers/lumen /usr/local/bin/lumen
 lumen apps                                    <span class="c"># 已集成的 App</span>
 lumen hierarchy --depth 4                     <span class="c"># 层级树</span>
 lumen query 'UIButton[text*="登录"]:visible' <span class="c"># 选择器查询</span>
 lumen screenshot 12 -o node.png               <span class="c"># 节点截图</span>
 lumen audit --fail-on error                   <span class="c"># 审计，出错退出码 1</span>
 lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属性</span></code></pre></div>
-          <p style="font-size:14px;margin:0">完整命令见 <a href="https://github.com/wangwanjie/Lumen#命令行速查" target="_blank" rel="noopener">README</a>，或运行 <code>lumen help</code>。</p>
+            <p class="sub">完整命令见 <a href="https://github.com/wangwanjie/Lumen#命令行速查" target="_blank" rel="noopener">README</a>，或运行 <code>lumen help</code>。</p>
+          </div>
         </div>
-      </div>
 
-      <div class="prompts-head reveal">
-        <h3>直接复制这些提示词</h3>
-        <p>Claude Code、Codex、ChatGPT、Cursor 通用</p>
-      </div>
-      <div class="prompt-grid">
-        <article class="prompt reveal">
-          <div class="prompt-top"><span class="prompt-tag"><svg class="ico" aria-hidden="true"><use href="#i-target"/></svg>排查</span><button type="button" class="copy-btn" data-copy-from="p1"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
-          <h4>按钮点了没反应</h4>
-          <blockquote id="p1">登录页的「忘记密码」按钮点了没反应。用 Lumen 查一下它是被别的视图挡住了，还是触控区域太小，告诉我原因和该改哪个文件。</blockquote>
-          <ul class="chips mono"><li>find_text</li><li>hit_test</li><li>locate_source</li></ul>
-        </article>
-        <article class="prompt reveal" style="--d:60ms">
-          <div class="prompt-top"><span class="prompt-tag"><svg class="ico" aria-hidden="true"><use href="#i-ruler"/></svg>排查</span><button type="button" class="copy-btn" data-copy-from="p2"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
-          <h4>大字号下文字被截断</h4>
-          <blockquote id="p2">订单详情页的价格标签在 iPhone SE 上被截断了。用 Lumen 把字号调到最大，看看还有哪些文字被截断，分析约束问题并给出修改方案。</blockquote>
-          <ul class="chips mono"><li>set_appearance</li><li>audit</li><li>get_constraints</li></ul>
-        </article>
-        <article class="prompt reveal" style="--d:120ms">
-          <div class="prompt-top"><span class="prompt-tag"><svg class="ico" aria-hidden="true"><use href="#i-compare"/></svg>写页面</span><button type="button" class="copy-btn" data-copy-from="p3"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
-          <h4>照设计稿写页面并核对</h4>
-          <blockquote id="p3">按 design/profile.png 用 SwiftUI 写个人资料页。写完在模拟器里运行，用 Lumen 读取层级和截图，与设计稿对照，列出间距、字号、颜色的偏差并修正，直到和设计稿一致。</blockquote>
-          <ul class="chips mono"><li>get_hierarchy</li><li>get_node</li><li>screenshot</li></ul>
-        </article>
-        <article class="prompt reveal">
-          <div class="prompt-top"><span class="prompt-tag"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg>写页面</span><button type="button" class="copy-btn" data-copy-from="p4"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
-          <h4>先在运行中试，再写进代码</h4>
-          <blockquote id="p4">首页的卡片看起来太挤了。用 Lumen 直接在运行中的 App 里试三组圆角、内边距和阴影的组合，每组截图给我挑，我选定后再改源码。</blockquote>
-          <ul class="chips mono"><li>query</li><li>set_attribute</li><li>screenshot</li></ul>
-        </article>
-        <article class="prompt reveal" style="--d:60ms">
-          <div class="prompt-top"><span class="prompt-tag"><svg class="ico" aria-hidden="true"><use href="#i-bug"/></svg>改 bug</span><button type="button" class="copy-btn" data-copy-from="p5"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
-          <h4>深色模式下文字看不清</h4>
-          <blockquote id="p5">深色模式下设置页的分组标题看不清。用 Lumen 切到深色模式复现，找出写死颜色的地方并修复，修完重新运行再验证一遍。</blockquote>
-          <ul class="chips mono"><li>set_appearance</li><li>accessibility</li><li>locate_source</li></ul>
-        </article>
-        <article class="prompt reveal" style="--d:120ms">
-          <div class="prompt-top"><span class="prompt-tag"><svg class="ico" aria-hidden="true"><use href="#i-history"/></svg>改 bug</span><button type="button" class="copy-btn" data-copy-from="p6"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
-          <h4>修复后做回归对比</h4>
-          <blockquote id="p6">改这个 bug 之前，先用 Lumen 把当前页面存成快照 before。改完重新运行，和 before 对比，确认只有预期的视图发生了变化，再跑一遍审计确保没有新问题。</blockquote>
-          <ul class="chips mono"><li>snapshot_save</li><li>snapshot_diff</li><li>audit</li></ul>
-        </article>
+        <div class="prompts-head">
+          <h3>直接复制这些提示词</h3>
+          <p>Claude Code、Codex、ChatGPT、Cursor 通用</p>
+        </div>
+        <div class="prompt-list">
+          <article class="prompt">
+            <div class="prompt-top"><h4>按钮点了没反应</h4><span class="prompt-kind">排查</span><button type="button" class="copy-btn" data-copy-from="p1"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
+            <blockquote id="p1">登录页的「忘记密码」按钮点了没反应。用 Lumen 查一下它是被别的视图挡住了，还是触控区域太小，告诉我原因和该改哪个文件。</blockquote>
+            <div class="tools mono">find_text  hit_test  locate_source</div>
+          </article>
+          <article class="prompt">
+            <div class="prompt-top"><h4>大字号下文字被截断</h4><span class="prompt-kind">排查</span><button type="button" class="copy-btn" data-copy-from="p2"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
+            <blockquote id="p2">订单详情页的价格标签在 iPhone SE 上被截断了。用 Lumen 把字号调到最大，看看还有哪些文字被截断，分析约束问题并给出修改方案。</blockquote>
+            <div class="tools mono">set_appearance  audit  get_constraints</div>
+          </article>
+          <article class="prompt">
+            <div class="prompt-top"><h4>照设计稿写页面并核对</h4><span class="prompt-kind">写页面</span><button type="button" class="copy-btn" data-copy-from="p3"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
+            <blockquote id="p3">按 design/profile.png 用 SwiftUI 写个人资料页。写完在模拟器里运行，用 Lumen 读取层级和截图，与设计稿对照，列出间距、字号、颜色的偏差并修正，直到和设计稿一致。</blockquote>
+            <div class="tools mono">get_hierarchy  get_node  screenshot</div>
+          </article>
+          <article class="prompt">
+            <div class="prompt-top"><h4>先在运行中试，再写进代码</h4><span class="prompt-kind">写页面</span><button type="button" class="copy-btn" data-copy-from="p4"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
+            <blockquote id="p4">首页的卡片看起来太挤了。用 Lumen 直接在运行中的 App 里试三组圆角、内边距和阴影的组合，每组截图给我挑，我选定后再改源码。</blockquote>
+            <div class="tools mono">query  set_attribute  screenshot</div>
+          </article>
+          <article class="prompt">
+            <div class="prompt-top"><h4>深色模式下文字看不清</h4><span class="prompt-kind">改 bug</span><button type="button" class="copy-btn" data-copy-from="p5"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
+            <blockquote id="p5">深色模式下设置页的分组标题看不清。用 Lumen 切到深色模式复现，找出写死颜色的地方并修复，修完重新运行再验证一遍。</blockquote>
+            <div class="tools mono">set_appearance  accessibility  locate_source</div>
+          </article>
+          <article class="prompt">
+            <div class="prompt-top"><h4>修复后做回归对比</h4><span class="prompt-kind">改 bug</span><button type="button" class="copy-btn" data-copy-from="p6"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div>
+            <blockquote id="p6">改这个 bug 之前，先用 Lumen 把当前页面存成快照 before。改完重新运行，和 before 对比，确认只有预期的视图发生了变化，再跑一遍审计确保没有新问题。</blockquote>
+            <div class="tools mono">snapshot_save  snapshot_diff  audit</div>
+          </article>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 隐私 -->
-  <section class="section" id="privacy" aria-labelledby="privacy-title">
+  <!-- ================= 能力清单：紧凑两栏 ================= -->
+  <section class="section" aria-labelledby="caps-title">
     <div class="wrap">
-      <div class="section-head reveal">
-        <span class="kicker">隐私</span>
+      <div class="section-head">
+        <h2 id="caps-title">调试界面要用的，都在这里</h2>
+      </div>
+      <dl class="caps">
+        <div class="cap"><dt>2D / 3D 画布</dt><dd>Metal 渲染，可调层间距，间距测量。</dd></div>
+        <div class="cap"><dt>SwiftUI 视图树</dt><dd>控件、修饰符链与 <code>@State</code> 值。</dd></div>
+        <div class="cap"><dt>时间轴</dt><dd>回看每次层级变化，比较两个时间点。</dd></div>
+        <div class="cap"><dt>设计稿对比</dt><dd>叠加参考图，给出还原度。</dd></div>
+        <div class="cap"><dt>无障碍检查</dt><dd>按 VoiceOver 顺序列出元素与 traits。</dd></div>
+        <div class="cap"><dt>外观覆盖</dt><dd>运行时切深色、大字号、从右到左。</dd></div>
+        <div class="cap"><dt>.lumen 归档</dt><dd>完整快照存成单个文件，离线打开。</dd></div>
+        <div class="cap"><dt>零改动注入</dt><dd>不改工程，一键注入 Mac App、模拟器、iOS 安装包与 USB 真机。</dd></div>
+        <div class="cap"><dt>手势面板</dt><dd>大纲行首竖条标出手势，点按查看并开关。</dd></div>
+        <div class="cap"><dt>屏蔽的类</dt><dd>按类名隐藏图层及子树，可临时显示。</dd></div>
+        <div class="cap"><dt>目标卡片</dt><dd>按平台与设备分组，标明 USB、Wi-Fi、模拟器。</dd></div>
+        <div class="cap"><dt>后台自动恢复</dt><dd>App 进入后台时提示，回到前台自动刷新。</dd></div>
+        <div class="cap"><dt>控制台执行方法</dt><dd>在控制台调用节点、layer 或 VC 上的方法。</dd></div>
+        <div class="cap"><dt>点击诊断</dt><dd>某一点命中了谁、其他视图为何被跳过。</dd></div>
+        <div class="cap"><dt>修改记录</dt><dd>运行时改过的属性留有记录，修改可撤销。</dd></div>
+        <div class="cap"><dt>应用日志</dt><dd>在 Lumen 底部面板查看被调试 App 的日志。</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ================= 隐私 ================= -->
+  <section class="section" id="privacy" aria-labelledby="privacy-title">
+    <div class="wrap privacy">
+      <div class="section-head">
         <h2 id="privacy-title">数据只留在你的 Mac 上</h2>
         <p>所有数据只在本机的 Lumen 与被调试 App 之间传输，不上传任何服务器。</p>
       </div>
-      <ul class="privacy">
-        <li class="reveal"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg></div><strong>只进 Debug 构建</strong>各种接入方式都只在 Debug 配置启用采集端。</li>
-        <li class="reveal" style="--d:80ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg></div><strong>默认只听本机</strong>采集端监听 127.0.0.1，局域网访问需显式开启。</li>
-        <li class="reveal" style="--d:160ms"><div class="cap-ico"><svg class="ico" aria-hidden="true"><use href="#i-lock"/></svg></div><strong>密码框掩码</strong>安全输入框的文本一律以掩码返回。</li>
-      </ul>
+      <dl class="priv-list">
+        <div><dt>只进 Debug 构建</dt><dd>各种接入方式都只在 Debug 配置启用采集端。</dd></div>
+        <div><dt>默认只听本机</dt><dd>采集端监听 <code>127.0.0.1</code>，局域网访问需显式开启。</dd></div>
+        <div><dt>密码框掩码</dt><dd>安全输入框的文本一律以掩码返回。</dd></div>
+      </dl>
     </div>
   </section>
 
-  <!-- 收尾下载 -->
+  <!-- ================= 下载 ================= -->
   <section class="final" aria-labelledby="final-title">
-    <div class="wrap reveal">
+    <div class="wrap">
       <img src="assets/AppIcon.png" alt="" width="96" height="96" loading="lazy">
       <h2 id="final-title">现在就拆开看看</h2>
       <p>免费使用，macOS 14 及以上，Apple 芯片与 Intel 均可用。</p>
@@ -1114,14 +2968,10 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
   var root = document.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  /* ---------- 外观切换：浅色 / 深色 / 跟随系统，存 localStorage ---------- */
+  /* ---------- 外观切换：浅色 / 深色 / 跟随系统，存 localStorage 的 lumen-theme ---------- */
   var themeButtons = document.querySelectorAll("[data-theme-choice]");
-  function currentChoice() {
-    var t = root.getAttribute("data-theme");
-    return t === "light" || t === "dark" ? t : "system";
-  }
   function syncThemeButtons() {
-    var choice = currentChoice();
+    var choice = root.getAttribute("data-theme") || "system";
     themeButtons.forEach(function (b) {
       b.setAttribute("aria-pressed", String(b.getAttribute("data-theme-choice") === choice));
     });
@@ -1129,72 +2979,447 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
   themeButtons.forEach(function (b) {
     b.addEventListener("click", function () {
       var choice = b.getAttribute("data-theme-choice");
-      if (choice === "system") {
-        root.removeAttribute("data-theme");
-      } else {
-        root.setAttribute("data-theme", choice);
-      }
+      root.setAttribute("data-theme", choice);
       try {
-        if (choice === "system") {
-          localStorage.removeItem("lumen-theme");
-        } else {
-          localStorage.setItem("lumen-theme", choice);
-        }
+        localStorage.setItem("lumen-theme", choice);
       } catch (e) {
-        // 隐私模式等场景下 localStorage 不可用，只影响记忆，不影响切换
+        // 隐私模式下 localStorage 不可用，只影响记忆，不影响切换
       }
       syncThemeButtons();
     });
   });
   syncThemeButtons();
 
-  /* ---------- 导航栏滚动后显示分隔线 ---------- */
-  var header = document.querySelector(".site-header");
-  function onScroll() {
-    header.classList.toggle("scrolled", window.scrollY > 8);
-  }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
+  /* ---------- 首屏模型：层数据（frame 为窗口坐标，模型单位与点数一致） ---------- */
+  // “京都”一层（kyoto）及其父 UIStackView 的读数取自 App；其余层的 frame 按本模型示意
+  var LAYERS = {
+    win: { cls: "UIWindow", icon: "i-window", d: 0, f: [0, 0, 1064, 780], parent: null, note: "App 的窗口，所有视图都挂在它下面。" },
+    vc: { cls: "UIView", tag: "MXTripDetailViewController", icon: "i-box", d: 1, f: [0, 0, 1064, 780], parent: "win", note: "行程详情页控制器的根视图。" },
+    scroll: { cls: "UIScrollView", icon: "i-scroll", d: 2, f: [0, 50, 1064, 730], parent: "vc", note: "承载整页内容，上下滚动。" },
+    stack: { cls: "UIStackView", icon: "i-stack", d: 3, f: [0, 50, 1064, 730], parent: "scroll", note: "纵向排列头图与三张内容卡片。" },
+    header: { cls: "MXHeaderGradientView", icon: "i-box", d: 4, f: [0, 50, 1064, 222], parent: "stack", note: "渐变头图，装着插图、标题与天气。" },
+    date: { cls: "UIView", tag: "日期卡片", icon: "i-box", d: 4, f: [16, 288, 1032, 116], parent: "stack", note: "12月5日 - 12月10日，带美食、人文、徒步三个标签。" },
+    budget: { cls: "UIView", tag: "预算 (SwiftUI)", icon: "i-swift", d: 4, f: [16, 420, 1032, 150], parent: "stack", note: "SwiftUI 写的预算卡：环形 35% 已花费，交通、住宿、餐饮、门票四条。" },
+    trip: { cls: "UIView", tag: "行程安排", icon: "i-box", d: 4, f: [16, 586, 1032, 180], parent: "stack", note: "第 1 天 抵达 · 入住町家，第 2 天 清水寺与二年坂。" },
+    img: { cls: "UIImageView", icon: "i-image", d: 5, f: [904, 118, 124, 124], parent: "header", note: "头图右侧的插图。" },
+    title: { cls: "UIStackView", icon: "i-stack", d: 5, f: [20, 186, 76, 66], parent: "header", real: true, note: "竖排的标题与副标题，76 × 66。" },
+    badge: { cls: "MXWeatherBadgeView", icon: "i-box", d: 5, f: [990, 66, 58, 24], parent: "header", note: "天气角标，自定义视图。" },
+    kyoto: { cls: "UILabel", tag: "“京都”", chain: "UIView › UIResponder › NSObject", icon: "i-label", d: 6, f: [20, 186, 76, 47], parent: "title", real: true, node: "#36" },
+    nights: { cls: "UILabel", tag: "“日本 · 5 晚”", chain: "UIView › UIResponder › NSObject", icon: "i-label", d: 6, f: [20, 233, 76, 19], parent: "title", note: "副标题，紧贴在“京都”下方。" }
+  };
+  var ORDER = Object.keys(LAYERS);
+  var MAX_DEPTH = 6;
 
-  /* ---------- Hero：2D / 3D 截图切换，与 App 的 ⌘1 / ⌘2 一致 ---------- */
-  var modeButtons = document.querySelectorAll("[data-mode]");
-  var shots = document.querySelectorAll("[data-shot]");
-  var showcase = document.querySelector(".showcase");
-  function setMode(mode) {
-    shots.forEach(function (img) {
-      if (img.getAttribute("data-shot") === mode) {
-        img.removeAttribute("data-hidden");
-      } else {
-        img.setAttribute("data-hidden", "");
-      }
-    });
-    modeButtons.forEach(function (b) {
-      b.setAttribute("aria-pressed", String(b.getAttribute("data-mode") === mode));
+  var stage = document.getElementById("stage");
+  var rig = document.getElementById("rig");
+  var gapInput = document.getElementById("gap");
+  var gapOut = document.getElementById("gap-out");
+  var pathbar = document.getElementById("pathbar");
+  var viewButtons = document.querySelectorAll("[data-view]");
+  var layerEls = {};
+  rig.querySelectorAll(".ly").forEach(function (el) {
+    layerEls[el.getAttribute("data-id")] = el;
+  });
+
+  // 3D 状态：rx / ry 为角度，gap 为层间距（点）
+  var DEFAULT_3D = { rx: 18, ry: 44, gap: 84 };
+  var state = { rx: DEFAULT_3D.rx, ry: DEFAULT_3D.ry, gap: DEFAULT_3D.gap };
+  var selected = "kyoto";
+
+  function clamp(v, a, b) {
+    return Math.max(a, Math.min(b, v));
+  }
+
+  // 按舞台尺寸算缩放，让展开后的模型整体落在画布里
+  // 缩放按默认 3D 角度下的投影外框计算，拖动时保持不变，避免模型忽大忽小
+  function fitScale() {
+    var w = stage.clientWidth;
+    var h = stage.clientHeight;
+    var rad = Math.PI / 180;
+    var ry = DEFAULT_3D.ry * rad;
+    var rx = DEFAULT_3D.rx * rad;
+    var depth = DEFAULT_3D.gap * MAX_DEPTH;
+    var pw = 1064 * Math.cos(ry) + depth * Math.sin(ry);
+    var ph = 780 * Math.cos(rx) + (depth * Math.cos(ry) + 1064 * Math.sin(ry)) * Math.sin(rx);
+    return Math.min(w * (w < 600 ? 0.86 : 0.98) / pw, h * 0.94 / ph);
+  }
+
+  function render() {
+    rig.style.setProperty("--s", fitScale().toFixed(4));
+    rig.style.setProperty("--rx", state.rx.toFixed(2) + "deg");
+    rig.style.setProperty("--ry", state.ry.toFixed(2) + "deg");
+    rig.style.setProperty("--gap", state.gap.toFixed(2));
+    // 线框随层间距加深：平铺时几乎看不到，展开后每层边框清楚
+    rig.style.setProperty("--wire", (0.12 + 0.4 * clamp(state.gap / 40, 0, 1)).toFixed(3));
+    gapInput.value = Math.round(state.gap);
+    gapOut.textContent = Math.round(state.gap) + " pt";
+    var flat = state.gap < 0.5 && Math.abs(state.rx) < 0.5 && Math.abs(state.ry) < 0.5;
+    viewButtons.forEach(function (b) {
+      b.setAttribute("aria-pressed", String((b.getAttribute("data-view") === "2d") === flat));
     });
   }
-  modeButtons.forEach(function (b) {
-    b.addEventListener("click", function () {
-      setMode(b.getAttribute("data-mode"));
-    });
-  });
-  // 截图在视口内时响应 ⌘1 / ⌘2（焦点在输入控件时不拦截）
-  document.addEventListener("keydown", function (e) {
-    if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) {
+
+  // 平滑过渡到目标状态（减少动效时直接跳到终态）
+  var animId = 0;
+  function animateTo(target, duration, done) {
+    cancelAnimationFrame(animId);
+    if (reduceMotion.matches || duration <= 0) {
+      state.rx = target.rx;
+      state.ry = target.ry;
+      state.gap = target.gap;
+      render();
+      if (done) {
+        done();
+      }
       return;
     }
-    if (e.key === "1" || e.key === "2") {
-      var box = showcase.getBoundingClientRect();
-      if (box.bottom > 0 && box.top < window.innerHeight) {
-        e.preventDefault();
-        setMode(e.key === "1" ? "2d" : "3d");
+    var from = { rx: state.rx, ry: state.ry, gap: state.gap };
+    var t0 = performance.now();
+    function step(now) {
+      var t = clamp((now - t0) / duration, 0, 1);
+      var e = 1 - Math.pow(1 - t, 3);
+      state.rx = from.rx + (target.rx - from.rx) * e;
+      state.ry = from.ry + (target.ry - from.ry) * e;
+      state.gap = from.gap + (target.gap - from.gap) * e;
+      render();
+      if (t < 1) {
+        animId = requestAnimationFrame(step);
+      } else if (done) {
+        done();
       }
     }
+    animId = requestAnimationFrame(step);
+  }
+
+  // 透视会让展开后的模型偏向一侧：按默认 3D 状态量一次所有层的外框，把它平移回舞台中央
+  function recenter() {
+    var saved = { rx: state.rx, ry: state.ry, gap: state.gap };
+    state.rx = DEFAULT_3D.rx;
+    state.ry = DEFAULT_3D.ry;
+    state.gap = DEFAULT_3D.gap;
+    rig.style.setProperty("--tx", "0px");
+    rig.style.setProperty("--ty", "0px");
+    render();
+    var box = { l: Infinity, t: Infinity, r: -Infinity, b: -Infinity };
+    ORDER.forEach(function (k) {
+      var rc = layerEls[k].getBoundingClientRect();
+      box.l = Math.min(box.l, rc.left);
+      box.t = Math.min(box.t, rc.top);
+      box.r = Math.max(box.r, rc.right);
+      box.b = Math.max(box.b, rc.bottom);
+    });
+    var st = stage.getBoundingClientRect();
+    rig.style.setProperty("--tx", ((st.left + st.width / 2) - (box.l + box.r) / 2).toFixed(1) + "px");
+    rig.style.setProperty("--ty", ((st.top + st.height / 2) - (box.t + box.b) / 2).toFixed(1) + "px");
+    state.rx = saved.rx;
+    state.ry = saved.ry;
+    state.gap = saved.gap;
+    render();
+  }
+
+  /* ---------- 读数面板 ---------- */
+  function rel(id) {
+    var L = LAYERS[id];
+    if (!L.parent) {
+      return { x: 0, y: 0, pw: L.f[2], ph: L.f[3], pcls: "UIWindowScene" };
+    }
+    var P = LAYERS[L.parent];
+    return { x: L.f[0] - P.f[0], y: L.f[1] - P.f[1], pw: P.f[2], ph: P.f[3], pcls: P.cls };
+  }
+  function setText(id, text) {
+    document.getElementById(id).textContent = text;
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c];
+    });
+  }
+
+  function select(id) {
+    selected = id;
+    var L = LAYERS[id];
+    ORDER.forEach(function (k) {
+      layerEls[k].classList.toggle("sel", k === id);
+    });
+    var r = rel(id);
+    var w = L.f[2];
+    var h = L.f[3];
+    document.getElementById("ro-icon").setAttribute("href", "#" + L.icon);
+    // 类名后面跟文本或所属控制器，与 App 大纲的写法一致
+    document.getElementById("ro-cls").innerHTML = esc(L.cls) + (L.tag ? "<span class=\"ro-q\">" + esc(L.tag) + "</span>" : "");
+    setText("ro-tag", L.chain || ("父视图 " + r.pcls));
+    setText("ro-depth", "第 " + L.d + " 层");
+    setText("geo-parent", r.pcls + "  " + r.pw + " × " + r.ph);
+    setText("geo-size", w + " × " + h);
+    setText("g-t", r.y);
+    setText("g-l", r.x);
+    setText("g-r", r.pw - r.x - w);
+    setText("g-b", r.ph - r.y - h);
+    setText("geo-origin", r.x + ", " + r.y);
+    setText("geo-win", L.f[0] + ", " + L.f[1]);
+
+    // 属性行：“京都”一层给出 App 里的真实属性，其余层给出 frame 与说明
+    var rows = document.getElementById("ro-rows");
+    if (id === "kyoto") {
+      rows.innerHTML = "<dt>NodeID</dt><dd class=\"mono\">#36</dd>" +
+        "<dt>text</dt><dd>京都</dd>" +
+        "<dt>font</dt><dd class=\"mono\">.SFNS-Heavy 40.0</dd>" +
+        "<dt>textColor</dt><dd class=\"mono\"><span class=\"ro-swatch\"></span>#FFFFFF 100%</dd>";
+      setText("ro-note", "这一层的读数取自 App 本身。点模型里的其他层，读数跟着换。");
+    } else {
+      rows.innerHTML = "<dt>frame</dt><dd class=\"mono\">" + r.x + ", " + r.y + ", " + w + ", " + h + "</dd>" +
+        "<dt>父视图</dt><dd class=\"mono\">" + esc(r.pcls) + "</dd>" +
+        "<dt>说明</dt><dd>" + esc(L.note) + "</dd>";
+      setText("ro-note", L.real ? "这一层的尺寸取自 App 本身。" : "层级取自演示 App；这一层的 frame 按本模型示意。");
+    }
+    renderPath();
+  }
+
+  /* ---------- 路径栏：根到选中节点，放不下时把祖先收进“…” ---------- */
+  function renderPath() {
+    var chain = [];
+    var cur = selected;
+    while (cur) {
+      chain.unshift(cur);
+      cur = LAYERS[cur].parent;
+    }
+    function build(skip) {
+      pathbar.innerHTML = "";
+      if (skip > 0) {
+        var more = document.createElement("span");
+        more.className = "more";
+        more.textContent = "…";
+        more.title = chain.slice(0, skip).map(function (k) {
+          return LAYERS[k].cls;
+        }).join(" › ");
+        pathbar.appendChild(more);
+      }
+      chain.slice(skip).forEach(function (k, i) {
+        if (skip > 0 || i > 0) {
+          var sep = document.createElement("span");
+          sep.className = "sep";
+          sep.setAttribute("aria-hidden", "true");
+          sep.textContent = "›";
+          pathbar.appendChild(sep);
+        }
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = LAYERS[k].cls;
+        if (k === selected) {
+          b.setAttribute("aria-current", "true");
+        }
+        b.addEventListener("click", function () {
+          select(k);
+        });
+        pathbar.appendChild(b);
+      });
+    }
+    var skip = 0;
+    build(skip);
+    while (pathbar.scrollWidth > pathbar.clientWidth + 1 && skip < chain.length - 1) {
+      skip += 1;
+      build(skip);
+    }
+  }
+
+  /* ---------- 拖动旋转（鼠标与触摸），短按即点选 ---------- */
+  var drag = null;
+  stage.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0) {
+      return;
+    }
+    var ly = e.target.closest(".ly");
+    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, rx: state.rx, ry: state.ry, moved: false, layer: ly ? ly.getAttribute("data-id") : null };
+    cancelAnimationFrame(animId);
+  });
+  stage.addEventListener("pointermove", function (e) {
+    if (!drag || e.pointerId !== drag.id) {
+      return;
+    }
+    var dx = e.clientX - drag.x;
+    var dy = e.clientY - drag.y;
+    if (!drag.moved && Math.abs(dx) + Math.abs(dy) > 5) {
+      drag.moved = true;
+      stage.classList.add("dragging");
+      try {
+        stage.setPointerCapture(e.pointerId);
+      } catch (err) {
+        // 指针已失效时忽略
+      }
+    }
+    if (drag.moved) {
+      state.ry = clamp(drag.ry + dx * 0.3, -62, 62);
+      // 触摸时竖向交给页面滚动，只有鼠标 / 触控笔才调整俯仰
+      if (e.pointerType !== "touch") {
+        state.rx = clamp(drag.rx - dy * 0.25, -10, 60);
+      }
+      render();
+    }
+  });
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.id) {
+      return;
+    }
+    if (!drag.moved && e.type === "pointerup" && drag.layer) {
+      select(drag.layer);
+    }
+    stage.classList.remove("dragging");
+    drag = null;
+  }
+  stage.addEventListener("pointerup", endDrag);
+  stage.addEventListener("pointercancel", endDrag);
+
+  // 键盘：左右旋转，上下在层之间切换
+  stage.addEventListener("keydown", function (e) {
+    var i = ORDER.indexOf(selected);
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      state.ry = clamp(state.ry + (e.key === "ArrowLeft" ? -6 : 6), -62, 62);
+      render();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      select(ORDER[(i + 1) % ORDER.length]);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      select(ORDER[(i - 1 + ORDER.length) % ORDER.length]);
+    }
+  });
+
+  gapInput.addEventListener("input", function () {
+    cancelAnimationFrame(animId);
+    state.gap = Number(gapInput.value);
+    render();
+  });
+  viewButtons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (b.getAttribute("data-view") === "2d") {
+        animateTo({ rx: 0, ry: 0, gap: 0 }, 650);
+      } else {
+        animateTo(DEFAULT_3D, 750);
+      }
+    });
+  });
+  window.addEventListener("resize", function () {
+    recenter();
+    renderPath();
+  });
+
+  // 首屏载入编排：先平铺成 2D，再展开到 3D 角度；减少动效时直接显示终态
+  select("kyoto");
+  recenter();
+  if (reduceMotion.matches) {
+    render();
+  } else {
+    state.rx = 0;
+    state.ry = 0;
+    state.gap = 0;
+    render();
+    setTimeout(function () {
+      animateTo(DEFAULT_3D, 1100);
+    }, 180);
+  }
+
+  /* ---------- 演示 1：改属性 ---------- */
+  var evLabel = document.getElementById("ev-label");
+  var pText = document.getElementById("p-text");
+  var pSize = document.getElementById("p-size");
+  var pAlpha = document.getElementById("p-alpha");
+  var swatches = document.querySelectorAll("[data-color]");
+  function applyEdit() {
+    evLabel.textContent = pText.value || " ";
+    evLabel.style.fontSize = pSize.value + "px";
+    evLabel.style.opacity = pAlpha.value;
+    document.getElementById("p-size-out").textContent = Number(pSize.value).toFixed(1);
+    var a = String(Number(Number(pAlpha.value).toFixed(2)));
+    document.getElementById("p-alpha-out").textContent = a;
+    document.getElementById("cmd-alpha").textContent = a;
+  }
+  [pText, pSize, pAlpha].forEach(function (el) {
+    el.addEventListener("input", applyEdit);
+  });
+  swatches.forEach(function (b) {
+    b.addEventListener("click", function () {
+      swatches.forEach(function (o) {
+        o.setAttribute("aria-pressed", String(o === b));
+      });
+      evLabel.style.color = b.getAttribute("data-color");
+    });
+  });
+  document.getElementById("edit-reset").addEventListener("click", function () {
+    pText.value = "京都";
+    pSize.value = 40;
+    pAlpha.value = 1;
+    swatches[0].click();
+    applyEdit();
+  });
+
+  /* ---------- 演示 2：审计标注（按真实元素位置摆放标注框） ---------- */
+  var auditView = document.getElementById("audit-view");
+  var markTargets = { trunc: "av-trunc", contrast: "av-tag", touch: "av-star" };
+  function placeMarks() {
+    var box = auditView.getBoundingClientRect();
+    Object.keys(markTargets).forEach(function (k) {
+      var t = document.getElementById(markTargets[k]).getBoundingClientRect();
+      var m = auditView.querySelector("[data-mark=\"" + k + "\"]");
+      m.style.left = (t.left - box.left - 4) + "px";
+      m.style.top = (t.top - box.top - 4) + "px";
+      m.style.width = (t.width + 8) + "px";
+      m.style.height = (t.height + 8) + "px";
+    });
+  }
+  placeMarks();
+  window.addEventListener("resize", placeMarks);
+  document.querySelectorAll("#audit-list button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var k = b.getAttribute("data-target");
+      document.querySelectorAll("#audit-list button").forEach(function (o) {
+        o.setAttribute("aria-pressed", String(o === b));
+      });
+      auditView.querySelectorAll(".av-mark").forEach(function (m) {
+        m.classList.toggle("focus", m.getAttribute("data-mark") === k);
+      });
+    });
+  });
+  document.getElementById("audit-run").addEventListener("click", function () {
+    if (reduceMotion.matches) {
+      return;
+    }
+    auditView.classList.remove("scanning");
+    void auditView.offsetWidth;
+    auditView.classList.add("scanning");
+    setTimeout(function () {
+      auditView.classList.remove("scanning");
+    }, 900);
+  });
+
+  /* ---------- 演示 3：重放 AI 排查过程 ---------- */
+  var termBody = document.getElementById("term-body");
+  var termTimers = [];
+  document.getElementById("term-play").addEventListener("click", function () {
+    termTimers.forEach(clearTimeout);
+    termTimers = [];
+    var lines = termBody.querySelectorAll("p");
+    if (reduceMotion.matches) {
+      return;
+    }
+    lines.forEach(function (p) {
+      p.classList.remove("on");
+    });
+    termBody.classList.add("playing");
+    lines.forEach(function (p, i) {
+      termTimers.push(setTimeout(function () {
+        p.classList.add("on");
+        if (i === lines.length - 1) {
+          termBody.classList.remove("playing");
+        }
+      }, 250 + i * 520));
+    });
   });
 
   /* ---------- 标签页：点击与方向键切换 ---------- */
   document.querySelectorAll("[role=tablist]").forEach(function (list) {
     var tabs = Array.prototype.slice.call(list.querySelectorAll("[role=tab]"));
-    function select(tab, focus) {
+    function choose(tab, focus) {
       tabs.forEach(function (t) {
         var on = t === tab;
         t.setAttribute("aria-selected", String(on));
@@ -1207,13 +3432,13 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
     }
     tabs.forEach(function (tab, i) {
       tab.addEventListener("click", function () {
-        select(tab, false);
+        choose(tab, false);
       });
       tab.addEventListener("keydown", function (e) {
         var next = null;
-        if (e.key === "ArrowRight") {
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") {
           next = tabs[(i + 1) % tabs.length];
-        } else if (e.key === "ArrowLeft") {
+        } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
           next = tabs[(i - 1 + tabs.length) % tabs.length];
         } else if (e.key === "Home") {
           next = tabs[0];
@@ -1222,7 +3447,7 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
         }
         if (next) {
           e.preventDefault();
-          select(next, true);
+          choose(next, true);
         }
       });
     });
@@ -1267,25 +3492,41 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
       });
     });
   });
-
-  /* ---------- 滚动进入渐显 ---------- */
-  var reveals = document.querySelectorAll(".reveal");
-  if ("IntersectionObserver" in window && !reduceMotion.matches) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) {
-          en.target.classList.add("in");
-          io.unobserve(en.target);
+  /* ---------- 截图标注：指向规格块时，对应引线加粗、锚点出现圆环 ---------- */
+  document.querySelectorAll(".anno-spec[data-k]").forEach(function (spec) {
+    var k = spec.getAttribute("data-k");
+    var g = document.querySelector('.anno-leaders g[data-k="' + k + '"]');
+    if (!g) {
+      return;
+    }
+    function on() {
+      g.classList.add("on");
+      spec.classList.add("on");
+    }
+    function off() {
+      g.classList.remove("on");
+      spec.classList.remove("on");
+    }
+    spec.addEventListener("mouseenter", on);
+    spec.addEventListener("mouseleave", off);
+    spec.addEventListener("focus", on);
+    spec.addEventListener("blur", off);
+  });
+  /* ---------- 截图标注：第一次进入视口时画出引线（内容默认可见，只是额外的编排） ---------- */
+  var annoSec = document.querySelector(".shot-sec");
+  if (annoSec && "IntersectionObserver" in window && !reduceMotion.matches) {
+    var annoIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && entry.boundingClientRect.top > 0) {
+          annoIO.disconnect();
+          annoSec.classList.add("intro");
+          setTimeout(function () {
+            annoSec.classList.remove("intro");
+          }, 1300);
         }
       });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
-    reveals.forEach(function (el) {
-      io.observe(el);
-    });
-  } else {
-    reveals.forEach(function (el) {
-      el.classList.add("in");
-    });
+    }, { threshold: 0.35 });
+    annoIO.observe(annoSec.querySelector(".anno-stage"));
   }
 })();
 </script>
