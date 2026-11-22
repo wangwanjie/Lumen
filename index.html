@@ -4245,12 +4245,12 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
     // 触屏左右滑动切换：水平位移超过 50px 且大于竖直位移才算
     var touchX = null;
     var touchY = null;
-    var stage = lb.querySelector(".lb-stage");
-    stage.addEventListener("touchstart", function (e) {
+    var lbStage = lb.querySelector(".lb-stage");
+    lbStage.addEventListener("touchstart", function (e) {
       touchX = e.touches[0].clientX;
       touchY = e.touches[0].clientY;
     }, { passive: true });
-    stage.addEventListener("touchend", function (e) {
+    lbStage.addEventListener("touchend", function (e) {
       if (touchX === null) {
         return;
       }
