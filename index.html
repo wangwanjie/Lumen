@@ -1156,6 +1156,159 @@
       }
     }
 
+
+    /* ================= 0.3.2 亮点 ================= */
+    .hl-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+      gap: 40px;
+      align-items: center;
+      margin-top: 64px;
+    }
+    #new .release-head {
+      max-width: none;
+    }
+    .release-head + .hl-row {
+      margin-top: 0;
+    }
+    .hl-row.rev {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    }
+    .hl-row.rev .hl-media {
+      order: 2;
+    }
+    .hl-media {
+      margin: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: #0e0f11;
+    }
+    .hl-media img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .hl-text h3 {
+      font-size: 22px;
+      letter-spacing: -.01em;
+      text-wrap: balance;
+    }
+    .hl-text > p {
+      margin: 12px 0 0;
+      font-size: 16px;
+      color: var(--text-2);
+    }
+    .hl-kicker {
+      display: block;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent);
+    }
+    /* 首屏耗时对比：条长按秒数等比例 */
+    .hl-stat {
+      margin: 20px 0 0;
+      display: grid;
+      gap: 10px;
+    }
+    .hl-bar {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr) 64px;
+      gap: 10px;
+      align-items: center;
+      font-size: 14px;
+      color: var(--text-2);
+    }
+    .hl-bar i {
+      display: block;
+      height: 10px;
+      border-radius: 5px;
+      background: var(--line-2);
+      min-width: 6px;
+    }
+    .hl-bar.now i {
+      background: var(--accent);
+    }
+    .hl-bar b {
+      font-family: var(--mono);
+      font-weight: 600;
+      color: var(--text);
+      text-align: right;
+    }
+    .hl-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px;
+      margin-top: 64px;
+    }
+    .hl-pair .hl-text {
+      margin-top: 18px;
+    }
+    @media (max-width: 1100px) {
+      .hl-row, .hl-row.rev {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
+      .hl-row.rev .hl-media {
+        order: 0;
+      }
+    }
+    @media (max-width: 760px) {
+      .hl-pair {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 44px;
+      }
+      .hl-text > p, .hl-bar {
+        font-size: 16px;
+      }
+    }
+    /* 教程：启动调试图文步骤 */
+    .launch-guide {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin: 20px 0;
+    }
+    .launch-guide figure {
+      margin: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+    .launch-guide img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .launch-guide figcaption {
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--text-3);
+      background: var(--surface);
+    }
+    .launch-guide ol {
+      margin: 0;
+      padding-left: 1.3em;
+      display: grid;
+      gap: 10px;
+      font-size: 15px;
+      color: var(--text-2);
+    }
+    .launch-guide ol strong {
+      display: block;
+      color: var(--text);
+    }
+    @media (max-width: 760px) {
+      .launch-guide {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .launch-guide ol {
+        font-size: 16px;
+      }
+    }
+
     /* 真实截图：全宽 */
     .shot-sec {
       padding: 96px 0 64px;
@@ -2260,7 +2413,7 @@
         <li>macOS 14 及以上</li>
         <li>Apple 公证</li>
         <li>内置自动更新</li>
-        <li><a class="mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">v0.3.0</a></li>
+        <li><a class="mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">v0.3.2</a></li>
       </ul>
 
     </div>
@@ -2380,7 +2533,87 @@
   </section>
 
   <!-- ================= 0.3.0 新特性：宣传片 + 三项可切换的新特性 + 六项新能力 ================= -->
-  <section class="section release" id="new" aria-labelledby="new-title">
+  <!-- ================= 0.3.2 亮点 ================= -->
+  <section class="section release" id="new" aria-labelledby="hl-title">
+    <div class="wrap">
+      <div class="release-head">
+        <div class="section-head">
+          <h2 id="hl-title">更多 App，拿来就能拆开看</h2>
+          <p>启动调试兼容 Electron / Chromium、Qt、iPad 版 Mac App 与模拟器里的系统 App；SwiftUI 大型界面秒开，难画的图层也画得出来。</p>
+        </div>
+        <a class="ver-link mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">0.3.2 新版本</a>
+      </div>
+
+      <div class="hl-row">
+        <figure class="hl-media">
+          <img src="assets/screens/v032-swiftui.webp" width="1600" height="1000" alt="Lumen 以 3D 分层查看 iOS 模拟器中的“设置”：列表图标、Apple 账户头像与底部液态玻璃搜索栏都完整显示，状态栏显示加载完成 0.59 秒" loading="lazy">
+        </figure>
+        <div class="hl-text">
+          <span class="hl-kicker">SwiftUI</span>
+          <h3>大型 SwiftUI 界面，打开就看得到</h3>
+          <p>首次读取慢的 SwiftUI 宿主先显示平台层级，App 空闲时在后台逐个补读，读完自动推送到画布与大纲。</p>
+          <div class="hl-stat" role="img" aria-label="iOS“设置”首屏加载耗时：之前 25.7 秒，现在 0.4 秒">
+            <div class="hl-bar"><span>之前</span><i style="width:100%"></i><b>25.7 s</b></div>
+            <div class="hl-bar now"><span>0.3.2</span><i style="width:1.6%"></i><b>0.4 s</b></div>
+          </div>
+          <ul class="ticks">
+            <li><span><strong>图标与着色</strong>SwiftUI 列表图标、<code>foregroundStyle</code> 着色的图层照原样显示</span></li>
+            <li><span><strong>液态玻璃</strong>按真实的模糊半径还原，玻璃下的内容不再透出重影</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="hl-pair">
+        <div>
+          <figure class="hl-media">
+            <img src="assets/screens/v032-chromium.webp" width="1600" height="1000" alt="Lumen 以 3D 分层查看注入启动的 Google Chrome：网页内容画在 RenderWidgetHostViewCocoa 这一层，路径栏显示从窗口到网页视图的路径" loading="lazy">
+          </figure>
+          <div class="hl-text">
+            <span class="hl-kicker">Electron / Chromium</span>
+            <h3>网页内容也在分层里</h3>
+            <p>Chrome、balenaEtcher、Mac App Store 上的 Chromium 应用都能注入启动。GPU 进程合成的网页画在它所在的那一层；采集端只进主进程，副本使用独立的数据目录，不碰原 App 的登录状态。</p>
+          </div>
+        </div>
+        <div>
+          <figure class="hl-media">
+            <img src="assets/screens/v032-opengl.webp" width="1600" height="1000" alt="Lumen 以 3D 分层查看 Qt 编写的 DB Browser for SQLite：整个窗口内容画在 QNSView 的 OpenGL 表面上，菜单、标签页与表格都清晰可见" loading="lazy">
+          </figure>
+          <div class="hl-text">
+            <span class="hl-kicker">OpenGL / Qt</span>
+            <h3>OpenGL 绘制的窗口不再空白</h3>
+            <p>Qt 5 等框架把整个窗口画在一块 OpenGL 表面上。Lumen 直接读取这块表面，DB Browser for SQLite 这样的 App 在 2D 与 3D 下都能看清内容。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hl-row rev">
+        <figure class="hl-media">
+          <img src="assets/screens/v032-launch-sim.webp" width="1400" height="1086" alt="启动调试窗口的模拟器标签：图标显示，上方为用户 App，下方“系统 App”分组列出日历、地图、信息、Safari、设置等" loading="lazy">
+        </figure>
+        <div class="hl-text">
+          <span class="hl-kicker">启动调试</span>
+          <h3>图标一眼找到，系统 App 也能调</h3>
+          <p>“Mac 应用”与“模拟器”标签可切换列表和图标显示，图标取自 App 本身；搜索框按名称或 bundle id 过滤。</p>
+          <ul class="ticks">
+            <li><span><strong>系统 App</strong>模拟器里的设置、Safari、信息等单独分组，同样可以注入调试</span></li>
+            <li><span><strong>最近启动</strong>右键查看原始文件与安装位置，可在访达中显示或复制路径</span></li>
+            <li><span><strong>状态跟得上</strong>绿点标出已启动的模拟器，列表高度可拖动调整</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <dl class="caps caps-new" aria-label="0.3.2 其他改进">
+        <div class="cap"><dt>Gatekeeper 拦下的 App</dt><dd>带下载隔离标记且未公证的 App，改为启动去掉隔离标记的重签副本，原 App 保持原样。</dd></div>
+        <div class="cap"><dt>iPad 版 Mac App</dt><dd>酷狗音乐这类 iPad 版 Mac App，以及包内带非 Mach-O 文件的 Qt App，都能重签启动。</dd></div>
+        <div class="cap"><dt>隐藏注入库</dt><dd>启动时枚举已加载库的 App 看不到注入库，可在启动参数里关闭；只用于你有权调试的 App。</dd></div>
+        <div class="cap"><dt>同进程只列一份</dt><dd>App 自己集成了 LumenServer 又被注入时，切换列表里只出现一次。</dd></div>
+        <div class="cap"><dt>首次层级不再空白</dt><dd>窗口稍晚才创建的 App，自动刷新关闭时也会在窗口出现后拉取层级。</dd></div>
+        <div class="cap"><dt>使用向导可滚动</dt><dd>内容较多的页面可以纵向滚动，底部的说明不再被裁掉。</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section release" id="v030" aria-labelledby="new-title">
     <div class="wrap">
       <div class="release-head">
         <div class="section-head">
@@ -2721,7 +2954,7 @@
           </div>
           <div class="tab-panel" role="tabpanel" id="panel-spm" aria-labelledby="tab-spm">
             <p>Xcode 中 File → Add Package Dependencies，输入 <code>https://github.com/wangwanjie/Lumen.git</code>，把 <code>LumenServer</code> 加到 App target；或写进 <code>Package.swift</code>：</p>
-            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.0"),
+            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.2"),
 <span class="c">// target 依赖</span>
 .product(name: "LumenServer", package: "Lumen"),</code></pre></div>
             <p>启动时调用：</p>
@@ -2745,7 +2978,7 @@ LumenServer.start()
           </div>
           <div class="tab-panel" role="tabpanel" id="panel-pods" aria-labelledby="tab-pods" hidden>
             <p>只在 Debug 配置中集成，启动代码与 SPM 相同：</p>
-            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.0/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
+            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.2/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
             <div class="code"><div class="code-bar"><span>Swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>#if DEBUG
 import LumenServer
 LumenServer.start()   <span class="c">// Objective-C：@import LumenServer; [LumenServer start];</span>
@@ -2770,12 +3003,27 @@ export IntegrateLumen=true</code></pre></div>
             </details>
           </div>
           <div class="tab-panel" role="tabpanel" id="panel-launch" aria-labelledby="tab-launch" hidden>
-            <p>不修改工程，把采集端直接注入启动。在 Lumen 中点工具栏的“启动调试”（⌘N），或把 <code>.app</code> / <code>.ipa</code> 拖进窗口：Mac 应用、模拟器中的 App、iOS 安装包（Apple 芯片的 Mac 上直接运行）、USB 真机都可以一键启动并自动连接。命令行同样可用：</p>
+            <p>不修改工程，把采集端直接注入启动。在 Lumen 中点工具栏的“启动调试”（⌘N），或把 <code>.app</code> / <code>.ipa</code> 拖进窗口：Mac 应用、模拟器中的 App、iOS 安装包（Apple 芯片的 Mac 上直接运行）、USB 真机都可以一键启动并自动连接。</p>
+            <div class="launch-guide">
+              <figure>
+                <img src="assets/screens/v032-launch-mac.webp" width="1400" height="1086" alt="启动调试窗口的 Mac 应用标签：左侧为最近启动，右侧以图标网格列出本机 App，上方有搜索框与列表 / 图标切换" loading="lazy">
+                <figcaption>“Mac 应用”标签的图标显示，左侧是最近启动</figcaption>
+              </figure>
+              <ol>
+                <li><strong>打开启动调试</strong>工具栏点“启动调试”或按 ⌘N，选“Mac 应用”“模拟器”“iOS 安装包”或“真机”。</li>
+                <li><strong>选中 App</strong>在图标或列表里点一下，也可以搜索名称、bundle id，或把 <code>.app</code> / <code>.ipa</code> 拖进窗口。</li>
+                <li><strong>看启动前检查</strong>需要重签时会列出影响；Electron / Chromium 副本使用独立数据目录，被 Gatekeeper 拦下的 App 改用去掉隔离标记的副本。</li>
+                <li><strong>点“启动”</strong>注入完成后自动连接。启动即退出的 App 可在“启动参数”里确认已勾选“隐藏注入库”。</li>
+              </ol>
+            </div>
+            <p>命令行同样可用：</p>
             <div class="code"><div class="code-bar"><span>Terminal</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>LUMEN=/Applications/Lumen.app/Contents/Helpers/lumen
 $LUMEN launch --mac /Applications/SomeApp.app --resign     <span class="c"># Mac 程序（签名挡住注入时重签副本）</span>
 $LUMEN launch --simulator booted com.example.MyApp         <span class="c"># 模拟器中的 App</span>
 $LUMEN launch --ios MyApp.ipa                              <span class="c"># iOS 安装包在本机运行</span>
-$LUMEN launch --ios MyApp.ipa --device "我的 iPhone"         <span class="c"># 重签后安装到真机</span></code></pre></div>
+$LUMEN launch --ios MyApp.ipa --device "我的 iPhone"         <span class="c"># 重签后安装到真机</span>
+$LUMEN simulators &lt;UDID&gt; --system                        <span class="c"># 列出模拟器中的用户 App 与系统 App</span>
+$LUMEN launch --simulator booted com.apple.Preferences     <span class="c"># 注入启动模拟器里的“设置”</span></code></pre></div>
             <p class="note">真机签名使用 Xcode 中登录的 Apple ID（免费账号即可），Lumen 不接触你的密码。受 SIP 保护的系统程序与 FairPlay 加密的 App Store 应用无法注入。</p>
           </div>
           <details class="more">

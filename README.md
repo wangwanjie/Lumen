@@ -14,10 +14,10 @@ Lumen 用来查看运行中 App 的视图层级，并把同一套能力开放给
 
 | 能力 | 说明 |
 |---|---|
-| 2D / 3D 层级画布 | Metal 渲染，平面与分层 3D 视图切换（透视投影，3D 分层跟随大纲的展开与折叠），可调层间距（⌘[ / ⌘]）、相机复位，显示隐藏节点与边框线；间距测量分关闭、父视图边距、锁定两节点三档；按 `layer.mask` 裁剪，不画被遮罩挡住的内容；搜索结果在画布上着色、其余淡化；无内容图层可选透明、只描边框或淡色底板；“定位”后目标图层闪烁高亮；还原 iOS 26 / 27 标签栏的液态玻璃底板与选中镜片，以及网页、Metal、视频、Lottie 等图层的内容；顶部工具条、底部路径栏（从根到所选节点，逐段可点）与缩放百分比；状态栏显示加载阶段、纹理进度与耗时 |
+| 2D / 3D 层级画布 | Metal 渲染，平面与分层 3D 视图切换（透视投影，3D 分层跟随大纲的展开与折叠），可调层间距（⌘[ / ⌘]）、相机复位，显示隐藏节点与边框线；间距测量分关闭、父视图边距、锁定两节点三档；按 `layer.mask` 裁剪，不画被遮罩挡住的内容；搜索结果在画布上着色、其余淡化；无内容图层可选透明、只描边框或淡色底板；“定位”后目标图层闪烁高亮；还原 iOS 26 / 27 标签栏的液态玻璃底板与选中镜片，以及网页、Metal、视频、Lottie、SwiftUI 列表图标与 `foregroundStyle` 着色、OpenGL 绘制的窗口（如 Qt 5 App）、Electron / Chromium 网页等图层的内容；液态玻璃按真实的模糊半径还原；顶部工具条、底部路径栏（从根到所选节点，逐段可点）与缩放百分比；状态栏显示加载阶段、纹理进度与耗时 |
 | 层级大纲 | 树形大纲与画布联动选中，悬停行时画布同步高亮；按类名、文本等过滤，搜索结果可继续下钻；键入类名或控制器名前缀直接定位；层级深度预设（⌥⌘1…⌥⌘5）按窗口与 ViewController 展开；聚焦模式只看某个节点的子树（Esc 退出）；按 App 记住展开状态；顶层列出 `UIWindowScene` 与 Layout Guide；层级很深时缩进自动收窄，深层节点也能看全；可在设置中调整字号、行高与层级引导竖线 |
 | 屏蔽的类 | 在设置中维护要屏蔽的类，画布不渲染命中的节点及其子树，大纲灰显标识，可临时显示、重新屏蔽或一键屏蔽此类 |
-| SwiftUI | 在宿主视图之下给出 SwiftUI 的逻辑视图树：`Text` 的文字、`Button` / `Toggle` / `TextField` 等控件、修饰符链与参数、调试数据中的属性值（含 `@State`），可按文本查找；集成 LumenServer 或注入后自动开启 |
+| SwiftUI | 在宿主视图之下给出 SwiftUI 的逻辑视图树：`Text` 的文字、`Button` / `Toggle` / `TextField` 等控件、修饰符链与参数、调试数据中的属性值（含 `@State`），可按文本查找；集成 LumenServer 或注入后自动开启。逻辑节点渐进加载：首次读取慢的宿主先显示平台层级，空闲时在后台逐个补读并自动推送，iOS“设置”这类大型 App 首屏从约 26 秒缩短到 0.4 秒 |
 | 属性检查器 | 几何读数卡（父视图与所选节点的尺寸、四边边距、原点与窗口坐标）；按类分组的属性、继承链（悬停显示所在的 framework）、所属 ViewController、实例变量名及其持有者、accessibilityIdentifier；`contentMode`、`textAlignment` 等枚举显示名称并可下拉修改；控件的“事件处理”栏列出 target-action 与 `UIAction` |
 | 运行时改属性 | 在检查器中直接修改可编辑属性（数值拖动微调、取色、文本等），值为 nil 的颜色与文本同样可改；修改记录可撤销、可复制为 AI 提示；命令行 `lumen set`（枚举可按名称设置，如 `scaleAspectFit`） |
 | App 自定义属性 | 在 view / layer / ViewController 上实现 `@objc lumen_debugInfo()`，把业务状态显示在检查器最前面，带 setter 的项可直接修改；实现 `+lumen_colorAliases` 后颜色属性旁显示设计色别名（见下文“自定义检查器内容”） |
@@ -37,13 +37,13 @@ Lumen 用来查看运行中 App 的视图层级，并把同一套能力开放给
 | JSON 快照与对比 | `lumen snapshot save` 保存 JSON 层级快照（`lumen.snapshot` 格式），与另一个快照或当前界面 diff，可作为 CI 断言 |
 | 命令行 | `lumen` 覆盖发现 App（本机、USB 真机、局域网）、层级、查询、节点详情、截图、快照与归档、审计、运行时修改、源码定位、注入启动 |
 | AI 助手 | `lumen mcp` 以 MCP 服务运行，提供层级、查询、节点详情、截图、快照对比、审计、hit-test、约束、无障碍、改属性、调用方法、外观覆盖、源码定位等工具 |
-| 目标选择 | 以卡片网格列出可调试的 App，按平台分组、按设备归类，标明 USB / Wi-Fi / 局域网 / 模拟器 / 本机，卡片显示主窗口预览 |
+| 目标选择 | 以卡片网格列出可调试的 App，按平台分组、按设备归类，标明 USB / Wi-Fi / 局域网 / 模拟器 / 本机，卡片显示主窗口预览；同一进程里同时有集成与注入的两份采集端时只列一份 |
 | 后台提示 | 目标 App 进入后台或被挂起时给出提示与重试，恢复后自动重新拉取层级与纹理 |
 | 断线保留现场 | 目标 App 退出、崩溃或网络断开时，最后一份层级、已读取的详情与纹理继续以只读方式显示，可另存为 `.lumen` 快照；同一 App 重新出现时自动切回实时 |
 | 应用日志 | 底部“应用日志”面板显示标准输出 / 错误与 os_log，启动调试的 App 与集成了 LumenServer 的 App 都能看；虚拟化列表应对大量日志，支持文本筛选、来源与级别过滤、白名单与黑名单规则 |
 | 界面语言与外观 | 界面支持简体中文、English、繁體中文，切换后立即生效；外观可跟随系统、浅色或深色 |
 | 一键接入 | `python3 /Applications/Lumen.app/Contents/Resources/lumen_setup.py` 把采集端接入 Xcode 工程的 Debug 配置（iOS 模拟器 / 真机、tvOS、macOS），无需改 Podfile / Package，`--remove` 原样撤销 |
-| 零改动注入 | “启动调试”窗口（⌘N）与 `lumen launch`：不改工程，注入启动 Mac App（含 Mac Catalyst）、模拟器中的 App、iOS 安装包（Apple 芯片的 Mac 上直接运行，可按 iPhone 机型尺寸运行）与 USB 真机上的 App；拖入 `.ipa` 时询问在本机还是真机运行；签名会挡住注入时自动重签副本，真机借 Xcode 中登录的 Apple ID（免费账号即可）自动签名，到期前提醒续签；最近启动可一键重启 |
+| 零改动注入 | “启动调试”窗口（⌘N）与 `lumen launch`：不改工程，注入启动 Mac App（含 Mac Catalyst）、模拟器中的 App、iOS 安装包（Apple 芯片的 Mac 上直接运行，可按 iPhone 机型尺寸运行）与 USB 真机上的 App；拖入 `.ipa` 时询问在本机还是真机运行；签名会挡住注入时自动重签副本；兼容 Electron / Chromium 内核的 App（含 Mac App Store 版）、iPad 版 Mac App、被 Gatekeeper 拦下的 App 与启动时检测注入的 App；模拟器中的系统 App（设置、Safari 等）也能注入调试；启动窗口支持列表 / 图标两种显示与搜索；真机借 Xcode 中登录的 Apple ID（免费账号即可）自动签名，到期前提醒续签；最近启动可一键重启 |
 | 平台 | 被调试端：iOS 15+、Mac Catalyst 15+、tvOS 15+、visionOS（UIKit）与 macOS 12+（AppKit）；客户端：macOS 14 及以上 |
 
 ## 下载
@@ -95,7 +95,7 @@ Xcode 中 File → Add Package Dependencies，输入 `https://github.com/wangwan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.0"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.2"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -135,7 +135,7 @@ SPM 无法按配置链接依赖，Release 构建也会链接 LumenServer，但 `
 ### 3. CocoaPods（仅 Debug 配置）
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.0/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.2/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 代码同上（Swift：`#if DEBUG` 中 `import LumenServer` 并调用 `LumenServer.start()`；Objective-C：`@import LumenServer;` 后 `[LumenServer start]`）。
@@ -144,8 +144,14 @@ pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lum
 
 不修改工程，直接把采集端注入启动。最省事的是在 Lumen 中点工具栏的“启动调试”（⌘N），或把 `.app` / `.ipa` 拖进窗口、拖到程序坞图标上：
 
-- **Mac 应用**：从列表中选择或选择任意 `.app` / 可执行文件。启用 Hardened Runtime、库验证的 App（多数从官网下载的 App 都是）会先列出重签的影响，确认后复制到 `~/Library/Caches/lumen/resigned/` 做 ad-hoc 重签再启动副本，原 App 不改动。Mac Catalyst App 经 LaunchServices 注入启动。
-- **模拟器**：选择模拟器与其中的 App（未启动的模拟器会自动启动），或安装模拟器构建的 `.app` 后启动。
+- **Mac 应用**：从列表中选择或选择任意 `.app` / 可执行文件。启用 Hardened Runtime、库验证的 App（多数从官网下载的 App 都是）会先列出重签的影响，确认后复制到 `~/Library/Caches/lumen/resigned/` 做 ad-hoc 重签再启动副本，原 App 不改动。Mac Catalyst App 经 LaunchServices 注入启动。以下情况也会自动处理：
+  - **Electron / Chromium 内核的 App**（Google Chrome、balenaEtcher、Mac App Store 上的网易云音乐等）：采集端只在主进程启动，GPU、渲染等辅助进程不受影响；带沙盒继承的辅助程序随主程序一起重签；副本使用独立的用户数据目录（`~/Library/Caches/lumen/resigned-data/`），不与原 App 争用单实例锁，也不读写原 App 的登录状态与 Cookie。
+  - **iPad 版 Mac App**（如酷狗音乐）与包内带非 Mach-O 文件的 App（如 Qt 打包的 DB Browser for SQLite）可正常重签启动。
+  - **被 Gatekeeper 拦下的 App**（带下载隔离标记且未公证、你也没有在“仍要打开”中放行）：改为启动去掉隔离标记的重签副本，原 App 保持原样。
+  - **启动时检测注入的 App**：部分 App 启动时枚举已加载的库，发现外来库就退出。“隐藏注入库”默认开启，把注入库从 App 看到的 dyld 镜像列表中去掉；它只能挡住按镜像名 / 数量枚举的检测，请仅用于你有权调试的 App。
+- **模拟器**：选择模拟器与其中的 App（未启动的模拟器会自动启动），或安装模拟器构建的 `.app` 后启动。用户 App 与系统 App（设置、Safari 等）分组列出，系统 App 同样可以注入调试；设备菜单中绿点表示已启动的模拟器。
+
+“Mac 应用”与“模拟器”标签可在列表和图标两种显示方式间切换，图标取自 App 本身；搜索框按名称或 bundle id 过滤，列表与说明区之间的分隔条可拖动调整高度。“最近启动”右键菜单列出原始文件与安装位置（重签副本、本机运行副本、模拟器中的安装目录、装到真机前的副本），可在访达中显示或复制路径。
 - **iOS 安装包**：在 Apple 芯片的 Mac 上直接运行 `.ipa` 或 iOS 真机构建的 `.app`——解包到缓存后把二进制改为 Mac Catalyst 平台、ad-hoc 签名运行；同一个包第二次启动复用副本。只适配 iPhone 的应用在 Mac 上默认是 iPad 布局，可在“屏幕尺寸”里选一个机型（或自定义尺寸）以该尺寸运行，方便用不同尺寸调 UI；要最真实的 iPhone 布局用模拟器或真机。
 - **真机**：选择 USB 连接的 iPhone / iPad 与安装包，Lumen 把注入库放进包内，用你的 Apple Development 证书重签后安装启动。证书与描述文件来自 Xcode 中登录的 Apple ID（免费账号即可，7 天有效，到期前一天提醒并可一键续签）；付费账号也可以在“设置 › 签名”中导入 App Store Connect API 密钥。Lumen 不接触你的 Apple ID 密码。
 
@@ -163,6 +169,7 @@ LUMEN=/Applications/Lumen.app/Contents/Helpers/lumen
 # macOS 程序（可执行文件或 .app）；签名会挡住注入时加 --resign 启动重签副本
 $LUMEN launch --mac /path/to/MyApp.app
 $LUMEN launch --mac /Applications/SomeApp.app --resign
+$LUMEN launch --mac /Applications/SomeApp.app --resign --show-injection   # 不隐藏注入库
 
 # iOS 模拟器中已安装的 App（booted 或模拟器 UDID），或先安装模拟器构建的 .app
 $LUMEN launch --simulator booted com.example.MyApp
@@ -177,6 +184,7 @@ $LUMEN launch --ios MyApp.ipa --allow-maximize               # 允许窗口最�
 $LUMEN launch --ios MyApp.ipa --device "我的 iPhone"
 
 $LUMEN simulators      # 列出模拟器与其中的 App
+$LUMEN simulators <UDID> --system   # 用户 App 与系统 App 分组列出
 $LUMEN identities      # 列出签名证书与开发描述文件
 ```
 
@@ -333,7 +341,7 @@ sudo ln -sf /Applications/Lumen.app/Contents/Helpers/lumen /usr/local/bin/lumen
 | `lumen set 12 UIView.alpha 0.5` | 运行时修改属性 |
 | `lumen launch --mac <App> [--resign]` | 零改动注入启动；第三方 Hardened Runtime App 加 `--resign` 启动重签副本 |
 | `lumen launch --ios <ipa> [--device <设备>]` | iOS 安装包在本机运行，或重签后安装到真机 |
-| `lumen simulators` / `lumen identities` | 列出模拟器与其中的 App / 签名证书与描述文件 |
+| `lumen simulators [UDID [--system]]` / `lumen identities` | 列出模拟器与其中的 App（`--system` 含系统 App） / 签名证书与描述文件 |
 | `lumen mcp` | 以 MCP 服务运行 |
 
 全局选项：`--json` 输出稳定的 JSON，`--app <名称|bundle id|pid|UDID>` 指定目标 App，`--device <UDID|设备名>` 只看该真机上的 App，`--network` 额外发现局域网中的 App，`--port N` 直连端口。`lumen help <命令>` 查看详细说明。
@@ -344,6 +352,7 @@ sudo ln -sf /Applications/Lumen.app/Contents/Helpers/lumen /usr/local/bin/lumen
 - 默认只监听本机回环地址（127.0.0.1），并拒绝非本机来源的连接；模拟器、Mac App 与 USB 连接的真机使用这种方式。
 - 局域网访问需要显式开启：Info.plist 设置 `LumenAllowsNetworkConnections = YES` 或调用 `LumenServer.start(allowsNetworkConnections: true)`，开启后监听所有网卡并广播 Bonjour 服务 `_lumen._tcp`（见“调试真机”）。
 - 经“启动调试”重签安装到真机的副本会开启局域网连接，以便设备经 Wi-Fi 连接时也能被发现；同一局域网中的设备都能连上这个副本，请在可信的网络中调试。
+- “启动调试”只改动缓存中的副本：重签、去掉隔离标记都在 `~/Library/Caches/lumen/` 下的副本上进行，原 App 不改动；Chromium 内核 App 的副本使用独立的数据目录，不接触原 App 的登录状态与 Cookie。
 - 密码框（安全输入框）的文本一律以掩码返回，不会离开被调试的 App。
 - 所有数据只在本机的 Lumen、`lumen` 与被调试 App 之间传输，不上传任何服务器。
 
