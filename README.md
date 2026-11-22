@@ -8,10 +8,9 @@
 
 <p align="center"><a href="https://lumen.vanjay.cn">官网</a> · <a href="README.en.md">English</a></p>
 
-<p align="center">
-  <video src="https://github.com/wangwanjie/Lumen/raw/main/assets/video/lumen-tour.mp4" poster="https://github.com/wangwanjie/Lumen/raw/main/assets/video/lumen-tour-poster.jpg" width="820" controls muted playsinline></video>
-  <br><sub>▶ 宣传片（1 分 42 秒，有背景音乐）· <a href="https://lumen.vanjay.cn/#tour">在官网观看章节版</a></sub>
-</p>
+https://github.com/user-attachments/assets/145638f3-5af4-4100-ad07-fdfa3a7fb970
+
+<p align="center"><sub>▶ 宣传片（1 分 42 秒，有背景音乐）· <a href="https://lumen.vanjay.cn/#tour">在官网观看章节版</a></sub></p>
 
 **为 AI 编程准备好的界面调试器。** 免费使用，内置 MCP 服务与命令行：
 
