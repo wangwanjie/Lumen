@@ -3,6 +3,51 @@
     <channel>
         <title>Lumen</title>
         <item>
+            <title>0.3.2</title>
+            <pubDate>Sun, 22 Nov 2026 17:17:35 +0800</pubDate>
+            <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.3.2</link>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.3.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/wangwanjie/Lumen/releases/download/v0.3.2/Lumen_v0.3.2_arm64.dmg" length="15715819" type="application/octet-stream" sparkle:edSignature="EvTyr4KML/DmDwsxegtiN/K/8atZiKXoHg3u4IA3Zy68Qa/j/ZnsG+wo6fzxCIr3AqSNKKnKpvMYmMkqiXTqCw==" />
+            <description>&lt;h2&gt;Lumen 0.3.2&lt;/h2&gt;
+&lt;p&gt;图文介绍见官网：&lt;a href="https://lumen.vanjay.cn/#new"&gt;https://lumen.vanjay.cn/#new&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;启动调试&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;兼容 Electron / Chromium 内核的 App（Google Chrome、balenaEtcher、Mac App Store 上的网易云音乐等）：采集端只在主进程启动，带沙盒继承的辅助程序随主程序一起重签，副本使用独立的用户数据目录（`~/Library/Caches/lumen/resigned-data/`），不与原 App 争用单实例锁，也不读写原 App 的登录状态&lt;/li&gt;&lt;li&gt;iPad 版 Mac App（如酷狗音乐）、包内带非 Mach-O 文件的 Qt App（如 DB Browser for SQLite）可以重签启动&lt;/li&gt;&lt;li&gt;被 Gatekeeper 拦下的 App（带下载隔离标记且未公证）改为启动去掉隔离标记的重签副本，原 App 不改动&lt;/li&gt;&lt;li&gt;新增“隐藏注入库”（默认开启）：启动时枚举已加载库、发现外来库就退出的 App 看不到注入库；命令行 `--show-injection` 关闭。只能挡住按镜像名 / 数量枚举的检测，请仅用于你有权调试的 App&lt;/li&gt;&lt;li&gt;模拟器标签分组列出用户 App 与系统 App（设置、Safari 等），系统 App 同样可以注入调试；`lumen simulators &amp;lt;UDID&amp;gt; --system`&lt;/li&gt;&lt;li&gt;“Mac 应用”“模拟器”标签支持列表 / 图标两种显示，显示 App 的真实图标；模拟器标签加入搜索；列表与说明区之间的分隔条可拖动&lt;/li&gt;&lt;li&gt;“最近启动”右键菜单列出原始文件与安装位置，可在访达中显示或复制路径&lt;/li&gt;&lt;li&gt;模拟器设备菜单用绿点标出已启动的设备，启动结束和回到窗口时自动刷新&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;画布与纹理&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;SwiftUI 逻辑节点渐进加载：首次读取慢的宿主先显示平台层级，空闲时在后台逐个补读并推送，iOS“设置”首屏从 25.7 秒降到 0.4 秒&lt;/li&gt;&lt;li&gt;Electron / Chromium 的网页内容在分层视图中完整显示&lt;/li&gt;&lt;li&gt;OpenGL 绘制的窗口（Qt 5 App）不再空白&lt;/li&gt;&lt;li&gt;SwiftUI 列表图标、`foregroundStyle` 等乘色滤镜着色正确显示；液态玻璃按真实模糊半径还原；不对齐位置的传送门内容不再丢失&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;修复&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;App 自身集成了 LumenServer 又被注入时，切换列表里出现两份&lt;/li&gt;&lt;li&gt;自动刷新关闭时，窗口晚于采集端创建的 App 连接后层级为空&lt;/li&gt;&lt;li&gt;Electron App 注入后启动不稳定（辅助进程也起采集端、早期监听与分配器钩子冲突）&lt;/li&gt;&lt;li&gt;使用向导“接入 App”页底部内容被裁掉；“真机”标签状态说明显示不全&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;安全&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;局域网中的设备伪造本机 App 的进程信息时，不能再顶替本机的真实连接，也不能隐藏本机的版本不兼容提示&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;性能&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;Metal、视频、网页等需要整窗截图补画的内容，同一轮纹理请求只截一次窗口&lt;/li&gt;&lt;li&gt;启动面板对同一台模拟器的 App 列表读取去重，打开面板不再重复运行 `simctl listapps`&lt;/li&gt;&lt;/ul&gt;
+&lt;ul&gt;&lt;li&gt;官网：&lt;a href="https://lumen.vanjay.cn"&gt;https://lumen.vanjay.cn&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</description>
+        </item>
+        <item>
+            <title>0.3.2</title>
+            <pubDate>Sun, 22 Nov 2026 17:17:37 +0800</pubDate>
+            <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.3.2</link>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.3.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/wangwanjie/Lumen/releases/download/v0.3.2/Lumen_v0.3.2_x86_64.dmg" length="16332978" type="application/octet-stream" sparkle:edSignature="8io/o7d5i9Ib8ntAk4QXCGDiLgyhzZXk8vyNOjUwapXcMf8o4kd5+NI9RH2ni4ZQapKdr9QYPEFF0e3oZfXuCA==" />
+            <description>&lt;h2&gt;Lumen 0.3.2&lt;/h2&gt;
+&lt;p&gt;图文介绍见官网：&lt;a href="https://lumen.vanjay.cn/#new"&gt;https://lumen.vanjay.cn/#new&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;启动调试&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;兼容 Electron / Chromium 内核的 App（Google Chrome、balenaEtcher、Mac App Store 上的网易云音乐等）：采集端只在主进程启动，带沙盒继承的辅助程序随主程序一起重签，副本使用独立的用户数据目录（`~/Library/Caches/lumen/resigned-data/`），不与原 App 争用单实例锁，也不读写原 App 的登录状态&lt;/li&gt;&lt;li&gt;iPad 版 Mac App（如酷狗音乐）、包内带非 Mach-O 文件的 Qt App（如 DB Browser for SQLite）可以重签启动&lt;/li&gt;&lt;li&gt;被 Gatekeeper 拦下的 App（带下载隔离标记且未公证）改为启动去掉隔离标记的重签副本，原 App 不改动&lt;/li&gt;&lt;li&gt;新增“隐藏注入库”（默认开启）：启动时枚举已加载库、发现外来库就退出的 App 看不到注入库；命令行 `--show-injection` 关闭。只能挡住按镜像名 / 数量枚举的检测，请仅用于你有权调试的 App&lt;/li&gt;&lt;li&gt;模拟器标签分组列出用户 App 与系统 App（设置、Safari 等），系统 App 同样可以注入调试；`lumen simulators &amp;lt;UDID&amp;gt; --system`&lt;/li&gt;&lt;li&gt;“Mac 应用”“模拟器”标签支持列表 / 图标两种显示，显示 App 的真实图标；模拟器标签加入搜索；列表与说明区之间的分隔条可拖动&lt;/li&gt;&lt;li&gt;“最近启动”右键菜单列出原始文件与安装位置，可在访达中显示或复制路径&lt;/li&gt;&lt;li&gt;模拟器设备菜单用绿点标出已启动的设备，启动结束和回到窗口时自动刷新&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;画布与纹理&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;SwiftUI 逻辑节点渐进加载：首次读取慢的宿主先显示平台层级，空闲时在后台逐个补读并推送，iOS“设置”首屏从 25.7 秒降到 0.4 秒&lt;/li&gt;&lt;li&gt;Electron / Chromium 的网页内容在分层视图中完整显示&lt;/li&gt;&lt;li&gt;OpenGL 绘制的窗口（Qt 5 App）不再空白&lt;/li&gt;&lt;li&gt;SwiftUI 列表图标、`foregroundStyle` 等乘色滤镜着色正确显示；液态玻璃按真实模糊半径还原；不对齐位置的传送门内容不再丢失&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;修复&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;App 自身集成了 LumenServer 又被注入时，切换列表里出现两份&lt;/li&gt;&lt;li&gt;自动刷新关闭时，窗口晚于采集端创建的 App 连接后层级为空&lt;/li&gt;&lt;li&gt;Electron App 注入后启动不稳定（辅助进程也起采集端、早期监听与分配器钩子冲突）&lt;/li&gt;&lt;li&gt;使用向导“接入 App”页底部内容被裁掉；“真机”标签状态说明显示不全&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;安全&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;局域网中的设备伪造本机 App 的进程信息时，不能再顶替本机的真实连接，也不能隐藏本机的版本不兼容提示&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;性能&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;Metal、视频、网页等需要整窗截图补画的内容，同一轮纹理请求只截一次窗口&lt;/li&gt;&lt;li&gt;启动面板对同一台模拟器的 App 列表读取去重，打开面板不再重复运行 `simctl listapps`&lt;/li&gt;&lt;/ul&gt;
+&lt;ul&gt;&lt;li&gt;官网：&lt;a href="https://lumen.vanjay.cn"&gt;https://lumen.vanjay.cn&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</description>
+        </item>
+        <item>
             <title>0.3.0</title>
             <pubDate>Sun, 22 Nov 2026 03:27:21 +0800</pubDate>
             <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.3.0</link>
