@@ -9,8 +9,8 @@
 <p align="center"><a href="https://lumen.vanjay.cn">Website</a> · <a href="README.md">简体中文</a></p>
 
 <p align="center">
-  <a href="https://lumen.vanjay.cn/#tour"><img src="assets/video/lumen-tour-poster.jpg" width="820" alt="Lumen promo video (plays on the website)"></a>
-  <br><sub>▶ Watch the promo video (1:42, Chinese captions, with music)</sub>
+  <video src="https://github.com/wangwanjie/Lumen/raw/main/assets/video/lumen-tour.mp4" poster="https://github.com/wangwanjie/Lumen/raw/main/assets/video/lumen-tour-poster.jpg" width="820" controls muted playsinline></video>
+  <br><sub>▶ Promo video (1:42, Chinese captions, with music) · <a href="https://lumen.vanjay.cn/#tour">chaptered version on the website</a></sub>
 </p>
 
 **A UI debugger built for AI-assisted development.** Free to use, with a built-in MCP server and CLI:
