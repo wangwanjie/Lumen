@@ -1037,6 +1037,47 @@
       font-family: var(--mono);
       color: var(--accent);
     }
+    /* 宣传片下方的功能截图墙 */
+    .shot-wall {
+      max-width: 1040px;
+      margin: 36px auto 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+    }
+    .shot-wall li {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-2);
+    }
+    .shot-wall a {
+      display: block;
+      aspect-ratio: 16 / 10;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #0e0f11;
+      box-shadow: var(--shadow);
+    }
+    .shot-wall img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform 0.3s ease;
+    }
+    .shot-wall a:hover img {
+      transform: scale(1.03);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .shot-wall img {
+        transition: none;
+      }
+    }
     .rel-switch {
       display: grid;
       grid-template-columns: 260px minmax(0, 1fr);
@@ -2370,6 +2411,7 @@
       Lumen
     </a>
     <nav class="nav-links" aria-label="页面导航">
+      <a href="#tour">宣传片</a>
       <a href="#new">新特性</a>
       <a href="#features">功能</a>
       <a href="#start">上手</a>
@@ -2529,6 +2571,53 @@
         <p class="stage-hint" id="stage-hint">拖动旋转，点任一层看读数</p>
       </div>
       <nav class="pathbar" id="pathbar" aria-label="选中节点的路径"></nav>
+    </div>
+  </section>
+
+  <!-- ================= 宣传片：一分半看完 Lumen 能做什么（AI 接入、拖入 ipa、多平台、检查器、控制台、SwiftUI、性能与诊断） ================= -->
+  <section class="section release" id="tour" aria-labelledby="tour-title">
+    <div class="wrap">
+      <div class="release-head">
+        <div class="section-head">
+          <h2 id="tour-title">一分半钟，看完 Lumen 能做什么</h2>
+          <p>为 AI 编程准备好的界面调试器：内置 MCP 与命令行，Claude Code、Codex、Cursor 一行命令接入；模拟器、真机、Mac 应用、第三方 ipa 都能调。</p>
+        </div>
+      </div>
+
+      <figure class="film">
+        <div class="film-frame">
+          <video controls playsinline preload="none" poster="assets/video/lumen-tour-poster.jpg" aria-label="Lumen 宣传片：AI 通过 MCP 调用 Lumen 排查界面问题、拖入第三方 ipa 调试、多平台支持、属性面板、控制台、SwiftUI、性能与诊断">
+            <source src="assets/video/lumen-tour.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption>
+          <span>宣传片 · 有背景音乐</span>
+          <ol class="film-chapters">
+            <li>AI 接入（MCP）</li>
+            <li>拖入第三方 ipa</li>
+            <li>多平台支持</li>
+            <li>属性面板</li>
+            <li>控制台</li>
+            <li>SwiftUI</li>
+            <li>性能与诊断</li>
+          </ol>
+        </figcaption>
+      </figure>
+
+      <!-- 功能截图墙：点开看原图 -->
+      <ul class="shot-wall" aria-label="功能截图">
+        <li><a href="assets/shots/tour/platforms.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/platforms.jpg" loading="lazy" alt="目标选择窗口按平台列出 iOS、Mac Catalyst 与 macOS App"></a><span>完善的平台支持</span></li>
+        <li><a href="assets/shots/tour/switch-app.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/switch-app.jpg" loading="lazy" alt="切换调试目标的弹窗"></a><span>切换调试 App，多平台支持</span></li>
+        <li><a href="assets/shots/tour/simulator.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/simulator.jpg" loading="lazy" alt="启动调试的模拟器标签，列出模拟器中的系统与第三方 App"></a><span>模拟器应用一键调试，系统应用也能调</span></li>
+        <li><a href="assets/shots/tour/ipa.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/ipa.jpg" loading="lazy" alt="iOS 安装包标签，选择在本机运行或安装到真机"></a><span>可调试任意未加壳的 ipa 或 app（Apple 芯片）</span></li>
+        <li><a href="assets/shots/tour/device.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/device.jpg" loading="lazy" alt="真机标签，用 Xcode 登录的证书重签并安装"></a><span>用 Xcode 登录的证书，一键调试到真机</span></li>
+        <li><a href="assets/shots/tour/mac-app.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/mac-app.jpg" loading="lazy" alt="Mac 应用标签，列出本机安装的应用"></a><span>支持调试任意 Mac 应用</span></li>
+        <li><a href="assets/shots/tour/ipa-on-mac.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/ipa-on-mac.jpg" style="object-fit:contain" loading="lazy" alt="iOS App 以 Mac Catalyst 方式在 Mac 上运行"></a><span>ipa 直接在 Mac 上运行，窗口大小随意定制</span></li>
+        <li><a href="assets/shots/tour/perf.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/perf.jpg" loading="lazy" alt="5400 多个节点的层级在 3D 画布中秒级刷新"></a><span>5400+ 节点，秒级刷新</span></li>
+        <li><a href="assets/shots/tour/audit.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/audit.jpg" loading="lazy" alt="审计面板列出布局问题并在画布上定位"></a><span>布局问题一键诊断定位</span></li>
+        <li><a href="assets/shots/tour/log.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/log.jpg" loading="lazy" alt="应用日志面板的正则与黑白名单过滤设置"></a><span>日志重定向：正则、黑白名单，pre-main 日志也能看</span></li>
+        <li><a href="assets/shots/tour/records.jpg" target="_blank" rel="noopener"><img src="assets/shots/tour/records.jpg" loading="lazy" alt="修改记录面板列出每次属性修改的旧值与新值"></a><span>调试记录保留每次修改</span></li>
+      </ul>
     </div>
   </section>
 

@@ -8,6 +8,19 @@
 
 <p align="center"><a href="https://lumen.vanjay.cn">Website</a> · <a href="README.md">简体中文</a></p>
 
+<p align="center">
+  <a href="https://lumen.vanjay.cn/#tour"><img src="assets/video/lumen-tour-poster.jpg" width="820" alt="Lumen promo video (plays on the website)"></a>
+  <br><sub>▶ Watch the promo video (1:42, Chinese captions, with music)</sub>
+</p>
+
+**A UI debugger built for AI-assisted development.** Free to use, with a built-in MCP server and CLI:
+
+```bash
+claude mcp add lumen -- /Applications/Lumen.app/Contents/Helpers/lumen mcp
+```
+
+After that one command, Claude Code, Codex, the ChatGPT desktop app, Cursor and other assistants can read the running app's hierarchy, take screenshots, run audits, change properties and locate source. Debug apps in the Simulator, on USB devices, any Mac app, or unencrypted third-party ipa files, across UIKit, SwiftUI and AppKit.
+
 ## Features
 
 Lumen inspects the view hierarchy of a running app and exposes the same capabilities to the command line and AI assistants. It supports macOS AppKit apps and can inject itself without any project changes.

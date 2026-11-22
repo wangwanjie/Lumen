@@ -8,6 +8,19 @@
 
 <p align="center"><a href="https://lumen.vanjay.cn">官网</a> · <a href="README.en.md">English</a></p>
 
+<p align="center">
+  <a href="https://lumen.vanjay.cn/#tour"><img src="assets/video/lumen-tour-poster.jpg" width="820" alt="Lumen 宣传片（点击在官网播放）"></a>
+  <br><sub>▶ 点击观看宣传片（1 分 42 秒，有背景音乐）</sub>
+</p>
+
+**为 AI 编程准备好的界面调试器。** 免费使用，内置 MCP 服务与命令行：
+
+```bash
+claude mcp add lumen -- /Applications/Lumen.app/Contents/Helpers/lumen mcp
+```
+
+一行命令后，Claude Code、Codex、ChatGPT 桌面 App、Cursor 等 AI 助手就能读取运行中 App 的层级、截图、审计、改属性、定位源码。模拟器、USB 真机、任意 Mac 应用、未加壳的第三方 ipa 都能直接调试，UIKit、SwiftUI、AppKit 全支持。
+
 ## 能力一览
 
 Lumen 用来查看运行中 App 的视图层级，并把同一套能力开放给命令行与 AI 助手，支持 macOS AppKit 程序与零改动注入。
