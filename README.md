@@ -95,7 +95,7 @@ Xcode 中 File → Add Package Dependencies，输入 `https://github.com/wangwan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.2"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.0"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -135,7 +135,7 @@ SPM 无法按配置链接依赖，Release 构建也会链接 LumenServer，但 `
 ### 3. CocoaPods（仅 Debug 配置）
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.2/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.0/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 代码同上（Swift：`#if DEBUG` 中 `import LumenServer` 并调用 `LumenServer.start()`；Objective-C：`@import LumenServer;` 后 `[LumenServer start]`）。
@@ -145,7 +145,7 @@ pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lum
 不修改工程，直接把采集端注入启动。最省事的是在 Lumen 中点工具栏的“启动调试”（⌘N），或把 `.app` / `.ipa` 拖进窗口、拖到程序坞图标上：
 
 - **Mac 应用**：从列表中选择或选择任意 `.app` / 可执行文件。启用 Hardened Runtime、库验证的 App（多数从官网下载的 App 都是）会先列出重签的影响，确认后复制到 `~/Library/Caches/lumen/resigned/` 做 ad-hoc 重签再启动副本，原 App 不改动。Mac Catalyst App 经 LaunchServices 注入启动。以下情况也会自动处理：
-  - **Electron / Chromium 内核的 App**（Google Chrome、balenaEtcher、Mac App Store 上的网易云音乐等）：采集端只在主进程启动，GPU、渲染等辅助进程不受影响；带沙盒继承的辅助程序随主程序一起重签；副本使用独立的用户数据目录（`~/Library/Caches/lumen/resigned-data/`），不与原 App 争用单实例锁，也不读写原 App 的登录状态与 Cookie。
+  - **Electron / Chromium 内核的 App**（Google Chrome、balenaEtcher、Mac App Store 上的网易云音乐等）：采集端只在主进程启动，GPU、渲染等辅助进程不受影响；带沙盒继承的辅助程序随主程序一起重签；副本使用独立的用户数据目录（`~/Library/Caches/lumen/resigned-data/`），不与原 App 争用单实例锁，也不读写原 App 的登录状态与 Cookie。Discord 这类自行决定数据目录、并会读取宿主签名证书的 App 也已适配：数据目录经它认的环境变量同样指向独立目录，副本改用钥匙串里的开发证书签名（在 Xcode 中登录 Apple ID 即有，免费账号即可）。
   - **iPad 版 Mac App**（如酷狗音乐）与包内带非 Mach-O 文件的 App（如 Qt 打包的 DB Browser for SQLite）可正常重签启动。
   - **被 Gatekeeper 拦下的 App**（带下载隔离标记且未公证、你也没有在“仍要打开”中放行）：改为启动去掉隔离标记的重签副本，原 App 保持原样。
   - **启动时检测注入的 App**：部分 App 启动时枚举已加载的库，发现外来库就退出。“隐藏注入库”默认开启，把注入库从 App 看到的 dyld 镜像列表中去掉；它只能挡住按镜像名 / 数量枚举的检测，请仅用于你有权调试的 App。

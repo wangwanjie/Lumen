@@ -92,7 +92,7 @@ In Xcode choose File → Add Package Dependencies, enter `https://github.com/wan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.2"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.0"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -132,7 +132,7 @@ SwiftPM links dependencies in every configuration, so Release builds still link 
 ### 3. CocoaPods (Debug only)
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.2/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.0/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 The code is the same as above (Swift: `import LumenServer` and `LumenServer.start()` inside `#if DEBUG`; Objective-C: `@import LumenServer;` then `[LumenServer start]`).
@@ -142,7 +142,7 @@ The code is the same as above (Swift: `import LumenServer` and `LumenServer.star
 Inject the server without modifying your project. The easiest way is the Launch for Debugging button in Lumen's toolbar (⌘N), or dropping an `.app` / `.ipa` onto the window or the Dock icon:
 
 - **Mac apps**: pick one from the list or choose any `.app` or executable. For apps using the Hardened Runtime or library validation (most apps downloaded from the web), Lumen first lists what re-signing affects; after you confirm, it copies the app to `~/Library/Caches/lumen/resigned/`, re-signs the copy ad-hoc and launches the copy. The original app is left untouched. Mac Catalyst apps are launched through LaunchServices. These cases are handled automatically too:
-  - **Electron / Chromium apps** (Google Chrome, balenaEtcher, Chromium apps from the Mac App Store and so on): the server starts only in the main process, leaving GPU, renderer and other helper processes alone; helpers that inherit the sandbox are re-signed along with the main app; the copy uses its own user data directory (`~/Library/Caches/lumen/resigned-data/`), so it never competes with the original app's single-instance lock or touches its sign-ins and cookies.
+  - **Electron / Chromium apps** (Google Chrome, balenaEtcher, Chromium apps from the Mac App Store and so on): the server starts only in the main process, leaving GPU, renderer and other helper processes alone; helpers that inherit the sandbox are re-signed along with the main app; the copy uses its own user data directory (`~/Library/Caches/lumen/resigned-data/`), so it never competes with the original app's single-instance lock or touches its sign-ins and cookies. Apps like Discord, which choose their own data directory and read the host's signing certificate, are handled too: their data-directory environment variable points to the same separate directory, and the copy is signed with the development certificate in your keychain (you get one by signing in with your Apple ID in Xcode; a free account works).
   - **iPad apps on Mac** and apps with non-Mach-O files in their code directories (such as Qt-packaged DB Browser for SQLite) re-sign and launch normally.
   - **Apps blocked by Gatekeeper** (quarantined, not notarized and not allowed with “Open Anyway”): Lumen launches a re-signed copy without the quarantine flag; the original stays as it is.
   - **Apps that check for injection at launch**: some apps enumerate loaded libraries at launch and quit when they find a foreign one. “Hide injection library” is on by default and removes the injection library from the dyld image list the app sees. It only defeats checks that enumerate image names or counts; use it only on apps you are entitled to debug.
