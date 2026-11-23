@@ -6,6 +6,29 @@
         <description>Lumen release feed.</description>
         <language>en</language>
         <item>
+            <title>0.3.2</title>
+            <pubDate>Mon, 23 Nov 2026 18:35:47 +0800</pubDate>
+            <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.3.2</link>
+            <sparkle:version>8</sparkle:version>
+            <sparkle:shortVersionString>0.3.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/wangwanjie/Lumen/releases/download/v0.3.2/Lumen_v0.3.2_x86_64.dmg" length="16637998" type="application/octet-stream" sparkle:edSignature="WDvFp88KTGAfIiRQsATXanWxi5PkoLlgQVwU4EkBxVZN0BLpm2dz4AAyRUz4u8oxB0Koiwa2bXBV7vueCwiwBA==" />
+            <description>&lt;h2&gt;Lumen 0.3.2&lt;/h2&gt;
+&lt;p&gt;图文介绍见官网：&lt;a href="https://lumen.vanjay.cn/#new"&gt;https://lumen.vanjay.cn/#new&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;画布&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;画布控件（2D / 3D、层间距、隐藏节点、边框线、测量、参考图）改为可停靠的悬浮胶囊，可停在画布上 / 下 / 左 / 右任一边缘，左右时竖排；拖动握把或右键菜单切换位置，位置会被记住；滚到标题栏下的图层柔和淡出&lt;/li&gt;&lt;li&gt;3D 下展开 / 折叠图层时，层栈以中间为基准对称伸缩，各图层用 0.25 秒平滑移到新深度，连续双击逐层展开时内容停在原处附近&lt;/li&gt;&lt;li&gt;无内容图层默认只显示边框线，3D 下空容器依然可见（已改过此设置的用户保留原选择）&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;大纲与编辑&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;大纲与画布的右键菜单新增“隐藏此节点 / 显示此节点”，与属性面板修改 `isHidden` 走同一条路径，记入修改记录、可撤销&lt;/li&gt;&lt;li&gt;连接新 App 时跳过输入法等系统辅助窗口，默认展开并选中当前页面的控制器&lt;/li&gt;&lt;li&gt;修复大层级在自动刷新时大纲 CPU 占满、内存涨到数 GB 的问题&lt;/li&gt;&lt;li&gt;在目标面板中再次点击已连接的 App 会刷新层级（查看历史时回到实时）&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;自动刷新&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;自动刷新默认改为仅手动；开启时工具栏按钮高亮并显示状态，每次应用变化时闪一下，连接时给出提示&lt;/li&gt;&lt;li&gt;正在点击、拖动、滚动或编辑时，新层级先记入时间轴，停手 1.5 秒后再替换界面，也可立即更新&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;应用日志&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;日志采集默认关闭，在“设置 › 通用”或日志面板工具栏开启；关闭时不起 `log stream`、不订阅推送，避免日志量大的 App 白白占用 CPU 与内存&lt;/li&gt;&lt;li&gt;新增“显示”菜单：精简行首、自动换行（默认开启）；自动换行下调整面板宽度不再重新扫描全部日志&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;AI 助手（MCP）&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;新增 `lumen_get_logs`：标准输出 / 错误与 os_log 按时间合并，支持文本 / 正则 / 级别 / 子系统过滤，`since` 游标增量读取，`wait_seconds` 等待新日志，可查看重启或崩溃前进程的日志&lt;/li&gt;&lt;li&gt;正则过滤限制模式长度并设置匹配时间预算，异常模式会被中止并报错；不换行的超长输出、异常的推送位置都有保护&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;其他&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;修复右键隐藏与属性面板同时修改同一属性时请求可能乱序的问题&lt;/li&gt;&lt;/ul&gt;</description>
+        </item>
+        <item>
             <title>0.3.0</title>
             <pubDate>Sun, 22 Nov 2026 20:26:52 +0800</pubDate>
             <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.3.0</link>
