@@ -26,12 +26,12 @@ Lumen 用来查看运行中 App 的视图层级，并把同一套能力开放给
 
 | 能力 | 说明 |
 |---|---|
-| 2D / 3D 层级画布 | Metal 渲染，平面与分层 3D 视图切换（透视投影，3D 分层跟随大纲的展开与折叠），可调层间距（⌘[ / ⌘]）、相机复位，显示隐藏节点与边框线；间距测量分关闭、父视图边距、锁定两节点三档；按 `layer.mask` 裁剪，不画被遮罩挡住的内容；搜索结果在画布上着色、其余淡化；无内容图层可选透明、只描边框或淡色底板；“定位”后目标图层闪烁高亮；还原 iOS 26 / 27 标签栏的液态玻璃底板与选中镜片，以及网页、Metal、视频、Lottie、SwiftUI 列表图标与 `foregroundStyle` 着色、OpenGL 绘制的窗口（如 Qt 5 App）、Electron / Chromium 网页等图层的内容；液态玻璃按真实的模糊半径还原；顶部工具条、底部路径栏（从根到所选节点，逐段可点）与缩放百分比；状态栏显示加载阶段、纹理进度与耗时 |
+| 2D / 3D 层级画布 | Metal 渲染，平面与分层 3D 视图切换（透视投影，3D 分层跟随大纲的展开与折叠），可调层间距（⌘[ / ⌘]）、相机复位，显示隐藏节点与边框线；间距测量分关闭、父视图边距、锁定两节点三档；按 `layer.mask` 裁剪，不画被遮罩挡住的内容；搜索结果在画布上着色、其余淡化；无内容图层可选透明、只描边框或淡色底板；“定位”后目标图层闪烁高亮；还原 iOS 26 / 27 标签栏的液态玻璃底板与选中镜片，以及网页、Metal、视频、Lottie、SwiftUI 列表图标与 `foregroundStyle` 着色、OpenGL 绘制的窗口（如 Qt 5 App）、Electron / Chromium 网页等图层的内容；液态玻璃按真实的模糊半径还原；3D 下展开 / 折叠时层栈以中间为基准对称伸缩，各层平滑移到新深度；画布控件是可停靠在上 / 下 / 左 / 右边缘的悬浮胶囊（左右时竖排，拖动或右键切换位置）、底部路径栏（从根到所选节点，逐段可点）与缩放百分比；状态栏显示加载阶段、纹理进度与耗时 |
 | 层级大纲 | 树形大纲与画布联动选中，悬停行时画布同步高亮；按类名、文本等过滤，搜索结果可继续下钻；键入类名或控制器名前缀直接定位；层级深度预设（⌥⌘1…⌥⌘5）按窗口与 ViewController 展开；聚焦模式只看某个节点的子树（Esc 退出）；按 App 记住展开状态；顶层列出 `UIWindowScene` 与 Layout Guide；层级很深时缩进自动收窄，深层节点也能看全；可在设置中调整字号、行高与层级引导竖线 |
 | 屏蔽的类 | 在设置中维护要屏蔽的类，画布不渲染命中的节点及其子树，大纲灰显标识，可临时显示、重新屏蔽或一键屏蔽此类 |
 | SwiftUI | 在宿主视图之下给出 SwiftUI 的逻辑视图树：`Text` 的文字、`Button` / `Toggle` / `TextField` 等控件、修饰符链与参数、调试数据中的属性值（含 `@State`），可按文本查找；集成 LumenServer 或注入后自动开启。逻辑节点渐进加载：首次读取慢的宿主先显示平台层级，空闲时在后台逐个补读并自动推送，iOS“设置”这类大型 App 首屏从约 26 秒缩短到 0.4 秒 |
 | 属性检查器 | 几何读数卡（父视图与所选节点的尺寸、四边边距、原点与窗口坐标）；按类分组的属性、继承链（悬停显示所在的 framework）、所属 ViewController、实例变量名及其持有者、accessibilityIdentifier；`contentMode`、`textAlignment` 等枚举显示名称并可下拉修改；控件的“事件处理”栏列出 target-action 与 `UIAction` |
-| 运行时改属性 | 在检查器中直接修改可编辑属性（数值拖动微调、取色、文本等），值为 nil 的颜色与文本同样可改；修改记录可撤销、可复制为 AI 提示；命令行 `lumen set`（枚举可按名称设置，如 `scaleAspectFit`） |
+| 运行时改属性 | 在检查器中直接修改可编辑属性（数值拖动微调、取色、文本等），值为 nil 的颜色与文本同样可改；大纲与画布的右键菜单可直接隐藏 / 显示节点；修改记录可撤销、可复制为 AI 提示；命令行 `lumen set`（枚举可按名称设置，如 `scaleAspectFit`） |
 | App 自定义属性 | 在 view / layer / ViewController 上实现 `@objc lumen_debugInfo()`，把业务状态显示在检查器最前面，带 setter 的项可直接修改；实现 `+lumen_colorAliases` 后颜色属性旁显示设计色别名（见下文“自定义检查器内容”） |
 | 调用方法 | 控制台中列出并调用节点、layer 或所属 ViewController 上的方法，方法名输入时预测并支持 Tab 补全，参数按签名逐个填写（颜色参数可用取色面板）；返回的对象可继续作为调用目标、列出方法或在大纲中选中；命令行 `lumen methods` / `lumen invoke` |
 | 手势 | 大纲行首的竖条标出挂有手势识别器的视图，点按弹出手势面板；查看类名、父类、持有它的实例变量、状态、目标动作与代理，单独启用或禁用；命令行 `lumen gestures` |
@@ -43,16 +43,16 @@ Lumen 用来查看运行中 App 的视图层级，并把同一套能力开放给
 | 时间轴 | 连接期间每次层级变化记入时间轴，可回看历史快照，并比较任意两个时间点之间的变化 |
 | 设计稿对比 | 在画布上叠加参考图（叠加 / 差异模式、可调不透明度），对齐窗口后给出还原度 |
 | 复制与导出 | 复制类名、Lumen 选择器、节点描述，复制为 AI 提示，导出节点截图 |
-| 自动刷新 | 按间隔刷新，并在 App 通知层级变化时自动刷新 |
+| 自动刷新 | 默认仅手动刷新；可开启按间隔刷新或在 App 通知层级变化时自动刷新，开启时工具栏按钮高亮并显示状态，每次应用变化时闪一下；正在点击、拖动、滚动或编辑时新层级先记入时间轴，停手后再替换界面 |
 | 选择器查询 | 类 CSS 语法：类名、`#identifier`、`[text*="登录"]`、`:visible`、后代 / 子代组合 |
 | `.lumen` 完整归档 | 把层级、全部节点详情与纹理存成单个 `.lumen` 文件（App 菜单“导出快照…”或 `lumen archive save`），可在 App 中离线打开，也可离线查询、审计、对比 |
 | JSON 快照与对比 | `lumen snapshot save` 保存 JSON 层级快照（`lumen.snapshot` 格式），与另一个快照或当前界面 diff，可作为 CI 断言 |
 | 命令行 | `lumen` 覆盖发现 App（本机、USB 真机、局域网）、层级、查询、节点详情、截图、快照与归档、审计、运行时修改、源码定位、注入启动 |
-| AI 助手 | `lumen mcp` 以 MCP 服务运行，提供层级、查询、节点详情、截图、快照对比、审计、hit-test、约束、无障碍、改属性、调用方法、外观覆盖、源码定位等工具 |
+| AI 助手 | `lumen mcp` 以 MCP 服务运行，提供层级、查询、节点详情、截图、快照对比、审计、hit-test、约束、无障碍、改属性、调用方法、外观覆盖、源码定位、应用日志查询等工具 |
 | 目标选择 | 以卡片网格列出可调试的 App，按平台分组、按设备归类，标明 USB / Wi-Fi / 局域网 / 模拟器 / 本机，卡片显示主窗口预览；同一进程里同时有集成与注入的两份采集端时只列一份 |
 | 后台提示 | 目标 App 进入后台或被挂起时给出提示与重试，恢复后自动重新拉取层级与纹理 |
 | 断线保留现场 | 目标 App 退出、崩溃或网络断开时，最后一份层级、已读取的详情与纹理继续以只读方式显示，可另存为 `.lumen` 快照；同一 App 重新出现时自动切回实时 |
-| 应用日志 | 底部“应用日志”面板显示标准输出 / 错误与 os_log，启动调试的 App 与集成了 LumenServer 的 App 都能看；虚拟化列表应对大量日志，支持文本筛选、来源与级别过滤、白名单与黑名单规则 |
+| 应用日志 | 开启“采集日志”后（默认关闭，在设置或面板工具栏开启），底部“应用日志”面板显示标准输出 / 错误与 os_log，启动调试的 App 与集成了 LumenServer 的 App 都能看；虚拟化列表应对大量日志，支持文本筛选、来源与级别过滤、白名单与黑名单规则 |
 | 界面语言与外观 | 界面支持简体中文、English、繁體中文，切换后立即生效；外观可跟随系统、浅色或深色 |
 | 一键接入 | `python3 /Applications/Lumen.app/Contents/Resources/lumen_setup.py` 把采集端接入 Xcode 工程的 Debug 配置（iOS 模拟器 / 真机、tvOS、macOS），无需改 Podfile / Package，`--remove` 原样撤销 |
 | 零改动注入 | “启动调试”窗口（⌘N）与 `lumen launch`：不改工程，注入启动 Mac App（含 Mac Catalyst）、模拟器中的 App、iOS 安装包（Apple 芯片的 Mac 上直接运行，可按 iPhone 机型尺寸运行）与 USB 真机上的 App；拖入 `.ipa` 时询问在本机还是真机运行；签名会挡住注入时自动重签副本；兼容 Electron / Chromium 内核的 App（含 Mac App Store 版）、iPad 版 Mac App、被 Gatekeeper 拦下的 App 与启动时检测注入的 App；模拟器中的系统 App（设置、Safari 等）也能注入调试；启动窗口支持列表 / 图标两种显示与搜索；真机借 Xcode 中登录的 Apple ID（免费账号即可）自动签名，到期前提醒续签；最近启动可一键重启 |
@@ -107,7 +107,7 @@ Xcode 中 File → Add Package Dependencies，输入 `https://github.com/wangwan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.0"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.2"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -147,7 +147,7 @@ SPM 无法按配置链接依赖，Release 构建也会链接 LumenServer，但 `
 ### 3. CocoaPods（仅 Debug 配置）
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.0/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.2/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 代码同上（Swift：`#if DEBUG` 中 `import LumenServer` 并调用 `LumenServer.start()`；Objective-C：`@import LumenServer;` 后 `[LumenServer start]`）。
@@ -169,7 +169,7 @@ pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lum
 
 无法启动时会说明原因并给出解决方案（例如 FairPlay 加密、Intel Mac 运行 iOS 包、设备未信任开发者），常见的处理可以一键执行。成功后自动连接；“重新启动当前 App”（⌥⌘R）沿用上次的方式重启并恢复选中的节点。
 
-App 的标准输出 / 错误与 os_log（`Logger`、`os_log`）都显示在底部的“应用日志”面板：Mac App 与 iOS 包在本机运行时用 `log stream` 跟随进程的 os_log，模拟器同样，真机由注入库把 os_log 转写进控制台（不含调试级别）。每条日志一行（多行消息折成一行），选中后在下方查看完整内容，⌘C 拷贝；错误红色、故障紫色、调试灰色。向上滚动会自动暂停“跟随最新”，滚回底部恢复，日志再多也不会把正在看的内容顶走。
+日志采集默认关闭，避免日志量很大的 App 白白占用 CPU 与内存；在“设置 › 通用 › 应用日志”或日志面板工具栏勾选“采集日志”后开启，开启时对当前连接的 App 立即补发最近一段历史，关闭时停止采集并清空面板（MCP 的 `lumen_get_logs` 自行订阅，不受此开关影响）。开启后，App 的标准输出 / 错误与 os_log（`Logger`、`os_log`）都显示在底部的“应用日志”面板：Mac App 与 iOS 包在本机运行时用 `log stream` 跟随进程的 os_log，模拟器同样，真机由注入库把 os_log 转写进控制台（不含调试级别）。“显示”菜单可开关精简行首（os_log 只留时分秒、类型与缩短的子系统:类别）与自动换行（长消息、多行消息在行内完整显示），两项默认开启；选中一行后在下方查看完整内容，⌘C 拷贝；错误红色、故障紫色、调试灰色。向上滚动会自动暂停“跟随最新”，滚回底部恢复，日志再多也不会把正在看的内容顶走。
 
 不是由“启动调试”启动的 App（例如在设备上手动打开已注入的 App，或用 CocoaPods / SPM 集成了 LumenServer 的 App），连接后由采集端经 Lumen 连接推送日志，面板同样能看到，只要在调试就一直有：注入的 App 从库加载起采集 print / NSLog（同时照常输出到原来的控制台），集成方式在连接后才开始采集；os_log 读取进程启动以来的全部记录（不含调试级别，需 iOS 15 / macOS 12 及以上）。采集端保留最近一段历史，断线重连只补发断开期间的部分。工具栏可按文本筛选；“过滤”里可以选择来源、os_log 最低级别，并同时设置白名单（只显示命中任一条规则的行）与黑名单（隐藏命中任一条规则的行），规则按整行、消息、子系统、类别或进程 / 库做包含、等于、开头是或正则匹配，忽略大小写，设置对所有 App 生效。在日志上右键可以把选中文本或所在行的子系统直接加入白名单或黑名单。
 
@@ -281,7 +281,7 @@ extension NSObject {
 
 ## AI 助手接入（MCP）
 
-`lumen mcp` 以 [Model Context Protocol](https://modelcontextprotocol.io) 服务运行，提供列出与选择 App、读取层级、选择器查询、按文本查找、节点详情、截图、快照对比、审计、hit-test、约束诊断、无障碍、运行时改属性、调用方法、外观覆盖、源码定位等工具。
+`lumen mcp` 以 [Model Context Protocol](https://modelcontextprotocol.io) 服务运行，提供列出与选择 App、读取层级、选择器查询、按文本查找、节点详情、截图、快照对比、审计、hit-test、约束诊断、无障碍、运行时改属性、调用方法、外观覆盖、源码定位、应用日志查询（`lumen_get_logs`：按文本 / 正则 / 级别 / 子系统过滤，`since` 游标增量读取，可等待新日志，可查看重启或崩溃前进程的日志）等工具。
 
 Claude Code：
 

@@ -1410,6 +1410,9 @@
     .caps.caps-new {
       margin-top: 72px;
     }
+    .release-head + .caps.caps-new {
+      margin-top: 0;
+    }
     @media (max-width: 1100px) {
       .rel-switch {
         grid-template-columns: minmax(0, 1fr);
@@ -1464,7 +1467,7 @@
       align-items: center;
       margin-top: 64px;
     }
-    #new .release-head {
+    #new .release-head, #v030a .release-head {
       max-width: none;
     }
     .release-head + .hl-row {
@@ -2713,7 +2716,7 @@
         <li>macOS 14 及以上</li>
         <li>Apple 公证</li>
         <li>内置自动更新</li>
-        <li><a class="mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">v0.3.0</a></li>
+        <li><a class="mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">v0.3.2</a></li>
       </ul>
 
     </div>
@@ -2887,8 +2890,33 @@
     </div>
   </section>
 
+  <!-- ================= 0.3.2 新特性：更顺手、更省资源 ================= -->
+  <section class="section release" id="new" aria-labelledby="v032-title">
+    <div class="wrap">
+      <div class="release-head">
+        <div class="section-head">
+          <h2 id="v032-title">更顺手，也更省资源</h2>
+          <p>画布控件改成可停靠的悬浮胶囊，3D 展开时内容停在原处；大层级不再卡顿，日志按需采集，AI 也能读日志定位问题。</p>
+        </div>
+        <a class="ver-link mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">0.3.2 新版本</a>
+      </div>
+      <dl class="caps caps-new" aria-label="0.3.2 改进">
+        <div class="cap"><dt>悬浮工具条</dt><dd>2D / 3D、层间距、测量等控件收进悬浮胶囊，可停靠在画布任一边缘，左右两侧竖排，拖动或右键切换位置。</dd></div>
+        <div class="cap"><dt>3D 展开不跑偏</dt><dd>连续双击逐层展开时，层栈以中间为基准对称伸缩，各层平滑移到新深度，内容停在原处附近。</dd></div>
+        <div class="cap"><dt>右键隐藏 / 显示</dt><dd>大纲与画布的右键菜单直接隐藏或显示节点，记入修改记录，可撤销。</dd></div>
+        <div class="cap"><dt>大层级不卡</dt><dd>层级大纲只调整展开状态有变化的节点，大层级自动刷新时 CPU 与内存保持平稳。</dd></div>
+        <div class="cap"><dt>自动刷新看得见</dt><dd>默认仅手动刷新；开启后按钮高亮并在每次更新时闪一下，正在操作时先记入时间轴，停手后再替换界面。</dd></div>
+        <div class="cap"><dt>日志按需采集</dt><dd>应用日志默认不采集，在设置或面板里一键开启；“显示”菜单可精简行首、自动换行。</dd></div>
+        <div class="cap"><dt>AI 读日志</dt><dd>MCP 新增 <code>lumen_get_logs</code>：按文本、正则、级别过滤，游标增量读取，可等待新日志，帮 AI 用打点定位时序问题。</dd></div>
+        <div class="cap"><dt>默认选中更准</dt><dd>连接新 App 时跳过输入法等系统辅助窗口，展开并选中当前页面的控制器。</dd></div>
+        <div class="cap"><dt>空图层只描边</dt><dd>无内容图层默认只显示边框线，3D 下空容器依然可见。</dd></div>
+        <div class="cap"><dt>点一下就刷新</dt><dd>在目标面板里再次点击已连接的 App 即刷新层级，查看历史时回到实时。</dd></div>
+      </dl>
+    </div>
+  </section>
+
   <!-- ================= 0.3.0 新特性（一）：更多 App 可注入调试 ================= -->
-  <section class="section release" id="new" aria-labelledby="hl-title">
+  <section class="section release" id="v030a" aria-labelledby="hl-title">
     <div class="wrap">
       <div class="release-head">
         <div class="section-head">
@@ -3308,7 +3336,7 @@
           </div>
           <div class="tab-panel" role="tabpanel" id="panel-spm" aria-labelledby="tab-spm">
             <p>Xcode 中 File → Add Package Dependencies，输入 <code>https://github.com/wangwanjie/Lumen.git</code>，把 <code>LumenServer</code> 加到 App target；或写进 <code>Package.swift</code>：</p>
-            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.0"),
+            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.2"),
 <span class="c">// target 依赖</span>
 .product(name: "LumenServer", package: "Lumen"),</code></pre></div>
             <p>启动时调用：</p>
@@ -3332,7 +3360,7 @@ LumenServer.start()
           </div>
           <div class="tab-panel" role="tabpanel" id="panel-pods" aria-labelledby="tab-pods" hidden>
             <p>只在 Debug 配置中集成，启动代码与 SPM 相同：</p>
-            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.0/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
+            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.2/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
             <div class="code"><div class="code-bar"><span>Swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>#if DEBUG
 import LumenServer
 LumenServer.start()   <span class="c">// Objective-C：@import LumenServer; [LumenServer start];</span>
@@ -3516,7 +3544,7 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
         <div class="cap"><dt>控制台执行方法</dt><dd>在控制台调用节点、layer 或 VC 上的方法。</dd></div>
         <div class="cap"><dt>点击诊断</dt><dd>某一点命中了谁、其他视图为何被跳过。</dd></div>
         <div class="cap"><dt>修改记录</dt><dd>运行时改过的属性留有记录，修改可撤销。</dd></div>
-        <div class="cap"><dt>应用日志</dt><dd>在 Lumen 底部面板查看被调试 App 的日志。</dd></div>
+        <div class="cap"><dt>应用日志</dt><dd>按需开启，在 Lumen 底部面板查看被调试 App 的日志。</dd></div>
       </dl>
     </div>
   </section>
