@@ -6,7 +6,7 @@
 
 <p align="center">iOS / macOS 界面调试工具：3D 分层查看界面层级，并提供命令行与 MCP 接口，让脚本、CI 与 AI 助手也能读取界面。</p>
 
-<p align="center"><a href="https://lumen.vanjay.cn">官网</a> · <a href="README.en.md">English</a></p>
+<p align="center"><a href="https://lumen.vanjay.cn">官网</a> · <a href="README.en.md">English</a> · <a href="https://lumen.vanjay.cn/#sponsor">☕ 请我喝杯咖啡</a></p>
 
 https://github.com/user-attachments/assets/145638f3-5af4-4100-ad07-fdfa3a7fb970
 

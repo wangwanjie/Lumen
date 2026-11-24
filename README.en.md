@@ -6,7 +6,7 @@
 
 <p align="center">A UI debugger for iOS and macOS apps: inspect view hierarchies in layered 3D, and read the same data from the command line or through MCP for scripts, CI and AI assistants.</p>
 
-<p align="center"><a href="https://lumen.vanjay.cn">Website</a> · <a href="README.md">简体中文</a></p>
+<p align="center"><a href="https://lumen.vanjay.cn">Website</a> · <a href="README.md">简体中文</a> · <a href="https://lumen.vanjay.cn/#sponsor">☕ Buy me a coffee</a></p>
 
 https://github.com/user-attachments/assets/145638f3-5af4-4100-ad07-fdfa3a7fb970
 
