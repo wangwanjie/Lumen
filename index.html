@@ -2824,7 +2824,7 @@
         <li>macOS 14 及以上</li>
         <li>Apple 公证</li>
         <li>内置自动更新</li>
-        <li><a class="mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">v0.3.2</a></li>
+        <li><a class="mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">v0.3.4</a></li>
       </ul>
 
     </div>
@@ -2998,8 +2998,32 @@
     </div>
   </section>
 
+  <!-- ================= 0.3.4 新特性：图片看得更清楚 ================= -->
+  <section class="section release" id="new" aria-labelledby="v034-title">
+    <div class="wrap">
+      <div class="release-head">
+        <div class="section-head">
+          <h2 id="v034-title">图片看得清，来源也找得到</h2>
+          <p>每张图片都能用“预览”打开原图，并显示图片名；被裁剪的内容也能完整看到，iPad 机型尺寸可以直接选。</p>
+        </div>
+        <a class="ver-link mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">0.3.4 新版本</a>
+      </div>
+      <dl class="caps caps-new" aria-label="0.3.4 改进">
+        <div class="cap"><dt>用“预览”打开图片</dt><dd>右键为节点持有的每张图片各给一项：图片、高亮图、按钮背景图、替换图与图层位图，按图片自身像素输出原图；图层截图同样可以直接交给“预览”。</dd></div>
+        <div class="cap"><dt>图片名一目了然</dt><dd>启动阶段加载的图片、按文件加载的图片，以及重画着色后的图片都能记下名字；属性面板的图片区显示图片名，右键可复制。</dd></div>
+        <div class="cap"><dt>显示被裁剪的内容</dt><dd>显示菜单（⇧⌘O）与悬浮工具条新增开关，默认开启，滚动视图可见区域之外的内容也画出来；画面因此与 App 实际显示不同时，画布底部提示一次，点“按实际显示”即可还原。</dd></div>
+        <div class="cap"><dt>iPad 机型尺寸</dt><dd>iOS 安装包在本机运行时可选 iPad mini、iPad Air、iPad Pro 的竖屏与横屏尺寸，所选尺寸优先于 App 自己设置的窗口限制。</dd></div>
+        <div class="cap"><dt>重新启动更干净</dt><dd>同一个安装包再次启动时先结束上一次的实例；尺寸模式变化后清除 App 保存的窗口大小。</dd></div>
+        <div class="cap"><dt>控制器列表更清楚</dt><dd>视图控制器的 children 每个子控制器一行并带内存地址，约束行完整折行显示。</dd></div>
+        <div class="cap"><dt>AI 读图片</dt><dd>MCP 的 <code>lumen_get_node</code> 列出节点持有的图片，<code>lumen_screenshot</code> 可按槽位读取图片原图。</dd></div>
+        <div class="cap"><dt>断开连接 ⌘.</dt><dd>调试菜单的“断开连接”新增快捷键，未连接时自动禁用。</dd></div>
+        <div class="cap"><dt>清理缓存不再转圈</dt><dd>设置里清理启动调试缓存时一次取得全部进程，缓存再大也能很快完成。</dd></div>
+      </dl>
+    </div>
+  </section>
+
   <!-- ================= 0.3.2 新特性：更顺手、更省资源 ================= -->
-  <section class="section release" id="new" aria-labelledby="v032-title">
+  <section class="section release" id="v032" aria-labelledby="v032-title">
     <div class="wrap">
       <div class="release-head">
         <div class="section-head">
@@ -3155,7 +3179,7 @@
             <p>“启动调试”窗口（⌘N）列出模拟器中的 App、Mac 应用、iOS 安装包与 USB 真机，启动过程逐步显示，成功后自动连接。</p>
             <ul class="ticks">
               <li><span><strong>模拟器</strong>未启动的模拟器自动开机，也可以先安装 .app 再启动</span></li>
-              <li><span><strong>iOS 安装包</strong>Apple 芯片的 Mac 上直接运行 .ipa，可按 iPhone 机型尺寸运行</span></li>
+              <li><span><strong>iOS 安装包</strong>Apple 芯片的 Mac 上直接运行 .ipa，可按 iPhone / iPad 机型尺寸运行</span></li>
               <li><span><strong>真机</strong>用 Xcode 中登录的 Apple ID 自动重签安装，免费账号即可，到期前提醒续签</span></li>
               <li><span><strong>Mac 应用</strong>Hardened Runtime 的 App 自动重签副本，原 App 不改动</span></li>
             </ul>
@@ -3444,7 +3468,7 @@
           </div>
           <div class="tab-panel" role="tabpanel" id="panel-spm" aria-labelledby="tab-spm">
             <p>Xcode 中 File → Add Package Dependencies，输入 <code>https://github.com/wangwanjie/Lumen.git</code>，把 <code>LumenServer</code> 加到 App target；或写进 <code>Package.swift</code>：</p>
-            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.2"),
+            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.4"),
 <span class="c">// target 依赖</span>
 .product(name: "LumenServer", package: "Lumen"),</code></pre></div>
             <p>启动时调用：</p>
@@ -3468,7 +3492,7 @@ LumenServer.start()
           </div>
           <div class="tab-panel" role="tabpanel" id="panel-pods" aria-labelledby="tab-pods" hidden>
             <p>只在 Debug 配置中集成，启动代码与 SPM 相同：</p>
-            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.2/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
+            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.4/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
             <div class="code"><div class="code-bar"><span>Swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>#if DEBUG
 import LumenServer
 LumenServer.start()   <span class="c">// Objective-C：@import LumenServer; [LumenServer start];</span>
@@ -3672,30 +3696,6 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
     </div>
   </section>
 
-  <!-- ================= 下载 ================= -->
-  <section class="final" aria-labelledby="final-title">
-    <div class="wrap">
-      <img src="assets/AppIcon.png" alt="" width="96" height="96" loading="lazy">
-      <h2 id="final-title">现在就拆开看看</h2>
-      <p>免费使用，macOS 14 及以上，Apple 芯片与 Intel 均可用。</p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="https://github.com/wangwanjie/Lumen/releases/latest/download/Lumen_arm64.dmg"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>下载 Lumen <small>Apple 芯片</small></a>
-        <a class="btn btn-secondary" href="https://github.com/wangwanjie/Lumen/releases/latest/download/Lumen_x86_64.dmg">Intel 版</a>
-        <a class="btn btn-ghost" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">更新记录<svg class="ext" aria-hidden="true"><use href="#i-ext"/></svg></a>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer class="site-footer">
-  <div class="wrap footer-grid">
-    <div>© 2026 wangwanjie</div>
-    <nav class="footer-links" aria-label="页脚链接">
-      <a href="https://github.com/wangwanjie/Lumen" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
-      <a href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">更新记录</a>
-      <a href="https://github.com/wangwanjie/Lumen/blob/main/README.md" target="_blank" rel="noopener">README</a>
-      <a href="https://github.com/wangwanjie/Lumen/blob/main/README.en.md" target="_blank" rel="noopener">English</a>
-      <a href="https://github.com/wangwanjie/Lumen/issues" target="_blank" rel="noopener">反馈问题</a>
   <!-- ================= 赞助 ================= -->
   <section class="section" id="sponsor" aria-labelledby="sponsor-title">
     <div class="wrap">
@@ -3738,6 +3738,31 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
     </div>
   </section>
 
+  <!-- ================= 下载 ================= -->
+  <section class="final" aria-labelledby="final-title">
+    <div class="wrap">
+      <img src="assets/AppIcon.png" alt="" width="96" height="96" loading="lazy">
+      <h2 id="final-title">现在就拆开看看</h2>
+      <p>免费使用，macOS 14 及以上，Apple 芯片与 Intel 均可用。</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/wangwanjie/Lumen/releases/latest/download/Lumen_arm64.dmg"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>下载 Lumen <small>Apple 芯片</small></a>
+        <a class="btn btn-secondary" href="https://github.com/wangwanjie/Lumen/releases/latest/download/Lumen_x86_64.dmg">Intel 版</a>
+        <a class="btn btn-ghost" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">更新记录<svg class="ext" aria-hidden="true"><use href="#i-ext"/></svg></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div>© 2026 wangwanjie</div>
+    <nav class="footer-links" aria-label="页脚链接">
+      <a href="https://github.com/wangwanjie/Lumen" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
+      <a href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">更新记录</a>
+      <a href="https://github.com/wangwanjie/Lumen/blob/main/README.md" target="_blank" rel="noopener">README</a>
+      <a href="https://github.com/wangwanjie/Lumen/blob/main/README.en.md" target="_blank" rel="noopener">English</a>
+      <a href="https://github.com/wangwanjie/Lumen/issues" target="_blank" rel="noopener">反馈问题</a>
+      <a href="#sponsor">赞助</a>
     </nav>
   </div>
 </footer>
@@ -3762,7 +3787,6 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
   "use strict";
   var root = document.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-      <a href="#sponsor">赞助</a>
 
   /* ---------- 外观切换：浅色 / 深色 / 跟随系统，存 localStorage 的 lumen-theme ---------- */
   var themeButtons = document.querySelectorAll("[data-theme-choice]");
@@ -4288,6 +4312,23 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
       });
     });
   });
+  /* ---------- 赞助：复制钱包地址 ---------- */
+  document.querySelectorAll(".wallet-list button[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.getAttribute("data-copy");
+      var p = navigator.clipboard && window.isSecureContext ? navigator.clipboard.writeText(text) : fallbackCopy(text);
+      p.then(function () {
+        btn.textContent = "已复制";
+      }, function () {
+        btn.textContent = "复制失败";
+      }).then(function () {
+        clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.textContent = "复制";
+        }, 1600);
+      });
+    });
+  });
   /* ---------- 截图标注：指向规格块时，对应引线加粗、锚点出现圆环 ---------- */
   document.querySelectorAll(".anno-spec[data-k]").forEach(function (spec) {
     var k = spec.getAttribute("data-k");
@@ -4312,23 +4353,6 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
   var lb = document.getElementById("lightbox");
   var lbLinks = Array.prototype.slice.call(document.querySelectorAll(".shot-wall a[data-lightbox]"));
   if (lb && lbLinks.length && typeof lb.showModal === "function") {
-  /* ---------- 赞助：复制钱包地址 ---------- */
-  document.querySelectorAll(".wallet-list button[data-copy]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var text = btn.getAttribute("data-copy");
-      var p = navigator.clipboard && window.isSecureContext ? navigator.clipboard.writeText(text) : fallbackCopy(text);
-      p.then(function () {
-        btn.textContent = "已复制";
-      }, function () {
-        btn.textContent = "复制失败";
-      }).then(function () {
-        clearTimeout(btn._timer);
-        btn._timer = setTimeout(function () {
-          btn.textContent = "复制";
-        }, 1600);
-      });
-    });
-  });
     var lbImg = lb.querySelector(".lb-stage img");
     var lbTitle = lb.querySelector(".lb-cap b");
     var lbDesc = lb.querySelector(".lb-cap span");
