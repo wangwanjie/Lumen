@@ -364,5 +364,9 @@ Global options: `--json` for stable JSON output, `--app <name|bundle id|pid|UDID
 - Data flows only between Lumen, `lumen` and the debugged app on your machine; nothing is uploaded.
 
 ## License
+## Sponsor
+
+Every Lumen feature is free. If it helps you, you can sponsor development with WeChat Pay or USDT; QR codes and addresses are in the [sponsor section](https://lumen.vanjay.cn/#sponsor) of the website.
+
 
 Lumen.app, the `lumen` CLI and the LumenServer SDK are free to use and distributed as binaries only; you may integrate the SDK into Debug builds of your own apps, but may not decompile, modify or redistribute it on its own. See [LICENSE](LICENSE). © 2026 wangwanjie. All rights reserved.

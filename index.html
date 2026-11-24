@@ -2465,6 +2465,110 @@
       color: var(--text-2);
     }
 
+    /* ================= 赞助 ================= */
+    .sponsor-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      margin-top: 32px;
+    }
+    .sponsor-card {
+      padding: 22px 24px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      text-align: center;
+    }
+    /* 内容较少的卡片（微信）在等高的网格行里上下也居中 */
+    .sponsor-card.center-y {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .sponsor-card h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+    .sponsor-card > p {
+      margin: 0 0 16px;
+      color: var(--text-2);
+      font-size: 15px;
+    }
+    .sponsor-qrs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+    }
+    .sponsor-qrs figure {
+      margin: 0;
+      text-align: center;
+    }
+    .sponsor-qrs img {
+      display: block;
+      width: 180px;
+      height: auto;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .sponsor-qrs figcaption {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--text-3);
+    }
+    .wallet-list {
+      list-style: none;
+      margin: 0 0 16px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .wallet-list li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+      padding: 10px 14px;
+      border-top: 1px solid var(--line);
+    }
+    .wallet-list li:first-child {
+      border-top: 0;
+    }
+    .wallet-list .net {
+      min-width: 120px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .wallet-list code {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      text-align: left;
+      font-size: 12.5px;
+    }
+    .wallet-list button {
+      min-height: 28px;
+      padding: 0 12px;
+      border: 1px solid var(--line-2);
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .wallet-list button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .sponsor-warn {
+      margin: 20px 0 0;
+      font-size: 13px;
+      color: var(--text-3);
+    }
+
     /* ================= 下载 ================= */
     .final {
       padding: 112px 0 104px;
@@ -2529,6 +2633,9 @@
       .stage-col {
         border-left: 0;
         border-top: 1px solid var(--line);
+      }
+      .sponsor-grid {
+        grid-template-columns: minmax(0, 1fr);
       }
       .demo, .doc, .ai-grid, .privacy {
         grid-template-columns: minmax(0, 1fr);
@@ -2678,6 +2785,7 @@
       <a href="#start">上手</a>
       <a href="#ai">AI 助手</a>
       <a href="#privacy">隐私</a>
+      <a href="#sponsor">赞助</a>
       <a href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">更新记录<svg class="ext" aria-hidden="true"><use href="#i-ext"/></svg></a>
     </nav>
     <div class="nav-tools">
@@ -3588,6 +3696,48 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
       <a href="https://github.com/wangwanjie/Lumen/blob/main/README.md" target="_blank" rel="noopener">README</a>
       <a href="https://github.com/wangwanjie/Lumen/blob/main/README.en.md" target="_blank" rel="noopener">English</a>
       <a href="https://github.com/wangwanjie/Lumen/issues" target="_blank" rel="noopener">反馈问题</a>
+  <!-- ================= 赞助 ================= -->
+  <section class="section" id="sponsor" aria-labelledby="sponsor-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="sponsor-title">请作者喝杯咖啡</h2>
+        <p>Lumen 的全部功能免费开放。如果它帮你省下了时间，欢迎自愿赞助；点 Star、反馈问题、分享给朋友同样是很大的支持。</p>
+      </div>
+      <div class="sponsor-grid">
+        <div class="sponsor-card center-y">
+          <h3>微信赞赏</h3>
+          <p>使用微信扫一扫。</p>
+          <div class="sponsor-qrs">
+            <figure>
+              <img src="assets/donate/wechat.png" alt="微信赞赏码" width="180" height="228" loading="lazy">
+              <figcaption>微信</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="sponsor-card">
+          <h3>USDT</h3>
+          <p>地址可一键复制，也可扫码。</p>
+          <ul class="wallet-list">
+            <li><span class="net">TRC20 (Tron)</span><code>TQMuNoHmcUAZb8swHenWuZBVrSznahen2f</code><button type="button" data-copy="TQMuNoHmcUAZb8swHenWuZBVrSznahen2f">复制</button></li>
+            <li><span class="net">ERC20 (Ethereum)</span><code>0x17b699795b2dfacbe10b76d77d9bf50340cc54be</code><button type="button" data-copy="0x17b699795b2dfacbe10b76d77d9bf50340cc54be">复制</button></li>
+            <li><span class="net">Arbitrum One</span><code>0x17b699795b2dfacbe10b76d77d9bf50340cc54be</code><button type="button" data-copy="0x17b699795b2dfacbe10b76d77d9bf50340cc54be">复制</button></li>
+          </ul>
+          <div class="sponsor-qrs">
+            <figure>
+              <img src="assets/donate/usdt-trc20.png" alt="USDT TRC20 地址二维码" width="140" height="140" loading="lazy">
+              <figcaption>USDT · TRC20</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/donate/usdt-evm.png" alt="USDT ERC20 / Arbitrum One 地址二维码" width="140" height="140" loading="lazy">
+              <figcaption>USDT · ERC20 / Arbitrum One</figcaption>
+            </figure>
+          </div>
+          <p class="sponsor-warn">转账前请核对网络与地址，选错网络资产无法找回。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
     </nav>
   </div>
 </footer>
@@ -3612,6 +3762,7 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
   "use strict";
   var root = document.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      <a href="#sponsor">赞助</a>
 
   /* ---------- 外观切换：浅色 / 深色 / 跟随系统，存 localStorage 的 lumen-theme ---------- */
   var themeButtons = document.querySelectorAll("[data-theme-choice]");
@@ -4161,6 +4312,23 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
   var lb = document.getElementById("lightbox");
   var lbLinks = Array.prototype.slice.call(document.querySelectorAll(".shot-wall a[data-lightbox]"));
   if (lb && lbLinks.length && typeof lb.showModal === "function") {
+  /* ---------- 赞助：复制钱包地址 ---------- */
+  document.querySelectorAll(".wallet-list button[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.getAttribute("data-copy");
+      var p = navigator.clipboard && window.isSecureContext ? navigator.clipboard.writeText(text) : fallbackCopy(text);
+      p.then(function () {
+        btn.textContent = "已复制";
+      }, function () {
+        btn.textContent = "复制失败";
+      }).then(function () {
+        clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.textContent = "复制";
+        }, 1600);
+      });
+    });
+  });
     var lbImg = lb.querySelector(".lb-stage img");
     var lbTitle = lb.querySelector(".lb-cap b");
     var lbDesc = lb.querySelector(".lb-cap span");

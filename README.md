@@ -369,5 +369,9 @@ sudo ln -sf /Applications/Lumen.app/Contents/Helpers/lumen /usr/local/bin/lumen
 - 所有数据只在本机的 Lumen、`lumen` 与被调试 App 之间传输，不上传任何服务器。
 
 ## 许可
+## 赞助
+
+Lumen 的全部功能免费开放。如果它帮到了你，欢迎通过微信或 USDT 赞助，收款码与地址见[官网赞助区](https://lumen.vanjay.cn/#sponsor)。
+
 
 Lumen.app、`lumen` 命令行工具与 LumenServer SDK 以二进制形式免费提供，可在自己 App 的 Debug 构建中集成 SDK；不得反编译、修改或单独再分发，详见 [LICENSE](LICENSE)。© 2026 wangwanjie，保留所有权利。
