@@ -3,6 +3,57 @@
     <channel>
         <title>Lumen</title>
         <item>
+            <title>0.3.4</title>
+            <pubDate>Tue, 24 Nov 2026 23:49:12 +0800</pubDate>
+            <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.3.4</link>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>0.3.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/wangwanjie/Lumen/releases/download/v0.3.4/Lumen_v0.3.4_arm64.dmg" length="16533817" type="application/octet-stream" sparkle:edSignature="0wt9Z87pR4sipoAQ5LcjjJuxzSgGUidw1fYqq8oQqWZcGnsGZatxb9OepuPPxy8hp0n1iOfLoZDFdsxiGUHkBg==" />
+            <description>&lt;h2&gt;Lumen 0.3.4&lt;/h2&gt;
+&lt;p&gt;图文介绍见官网：&lt;a href="https://lumen.vanjay.cn/#new"&gt;https://lumen.vanjay.cn/#new&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;图片&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;右键菜单为节点持有的每张图片各给一项“用“预览”打开”：图片、高亮图、按钮背景图、替换图与图层位图，按图片自身像素输出原图；图层截图同样可以直接交给“预览”&lt;/li&gt;&lt;li&gt;记录图片名：启动阶段按名字加载、按文件加载，以及派生与重画着色后的图片都能记下名字；属性面板新增图片区显示图片名，右键可复制&lt;/li&gt;&lt;li&gt;读取原图时大图的解码与重画放到后台进行，不再占用 App 主线程&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;画布&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;新增“显示被裁剪的内容”（⇧⌘O，悬浮工具条同步提供开关，默认开启）：滚动视图可见区域之外、轮播其他页等被裁掉的内容也画出来；画面因此与 App 实际显示不同时，画布底部提示一次，点“按实际显示”即可还原&lt;/li&gt;&lt;li&gt;画布右键菜单新增“展开全部子节点”“折叠全部子节点”&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;属性面板&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;新增 Relation：依次列出 (VC *).view、持有该 VC 的实例变量、特殊关系（窗口层级、单元格位置、表格行列等）与持有节点的实例变量，相同关系合并并标出次数，持有者可点击定位&lt;/li&gt;&lt;li&gt;视图控制器的 children 每个子控制器一行，并附内存地址&lt;/li&gt;&lt;li&gt;约束行完整折行显示&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;大纲与编辑&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;支持 ⌘Z / ⇧⌘Z 撤销、重做对 App 的修改（属性编辑、隐藏 / 显示节点、手势开关、修改记录中的单条撤销），菜单标题显示下一步操作&lt;/li&gt;&lt;li&gt;点击节点时保持横向滚动位置；退出聚焦后回到聚焦前的滚动位置&lt;/li&gt;&lt;li&gt;修复折叠节点后偶现大量空白行&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;启动调试&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;iOS 安装包本机运行新增 iPad mini、iPad Air、iPad Pro 等竖屏与横屏尺寸，所选尺寸优先于 App 自己设置的窗口限制&lt;/li&gt;&lt;li&gt;同一个安装包再次启动时先结束上一次的实例；尺寸模式变化后清除 App 保存的窗口大小&lt;/li&gt;&lt;li&gt;修复设置中清理启动调试缓存时一直转圈&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;命令行与 AI 助手（MCP）&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;`lumen_get_node` 列出节点持有的图片与 Relation 信息，`lumen_screenshot` 新增 `image=&amp;lt;槽位&amp;gt;` 读取图片原图&lt;/li&gt;&lt;li&gt;层级 JSON 新增节点的屏幕坐标与所在屏幕；`lumen hierarchy` 新增 `--views-only`，`lumen_get_hierarchy` 新增 `views_only`，只输出视图&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;其他&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;调试菜单的“断开连接”新增快捷键 ⌘.&lt;/li&gt;&lt;li&gt;“用“预览”打开”的临时文件名只保留安全字符并核对写入目录&lt;/li&gt;&lt;/ul&gt;</description>
+        </item>
+        <item>
+            <title>0.3.4</title>
+            <pubDate>Tue, 24 Nov 2026 23:49:15 +0800</pubDate>
+            <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.3.4</link>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>0.3.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/wangwanjie/Lumen/releases/download/v0.3.4/Lumen_v0.3.4_x86_64.dmg" length="17159800" type="application/octet-stream" sparkle:edSignature="n5UXrM1sxBWx0QIfcDk8+50hy9EPkcPwiJfmkrmc2ckZWhrP8WOsddmyOn/ZQ7gGVl7hhcuFJ7ToNGK6hK1nCQ==" />
+            <description>&lt;h2&gt;Lumen 0.3.4&lt;/h2&gt;
+&lt;p&gt;图文介绍见官网：&lt;a href="https://lumen.vanjay.cn/#new"&gt;https://lumen.vanjay.cn/#new&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;图片&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;右键菜单为节点持有的每张图片各给一项“用“预览”打开”：图片、高亮图、按钮背景图、替换图与图层位图，按图片自身像素输出原图；图层截图同样可以直接交给“预览”&lt;/li&gt;&lt;li&gt;记录图片名：启动阶段按名字加载、按文件加载，以及派生与重画着色后的图片都能记下名字；属性面板新增图片区显示图片名，右键可复制&lt;/li&gt;&lt;li&gt;读取原图时大图的解码与重画放到后台进行，不再占用 App 主线程&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;画布&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;新增“显示被裁剪的内容”（⇧⌘O，悬浮工具条同步提供开关，默认开启）：滚动视图可见区域之外、轮播其他页等被裁掉的内容也画出来；画面因此与 App 实际显示不同时，画布底部提示一次，点“按实际显示”即可还原&lt;/li&gt;&lt;li&gt;画布右键菜单新增“展开全部子节点”“折叠全部子节点”&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;属性面板&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;新增 Relation：依次列出 (VC *).view、持有该 VC 的实例变量、特殊关系（窗口层级、单元格位置、表格行列等）与持有节点的实例变量，相同关系合并并标出次数，持有者可点击定位&lt;/li&gt;&lt;li&gt;视图控制器的 children 每个子控制器一行，并附内存地址&lt;/li&gt;&lt;li&gt;约束行完整折行显示&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;大纲与编辑&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;支持 ⌘Z / ⇧⌘Z 撤销、重做对 App 的修改（属性编辑、隐藏 / 显示节点、手势开关、修改记录中的单条撤销），菜单标题显示下一步操作&lt;/li&gt;&lt;li&gt;点击节点时保持横向滚动位置；退出聚焦后回到聚焦前的滚动位置&lt;/li&gt;&lt;li&gt;修复折叠节点后偶现大量空白行&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;启动调试&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;iOS 安装包本机运行新增 iPad mini、iPad Air、iPad Pro 等竖屏与横屏尺寸，所选尺寸优先于 App 自己设置的窗口限制&lt;/li&gt;&lt;li&gt;同一个安装包再次启动时先结束上一次的实例；尺寸模式变化后清除 App 保存的窗口大小&lt;/li&gt;&lt;li&gt;修复设置中清理启动调试缓存时一直转圈&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;命令行与 AI 助手（MCP）&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;`lumen_get_node` 列出节点持有的图片与 Relation 信息，`lumen_screenshot` 新增 `image=&amp;lt;槽位&amp;gt;` 读取图片原图&lt;/li&gt;&lt;li&gt;层级 JSON 新增节点的屏幕坐标与所在屏幕；`lumen hierarchy` 新增 `--views-only`，`lumen_get_hierarchy` 新增 `views_only`，只输出视图&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;其他&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;调试菜单的“断开连接”新增快捷键 ⌘.&lt;/li&gt;&lt;li&gt;“用“预览”打开”的临时文件名只保留安全字符并核对写入目录&lt;/li&gt;&lt;/ul&gt;</description>
+        </item>
+        <item>
             <title>0.3.2</title>
             <pubDate>Mon, 23 Nov 2026 18:35:45 +0800</pubDate>
             <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.3.2</link>
