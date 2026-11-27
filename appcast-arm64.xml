@@ -6,6 +6,23 @@
         <description>Lumen release feed.</description>
         <language>en</language>
         <item>
+            <title>0.3.5</title>
+            <pubDate>Fri, 27 Nov 2026 15:22:44 +0800</pubDate>
+            <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.3.5</link>
+            <sparkle:version>10</sparkle:version>
+            <sparkle:shortVersionString>0.3.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/wangwanjie/Lumen/releases/download/v0.3.5/Lumen_v0.3.5_arm64.dmg" length="16554029" type="application/octet-stream" sparkle:edSignature="zP8XIhBLZsdF4MOPTpzTKOlMZkkNerbLBah+Hmsec5rCEJAtU8HZRxWG5bPr8egtvqlN74oKv8smX6WTtqbMCg==" />
+            <description>&lt;h2&gt;Lumen 0.3.5&lt;/h2&gt;
+&lt;h3&gt;画布&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;遮罩（layer.mask / UIView.mask）始终按 App 里的样子显示：底色为方块、靠圆形遮罩显示成圆盘的视图，以及 Lottie 用遮罩挖出形状的图层，不再受“显示被裁剪的内容”影响；该开关只控制 clipsToBounds、滚动视图可见区域之外的内容&lt;/li&gt;&lt;li&gt;圆角加 clipsToBounds 的容器把子节点裁成圆角（只圆部分角时下角保持直角，如底部弹层），“显示被裁剪的内容”开启时不裁&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;采集端（LumenServer / LumenLite）&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;节点新增可选的 `maskedCorners`（哪些角是圆角），完整采集端与 LumenLite 均导出&lt;/li&gt;&lt;li&gt;新增 LumenLite：线上版本可用的轻量导出库（iOS / Mac Catalyst，纯 Objective-C 静态库），把指定 UIWindow / UIViewController / UIView 导出为 .lumen 离线归档，支持截屏时自动导出；接入方式见官网与发布仓库 README&lt;/li&gt;&lt;li&gt;LumenLite 导出补全：节点遮罩（含逐像素形状）、Metal / 视频等只在屏幕合成结果里的内容（如 MTKView）从屏幕补画进单层纹理&lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;离线归档&lt;/h3&gt;
+&lt;ul&gt;&lt;li&gt;读取 .lumen 格式版本 2：JSON 分段压缩、相同纹理共用数据（Lumen.app 与命令行自己写出的仍是版本 1）&lt;/li&gt;&lt;/ul&gt;</description>
+        </item>
+        <item>
             <title>0.3.4</title>
             <pubDate>Tue, 24 Nov 2026 23:49:12 +0800</pubDate>
             <link>https://github.com/wangwanjie/Lumen/releases/tag/v0.3.4</link>
