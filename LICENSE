@@ -2,11 +2,12 @@ Lumen 软件许可协议
 
 Copyright (c) 2026 wangwanjie. 保留所有权利。
 
-本仓库发布的 Lumen.app、lumen 命令行工具与 LumenServer 二进制 SDK（以下统称“本软件”）以二进制形式免费提供，
+本仓库发布的 Lumen.app、lumen 命令行工具、LumenServer 二进制 SDK 与 LumenLite 二进制库（以下统称“本软件”）以二进制形式免费提供，
 著作权归 wangwanjie 所有。
 
 1. 授权：在遵守本协议的前提下，你可以免费下载、安装和使用本软件，并可在你自己的 App 的调试（Debug）构建中
-   集成 LumenServer 二进制 SDK，用于开发与调试。
+   集成 LumenServer 二进制 SDK，用于开发与调试；并可在你自己的 App 的任意构建（包括对外发布的版本）中
+   集成 LumenLite 二进制库，随你的 App 一起分发。
 2. 限制：未经著作权人书面许可，不得
    (a) 对本软件进行反编译、反汇编、逆向工程，或以其他方式尝试获取其源代码，适用法律明确允许的除外；
    (b) 修改本软件，或基于本软件制作衍生作品；
@@ -23,11 +24,13 @@ Lumen Software License
 
 Copyright (c) 2026 wangwanjie. All rights reserved.
 
-Lumen.app, the lumen command line tool and the LumenServer binary SDK published in this repository
+Lumen.app, the lumen command line tool, the LumenServer binary SDK and the LumenLite binary library published in this repository
 (the "Software") are provided free of charge in binary form only. All rights are owned by wangwanjie.
 
 1. Grant: subject to this license, you may download, install and use the Software free of charge, and
-   integrate the LumenServer binary SDK into Debug builds of your own apps for development and debugging.
+   integrate the LumenServer binary SDK into Debug builds of your own apps for development and debugging,
+   and integrate the LumenLite binary library into any build of your own apps (including public releases)
+   and distribute it as part of those apps.
 2. Restrictions: without prior written permission you may not
    (a) decompile, disassemble, reverse engineer or otherwise attempt to derive the source code of the
        Software, except to the extent expressly permitted by applicable law;

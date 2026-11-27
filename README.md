@@ -107,7 +107,7 @@ Xcode 中 File → Add Package Dependencies，输入 `https://github.com/wangwan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.4"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.5"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -147,7 +147,7 @@ SPM 无法按配置链接依赖，Release 构建也会链接 LumenServer，但 `
 ### 3. CocoaPods（仅 Debug 配置）
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.4/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.5/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 代码同上（Swift：`#if DEBUG` 中 `import LumenServer` 并调用 `LumenServer.start()`；Objective-C：`@import LumenServer;` 后 `[LumenServer start]`）。
@@ -204,6 +204,56 @@ $LUMEN identities      # 列出签名证书与开发描述文件
 注入库随 App 安装在 `/Applications/Lumen.app/Contents/Helpers/` 与 `Contents/Resources/`，`lumen` 会自动找到。受 SIP 保护的系统程序、经过 FairPlay 加密的 App Store 应用无法这样调试。自己的 App 推荐用前三种方式。
 
 启动被调试的 App 后打开 Lumen，它会自动发现本机的 App 并连接；同时运行多个 App 时在工具栏中切换。
+
+## 线上版本导出现场：LumenLite
+
+LumenLite 是可以放进线上（Release）版本的轻量导出库。调用时把指定 `UIWindow` / `UIViewController` / `UIView` 当前的界面现场导出为 Lumen 离线归档（`.lumen`），文件拉回本地后双击或拖进 Lumen.app，就能离线查看 3D 分层、层级树、节点属性、Auto Layout 约束和截图。适合线上用户反馈“某个界面显示不对”、却很难复现的场景。
+
+- **不影响 App 运行**：纯 ObjC 静态库，没有 `+load`、构造函数、方法交换，不修改宿主的 view / layer 树；不调用就不执行任何代码，对启动零影响。
+- **体积小**：arm64 链接进 App 后增量约 150 KB，只依赖 UIKit、QuartzCore、ImageIO 与系统库 libcompression。
+- **只在导出时工作**：采集与渲染在主线程（150 个节点的典型页面约 50 ms），PNG 编码与写盘在后台队列；一份典型页面的归档约 1 MB。
+- **隐私**：密码框文本一律掩码；`redactsText` 可把全部文本替换为掩码，`includesTextures = NO` 只导出层级与属性。
+- **支持范围**：iOS 12+（SPM 为 iOS 15+）与 Mac Catalyst 的 UIKit 界面，ObjC / Swift 均可；SwiftUI 宿主视图按普通 view 导出（能看到截图）。
+- **体积可控**：层级与详情压缩保存、相同纹理只存一份；`textureScale` 设置截图倍率（1 / 2 / 3 倍图），`maxTotalTexturePixels` 限制导出时的峰值内存。
+- **打开归档需要同版本或更新的 Lumen.app**（LumenLite 写出的是归档格式版本 2）。
+
+以预编译的静态 `LumenLite.xcframework` 发布（iOS 真机、模拟器、Mac Catalyst），不需要嵌入（Do Not Embed）。
+
+Swift Package Manager：添加 `https://github.com/wangwanjie/Lumen.git` 后把 `LumenLite` 产品加到 App target：
+
+```swift
+.product(name: "LumenLite", package: "Lumen"),
+```
+
+CocoaPods（所有配置，包括 Release）：
+
+```ruby
+pod 'LumenLite', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.5/LumenLite.podspec'
+```
+
+也可以从 [Releases](https://github.com/wangwanjie/Lumen/releases/latest) 下载 `LumenLite_v<版本>.xcframework.zip`，解压后拖进工程。
+
+```swift
+import LumenLite
+
+let options = LumenLite.Options()
+options.note = "反馈单 \(ticketID) · 路由 \(route)"   // 写进归档，Lumen.app 里可见
+
+// 导出当前最顶层的页面，主线程回调
+if let vc = LumenLite.topViewController {
+    LumenLite.export(viewController: vc, to: LumenLite.defaultDirectory, options: options) { result, error in
+        // result?.fileURL 即导出的 .lumen 文件
+    }
+}
+
+// 只对需要的用户开启：用户截屏时自动导出，目录里最多保留 10 份
+LumenLite.startAutoExportOnScreenshot(directory: LumenLite.defaultDirectory, target: .keyWindow,
+                                      options: options, maxFileCount: 10, handler: nil)
+```
+
+Objective-C：`#import <LumenLite/LumenLite.h>`（或 `@import LumenLite;`），入口为 `[LumenLite exportViewController:toDestination:options:completion:]`、`[LumenLite startAutoExportOnScreenshotToDirectory:...]`。默认目录是 `Library/Caches/LumenLite`，`LumenLite.exportedFiles(inDirectory:)` 列出已导出的文件，排查时随日志一起上传即可。
+
+与 Debug 用的 LumenServer 相比，LumenLite 没有实时连接、属性修改与方法调用、SwiftUI 逻辑节点；背景模糊、Metal、视频等内容在根节点的整体截图里仍能看到。
 
 ## 调试真机
 
@@ -375,4 +425,4 @@ Lumen 的全部功能免费开放。如果它帮到了你，欢迎通过微信�
 
 ## 许可
 
-Lumen.app、`lumen` 命令行工具与 LumenServer SDK 以二进制形式免费提供，可在自己 App 的 Debug 构建中集成 SDK；不得反编译、修改或单独再分发，详见 [LICENSE](LICENSE)。© 2026 wangwanjie，保留所有权利。
+Lumen.app、`lumen` 命令行工具、LumenServer SDK 与 LumenLite 以二进制形式免费提供，可在自己 App 的 Debug 构建中集成 LumenServer，在任意构建（含上架版本）中集成 LumenLite；不得反编译、修改或单独再分发，详见 [LICENSE](LICENSE)。© 2026 wangwanjie，保留所有权利。

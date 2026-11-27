@@ -2824,7 +2824,7 @@
         <li>macOS 14 及以上</li>
         <li>Apple 公证</li>
         <li>内置自动更新</li>
-        <li><a class="mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">v0.3.4</a></li>
+        <li><a class="mono" href="https://github.com/wangwanjie/Lumen/releases" target="_blank" rel="noopener">v0.3.5</a></li>
       </ul>
 
     </div>
@@ -3468,7 +3468,7 @@
           </div>
           <div class="tab-panel" role="tabpanel" id="panel-spm" aria-labelledby="tab-spm">
             <p>Xcode 中 File → Add Package Dependencies，输入 <code>https://github.com/wangwanjie/Lumen.git</code>，把 <code>LumenServer</code> 加到 App target；或写进 <code>Package.swift</code>：</p>
-            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.4"),
+            <div class="code"><div class="code-bar"><span>Package.swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>.package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.5"),
 <span class="c">// target 依赖</span>
 .product(name: "LumenServer", package: "Lumen"),</code></pre></div>
             <p>启动时调用：</p>
@@ -3492,7 +3492,7 @@ LumenServer.start()
           </div>
           <div class="tab-panel" role="tabpanel" id="panel-pods" aria-labelledby="tab-pods" hidden>
             <p>只在 Debug 配置中集成，启动代码与 SPM 相同：</p>
-            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.4/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
+            <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.5/LumenServer.podspec', :configurations => ['Debug']</code></pre></div>
             <div class="code"><div class="code-bar"><span>Swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>#if DEBUG
 import LumenServer
 LumenServer.start()   <span class="c">// Objective-C：@import LumenServer; [LumenServer start];</span>
@@ -3655,6 +3655,44 @@ lumen set 12 UIView.alpha 0.5                 <span class="c"># 运行时改属�
   </section>
 
   <!-- ================= 能力清单：紧凑两栏 ================= -->
+  <section class="section" id="lite" aria-labelledby="lite-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="lite-title">线上版本也能留下界面现场</h2>
+        <p>轻量导出库 <code>LumenLite</code> 可以进 Release 构建：调用时把当前界面导出为 <code>.lumen</code> 离线归档，拉回本地用 Lumen 打开，3D 分层、层级、属性、约束与截图都在。</p>
+      </div>
+      <div class="doc">
+        <aside class="doc-aside">
+          <h3>为线上设计</h3>
+          <p>纯 ObjC 静态库，没有 <code>+load</code>、构造函数和方法交换，不修改宿主的 view / layer 树；不调用就不执行任何代码，对启动零影响。</p>
+          <ul class="connect-list">
+            <li><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg><span><strong>约 150 KB</strong>arm64 链接进 App 后的增量，只依赖 UIKit、QuartzCore、ImageIO 与 libcompression</span></li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-mac"/></svg><span><strong>只在导出时工作</strong>典型页面主线程约 50 ms，编码与写盘在后台</span></li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span><strong>隐私可控</strong>密码框一律掩码，可选全部文本掩码、不导出纹理</span></li>
+          </ul>
+        </aside>
+        <div>
+          <p>iOS 12+（SPM 为 iOS 15+）与 Mac Catalyst 的 UIKit 界面。SPM 添加 <code>https://github.com/wangwanjie/Lumen.git</code> 后选 <code>LumenLite</code> 产品；CocoaPods 在所有配置中集成：</p>
+          <div class="code"><div class="code-bar"><span>Podfile</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>pod 'LumenLite', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.5/LumenLite.podspec'</code></pre></div>
+          <div class="code"><div class="code-bar"><span>Swift</span><button type="button" class="copy-btn"><svg class="cp" aria-hidden="true"><use href="#i-copy"/></svg><svg class="ok" aria-hidden="true"><use href="#i-check"/></svg><span>复制</span></button></div><pre><code>import LumenLite
+
+let options = LumenLite.Options()
+options.note = "反馈单 \(ticketID)"   <span class="c">// 写进归档，Lumen 中可见</span>
+if let vc = LumenLite.topViewController {
+    LumenLite.export(viewController: vc, to: LumenLite.defaultDirectory, options: options) { result, error in
+        <span class="c">// result?.fileURL 即导出的 .lumen 文件</span>
+    }
+}
+
+<span class="c">// 只对需要的用户开启：截屏时自动导出，最多保留 10 份</span>
+LumenLite.startAutoExportOnScreenshot(directory: LumenLite.defaultDirectory, target: .keyWindow,
+                                      options: options, maxFileCount: 10, handler: nil)</code></pre></div>
+          <p class="note">Objective-C：<code>#import &lt;LumenLite/LumenLite.h&gt;</code>，入口为 <code>[LumenLite exportViewController:toDestination:options:completion:]</code>。与 Debug 用的 LumenServer 相比，没有实时连接、属性修改与 SwiftUI 逻辑节点；模糊、Metal、视频等内容在整体截图里仍能看到。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="section" aria-labelledby="caps-title">
     <div class="wrap">
       <div class="section-head">

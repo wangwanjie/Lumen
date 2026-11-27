@@ -104,7 +104,7 @@ In Xcode choose File → Add Package Dependencies, enter `https://github.com/wan
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.4"),
+    .package(url: "https://github.com/wangwanjie/Lumen.git", from: "0.3.5"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [
@@ -144,7 +144,7 @@ SwiftPM links dependencies in every configuration, so Release builds still link 
 ### 3. CocoaPods (Debug only)
 
 ```ruby
-pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.4/LumenServer.podspec', :configurations => ['Debug']
+pod 'LumenServer', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.5/LumenServer.podspec', :configurations => ['Debug']
 ```
 
 The code is the same as above (Swift: `import LumenServer` and `LumenServer.start()` inside `#if DEBUG`; Objective-C: `@import LumenServer;` then `[LumenServer start]`).
@@ -201,6 +201,56 @@ $LUMEN identities      # signing certificates and development provisioning profi
 The injection libraries ship inside `/Applications/Lumen.app/Contents/Helpers/` and `Contents/Resources/`, and `lumen` finds them automatically. SIP-protected system apps and FairPlay-encrypted App Store apps cannot be debugged this way. For your own apps, prefer one of the first three options.
 
 Then open Lumen: it discovers apps on this Mac and connects automatically; switch between apps from the toolbar.
+
+## Capturing the UI in production: LumenLite
+
+LumenLite is a lightweight export library you can ship in Release builds. When called, it exports the current state of a `UIWindow` / `UIViewController` / `UIView` as a Lumen offline archive (`.lumen`); bring the file back and double-click it or drop it onto Lumen.app to inspect the 3D layers, hierarchy, node properties, Auto Layout constraints and screenshots offline. It is meant for "this screen looks wrong" reports from users that are hard to reproduce.
+
+- **Does not affect your app**: a pure Objective-C static library with no `+load`, no constructors and no method swizzling; it never modifies your view / layer tree, and runs no code until you call it, so launch time is unaffected.
+- **Small**: about 150 KB added to an arm64 app; depends only on UIKit, QuartzCore, ImageIO and the system libcompression.
+- **Works only when exporting**: capture and rendering run on the main thread (about 50 ms for a typical 150-node screen), PNG encoding and file writes on a background queue; a typical archive is about 1 MB.
+- **Privacy**: text in secure text fields is always masked; `redactsText` masks all text, and `includesTextures = NO` exports only the hierarchy and properties.
+- **Scope**: UIKit UI on iOS 12+ (iOS 15+ via SPM) and Mac Catalyst, from Objective-C or Swift; SwiftUI hosting views are exported as regular views (their screenshots are included).
+- **Size under control**: hierarchy and details are stored compressed and identical textures are stored once; `textureScale` sets the screenshot resolution (1x / 2x / 3x) and `maxTotalTexturePixels` caps peak memory during export.
+- **Open archives with the same or a newer Lumen.app** (LumenLite writes archive format version 2).
+
+It ships as a prebuilt static `LumenLite.xcframework` (iOS device, simulator, Mac Catalyst); choose Do Not Embed.
+
+Swift Package Manager: add `https://github.com/wangwanjie/Lumen.git` and add the `LumenLite` product to your app target:
+
+```swift
+.product(name: "LumenLite", package: "Lumen"),
+```
+
+CocoaPods (all configurations, including Release):
+
+```ruby
+pod 'LumenLite', :podspec => 'https://raw.githubusercontent.com/wangwanjie/Lumen/v0.3.5/LumenLite.podspec'
+```
+
+You can also download `LumenLite_v<version>.xcframework.zip` from [Releases](https://github.com/wangwanjie/Lumen/releases/latest), unzip it and drag it into your project.
+
+```swift
+import LumenLite
+
+let options = LumenLite.Options()
+options.note = "Ticket \(ticketID) · route \(route)"   // stored in the archive, shown in Lumen.app
+
+// Export the topmost screen; the completion runs on the main thread
+if let vc = LumenLite.topViewController {
+    LumenLite.export(viewController: vc, to: LumenLite.defaultDirectory, options: options) { result, error in
+        // result?.fileURL is the exported .lumen file
+    }
+}
+
+// Enable only for the users you need: export automatically when the user takes a screenshot, keeping at most 10 files
+LumenLite.startAutoExportOnScreenshot(directory: LumenLite.defaultDirectory, target: .keyWindow,
+                                      options: options, maxFileCount: 10, handler: nil)
+```
+
+Objective-C: `#import <LumenLite/LumenLite.h>` (or `@import LumenLite;`); the entry points are `[LumenLite exportViewController:toDestination:options:completion:]` and `[LumenLite startAutoExportOnScreenshotToDirectory:...]`. The default directory is `Library/Caches/LumenLite`; `LumenLite.exportedFiles(inDirectory:)` lists exported files, which you can upload together with your logs.
+
+Compared with the Debug-only LumenServer, LumenLite has no live connection, property editing, method calls or SwiftUI logical nodes; background blur, Metal and video content still appear in the root screenshot.
 
 ## Debugging on a device
 
@@ -370,4 +420,4 @@ Every Lumen feature is free. If it helps you, you can sponsor development with W
 
 ## License
 
-Lumen.app, the `lumen` CLI and the LumenServer SDK are free to use and distributed as binaries only; you may integrate the SDK into Debug builds of your own apps, but may not decompile, modify or redistribute it on its own. See [LICENSE](LICENSE). © 2026 wangwanjie. All rights reserved.
+Lumen.app, the `lumen` CLI, the LumenServer SDK and LumenLite are free to use and distributed as binaries only; you may integrate LumenServer into Debug builds of your own apps and LumenLite into any build (including App Store releases), but may not decompile, modify or redistribute it on its own. See [LICENSE](LICENSE). © 2026 wangwanjie. All rights reserved.
